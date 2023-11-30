@@ -1,0 +1,46 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Restaurant {
+  id                  Int                  @id @default(autoincrement())
+  name                String               @db.VarChar(255)
+  summary             String?
+  locations           Location[]
+  cuisines            Cuisine[]
+  restaurantInstances RestaurantInstance[]
+}
+
+model RestaurantInstance {
+  id           Int        @id @default(autoincrement())
+  address      String
+  rating       Float?
+  price        String
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  locationId   Int
+  location     Location   @relation(fields: [locationId], references: [id])
+}
+
+model Location {
+  id                  Int                  @id @default(autoincrement())
+  city                String
+  state               String?
+  country             String               @db.VarChar(100)
+  restaurants         Restaurant[]
+  restaurantinstances RestaurantInstance[]
+}
+
+model Cuisine {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(100)
+  restaurants Restaurant[]
+}
