@@ -24,18 +24,22 @@ export default function DashboardNav() {
 
         innerWidth2 = window.innerWidth;
 
-        console.log("sidenavInstance2:", sidenavInstance2);
-
-        if (window.innerWidth < sidenavInstance2.getBreakpoint("xl")) {
+        if (
+          sidenavInstance2 &&
+          window.innerWidth < sidenavInstance2.getBreakpoint("xl")
+        ) {
           sidenavInstance2.changeMode("over");
           sidenavInstance2.hide();
-        } else {
+        } else if (sidenavInstance2) {
           sidenavInstance2.changeMode("side");
           sidenavInstance2.show();
         }
       };
 
-      if (window.innerWidth < sidenavInstance2.getBreakpoint("sm")) {
+      if (
+        sidenavInstance2 &&
+        window.innerWidth < sidenavInstance2.getBreakpoint("sm")
+      ) {
         setMode2();
       }
 
