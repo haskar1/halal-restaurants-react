@@ -15,10 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} bg-slate-800 text-slate-100 container mx-auto p-4`}
-      >
-        {children}
+      <body className={`${inter.className} bg-slate-800 text-slate-100`}>
+        <div className="xl:absolute xl:left-60 px-12 pt-28 w-fit mx-auto">
+          {children}
+        </div>
+
+        <footer></footer>
       </body>
     </html>
   );
