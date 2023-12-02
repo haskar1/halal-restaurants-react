@@ -5,22 +5,10 @@ const restaurantInstances = await prisma.restaurantInstance.findMany({
   include: {
     restaurant: {
       include: {
-        cuisines: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        cuisines: {},
       },
     },
-    location: {
-      select: {
-        id: true,
-        city: true,
-        state: true,
-        country: true,
-      },
-    },
+    location: {},
   },
 });
 
@@ -28,17 +16,18 @@ export default function RestaurantInstanceList() {
   return (
     <>
       <h1 className="text-3xl pb-8">Restaurant Instance List</h1>
-      <ul className="grid gap-10 grid-cols-[repeat(auto-fit,minmax(20rem,1fr))]">
+      <ul className="flex flex-wrap gap-8">
         {restaurantInstances.length > 0 ? (
           restaurantInstances.map((restaurantInstance) => (
-            <Link
-              className="border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
-              href={`/dashboard/restaurant-instances/${encodeURIComponent(
-                restaurantInstance.id.toString()
-              )}`}
+            <li
               key={restaurantInstance.id}
+              className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
             >
-              <li>
+              <Link
+                href={`/dashboard/restaurant-instances/${encodeURIComponent(
+                  restaurantInstance.id.toString()
+                )}`}
+              >
                 <h2 className="text-2xl pb-6">
                   {restaurantInstance.restaurant.name}
                 </h2>
@@ -89,8 +78,8 @@ export default function RestaurantInstanceList() {
                 )}
 
                 <p>Address: {restaurantInstance.address}</p>
-              </li>
-            </Link>
+              </Link>
+            </li>
           ))
         ) : (
           <li>There are no restaurants.</li>

@@ -3,20 +3,8 @@ import prisma from "@/lib/prisma";
 
 const restaurants = await prisma.restaurant.findMany({
   include: {
-    cuisines: {
-      select: {
-        id: true,
-        name: true,
-      },
-    },
-    locations: {
-      select: {
-        id: true,
-        city: true,
-        state: true,
-        country: true,
-      },
-    },
+    cuisines: {},
+    locations: {},
   },
 });
 
@@ -24,17 +12,18 @@ export default function RestaurantList() {
   return (
     <>
       <h1 className="text-3xl pb-8">Restaurant List</h1>
-      <ul className="grid gap-10 grid-cols-[repeat(auto-fit,minmax(20rem,1fr))]">
+      <ul className="flex flex-wrap gap-8">
         {restaurants.length > 0 ? (
           restaurants.map((restaurant) => (
-            <Link
-              className="border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
-              href={`/dashboard/restaurants/${encodeURIComponent(
-                restaurant.id.toString()
-              )}`}
+            <li
               key={restaurant.id}
+              className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
             >
-              <li>
+              <Link
+                href={`/dashboard/restaurants/${encodeURIComponent(
+                  restaurant.id.toString()
+                )}`}
+              >
                 <h2 className="text-2xl pb-6">{restaurant.name}</h2>
 
                 {restaurant.cuisines.length > 1 ? (
@@ -86,8 +75,8 @@ export default function RestaurantList() {
                 )}
 
                 <p>Summary: {restaurant.summary}</p>
-              </li>
-            </Link>
+              </Link>
+            </li>
           ))
         ) : (
           <li>There are no restaurants.</li>

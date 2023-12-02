@@ -124,6 +124,6 @@ textarea:not([rows]) {
   }
 }
 
-ul li p + p {
+p + p {
   padding-top: 0.75rem;
 }

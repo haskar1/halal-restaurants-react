@@ -10,18 +10,17 @@ export default function CuisineList() {
       <ul>
         {cuisines.length > 0 ? (
           cuisines.map((cuisine) => (
-            <Link
-              href={`/dashboard/cuisines/${encodeURIComponent(
-                cuisine.id.toString()
-              )}`}
-              key={cuisine.id}
-            >
-              <li>
+            <li key={cuisine.id}>
+              <Link
+                href={`/dashboard/cuisines/${encodeURIComponent(
+                  cuisine.id.toString()
+                )}`}
+              >
                 <p>
                   <span>{cuisine.name}</span>
                 </p>
-              </li>
-            </Link>
+              </Link>
+            </li>
           ))
         ) : (
           <li>There are no cuisines.</li>

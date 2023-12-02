@@ -10,13 +10,12 @@ export default function LocationList() {
       <ul>
         {locations.length > 0 ? (
           locations.map((location) => (
-            <Link
-              href={`/dashboard/locations/${encodeURIComponent(
-                location.id.toString()
-              )}`}
-              key={location.id}
-            >
-              <li>
+            <li key={location.id}>
+              <Link
+                href={`/dashboard/locations/${encodeURIComponent(
+                  location.id.toString()
+                )}`}
+              >
                 <p>
                   <span>
                     {location.city + ", "}
@@ -24,8 +23,8 @@ export default function LocationList() {
                     {location.country}
                   </span>
                 </p>
-              </li>
-            </Link>
+              </Link>
+            </li>
           ))
         ) : (
           <li>There are no locations.</li>
