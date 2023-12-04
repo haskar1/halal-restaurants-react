@@ -1,16 +1,19 @@
-import { cache } from "react";
 import prisma from "@/lib/prisma";
 
-export const getRestaurant = cache(async (id: string) => {
+export async function getRestaurant({ params }: { params: { id: string } }) {
   const restaurant = await prisma.restaurant.findUnique({
     where: {
-      id: id,
+      id: params.id,
     },
     include: {
-      cuisines: true,
-      locations: true,
-      restaurantInstances: true,
+      cuisines: {},
+      restaurantInstances: {
+        include: {
+          location: {},
+        },
+      },
     },
   });
+
   return restaurant;
-});
+}

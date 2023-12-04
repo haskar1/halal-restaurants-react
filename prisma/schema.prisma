@@ -36,7 +36,7 @@ model Location {
   state               String?
   country             String               @db.VarChar(100)
   restaurants         Restaurant[]
-  restaurantinstances RestaurantInstance[]
+  restaurantInstances RestaurantInstance[]
 }
 
 model Cuisine {

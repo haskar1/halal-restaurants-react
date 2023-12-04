@@ -71,10 +71,10 @@ export default function RestaurantList() {
                     ))}
                   </p>
                 ) : (
-                  <p>None</p>
+                  <p>No locations yet</p>
                 )}
 
-                <p>Summary: {restaurant.summary}</p>
+                {restaurant.summary && <p>Summary: {restaurant.summary}</p>}
               </Link>
             </li>
           ))

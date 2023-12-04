@@ -1,42 +1,14 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+import { getRestaurant } from "@/utils/get-restaurant";
 
-async function getStaticPaths() {
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
   const restaurants = await prisma.restaurant.findMany();
-  const paths = restaurants.map((restaurant) => ({
-    params: { id: restaurant.id.toString() },
+  return restaurants.map((restaurant) => ({
+    id: restaurant.id.toString(),
   }));
-
-  return { paths, fallback: true };
-}
-
-async function getRestaurant({ params }: { params: { id: string } }) {
-  const restaurant = await prisma.restaurant.findUnique({
-    where: {
-      id: params.id,
-    },
-    include: {
-      cuisines: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      restaurantInstances: {
-        include: {
-          location: {
-            select: {
-              city: true,
-              state: true,
-              country: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  return restaurant;
 }
 
 export default async function RestaurantList({
@@ -75,7 +47,7 @@ export default async function RestaurantList({
           )}
 
           {/* Restaurant's Summary */}
-          <p>Summary: {restaurant.summary}</p>
+          {restaurant.summary && <p>Summary: {restaurant.summary}</p>}
 
           {/* Restaurant's Locations */}
           <h2 className="text-xl py-8">Locations</h2>
@@ -99,7 +71,9 @@ export default async function RestaurantList({
                     </p>
 
                     <p>Address: {restaurantInstance.address}</p>
-                    <p>Rating: {restaurantInstance.rating}</p>
+                    {restaurantInstance.rating && (
+                      <p>Rating: {restaurantInstance.rating}</p>
+                    )}
                     <p>Price: {restaurantInstance.price}</p>
                   </Link>
                 </li>
