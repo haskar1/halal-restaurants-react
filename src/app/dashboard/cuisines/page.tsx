@@ -1,4 +1,3 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 
 const cuisines = await prisma.cuisine.findMany();
@@ -11,7 +10,7 @@ export default function CuisineList() {
         {cuisines.length > 0 ? (
           cuisines.map((cuisine) => (
             <li key={cuisine.id}>
-              <Link
+              <a
                 href={`/dashboard/cuisines/${encodeURIComponent(
                   cuisine.id.toString()
                 )}`}
@@ -19,7 +18,7 @@ export default function CuisineList() {
                 <p>
                   <span>{cuisine.name}</span>
                 </p>
-              </Link>
+              </a>
             </li>
           ))
         ) : (
