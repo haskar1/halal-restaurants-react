@@ -1,19 +1,15 @@
-import prisma from "@/lib/prisma";
+import callAPI_GET from "@/utils/callAPI_GET";
+import { RestaurantInterface } from "@/lib/modelsInterfaces";
 
-const restaurants = await prisma.restaurant.findMany({
-  include: {
-    cuisines: {},
-    locations: {},
-  },
-});
+export default async function RestaurantList() {
+  const restaurants = await callAPI_GET("restaurants");
 
-export default function RestaurantList() {
   return (
     <>
       <h1 className="text-3xl pb-8">Restaurant List</h1>
       <ul className="flex flex-wrap gap-8">
         {restaurants.length > 0 ? (
-          restaurants.map((restaurant) => (
+          restaurants.map((restaurant: RestaurantInterface) => (
             <li
               key={restaurant.id}
               className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"

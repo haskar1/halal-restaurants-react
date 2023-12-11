@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import callAPI_GET from "@/utils/callAPI_GET";
-import { RestaurantInterface } from "@/lib/modelsInterfaces";
+import { CuisineInterface } from "@/lib/modelsInterfaces";
 
 export const dynamicParams = true;
 
@@ -16,7 +16,7 @@ export default async function CuisineList({
 }: {
   params: { id: string };
 }) {
-  const cuisine = await callAPI_GET(`cuisines/${params.id}`);
+  const cuisine: CuisineInterface = await callAPI_GET(`cuisines/${params.id}`);
 
   return (
     <>
@@ -27,7 +27,7 @@ export default async function CuisineList({
           {/* Restaurant's Locations */}
           {cuisine.restaurants.length > 0 ? (
             <ul className="flex flex-wrap gap-8">
-              {cuisine.restaurants.map((restaurant: RestaurantInterface) => (
+              {cuisine.restaurants.map((restaurant) => (
                 <li
                   key={restaurant.id}
                   className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
-import { getRestaurant } from "@/utils/get-restaurant";
+import callAPI_GET from "@/utils/callAPI_GET";
+import { RestaurantInterface } from "@/lib/modelsInterfaces";
 
 export const dynamicParams = true;
 
@@ -15,7 +16,9 @@ export default async function RestaurantList({
 }: {
   params: { id: string };
 }) {
-  const restaurant = await getRestaurant({ params });
+  const restaurant: RestaurantInterface = await callAPI_GET(
+    `restaurants/${params.id}`
+  );
 
   return (
     <>

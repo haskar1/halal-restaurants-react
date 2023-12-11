@@ -1,14 +1,15 @@
-import prisma from "@/lib/prisma";
+import callAPI_GET from "@/utils/callAPI_GET";
+import { LocationInterface } from "@/lib/modelsInterfaces";
 
-const locations = await prisma.location.findMany();
+export default async function LocationList() {
+  const locations = await callAPI_GET("locations");
 
-export default function LocationList() {
   return (
     <>
       <h1 className="text-3xl pb-8">Location List</h1>
       <ul>
         {locations.length > 0 ? (
-          locations.map((location) => (
+          locations.map((location: LocationInterface) => (
             <li key={location.id}>
               <a
                 href={`/dashboard/locations/${encodeURIComponent(

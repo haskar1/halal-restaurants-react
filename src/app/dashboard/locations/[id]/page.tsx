@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
-import { getLocation } from "@/utils/get-location";
+import callAPI_GET from "@/utils/callAPI_GET";
+import { LocationInterface } from "@/lib/modelsInterfaces";
 
 export const dynamicParams = true;
 
@@ -15,7 +16,9 @@ export default async function LocationList({
 }: {
   params: { id: string };
 }) {
-  const location = await getLocation({ params });
+  const location: LocationInterface = await callAPI_GET(
+    `locations/${params.id}`
+  );
 
   return (
     <>
