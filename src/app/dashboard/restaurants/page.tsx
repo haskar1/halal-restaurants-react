@@ -1,4 +1,3 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 
 const restaurants = await prisma.restaurant.findMany({
@@ -19,7 +18,7 @@ export default function RestaurantList() {
               key={restaurant.id}
               className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
             >
-              <Link
+              <a
                 href={`/dashboard/restaurants/${encodeURIComponent(
                   restaurant.id.toString()
                 )}`}
@@ -75,7 +74,7 @@ export default function RestaurantList() {
                 )}
 
                 {restaurant.summary && <p>Summary: {restaurant.summary}</p>}
-              </Link>
+              </a>
             </li>
           ))
         ) : (

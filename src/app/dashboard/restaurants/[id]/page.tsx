@@ -1,4 +1,3 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { getRestaurant } from "@/utils/get-restaurant";
 
@@ -58,7 +57,7 @@ export default async function RestaurantList({
                   key={restaurantInstance.id}
                   className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
                 >
-                  <Link
+                  <a
                     href={`/dashboard/restaurant-instances/${encodeURIComponent(
                       restaurantInstance.id.toString()
                     )}`}
@@ -75,7 +74,7 @@ export default async function RestaurantList({
                       <p>Rating: {restaurantInstance.rating}</p>
                     )}
                     <p>Price: {restaurantInstance.price}</p>
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

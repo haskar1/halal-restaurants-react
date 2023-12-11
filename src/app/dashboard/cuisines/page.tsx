@@ -1,14 +1,15 @@
-import prisma from "@/lib/prisma";
+import callAPI_GET from "@/utils/callAPI_GET";
+import { CuisineInterface } from "@/lib/modelsInterfaces";
 
-const cuisines = await prisma.cuisine.findMany();
+export default async function CuisineList() {
+  const cuisines = await callAPI_GET("cuisines");
 
-export default function CuisineList() {
   return (
     <>
       <h1 className="text-3xl pb-8">Cuisine List</h1>
       <ul>
         {cuisines.length > 0 ? (
-          cuisines.map((cuisine) => (
+          cuisines.map((cuisine: CuisineInterface) => (
             <li key={cuisine.id}>
               <a
                 href={`/dashboard/cuisines/${encodeURIComponent(

@@ -1,34 +1,34 @@
-export interface Restaurant {
+export interface RestaurantInterface {
   id: string;
   name: string;
   summary?: string;
-  locations: Location[];
-  cuisines: Cuisine[];
-  restaurantInstances: RestaurantInstance[];
+  locations: LocationInterface[];
+  cuisines: CuisineInterface[];
+  restaurantInstances: RestaurantInstanceInterface[];
 }
 
-export interface RestaurantInstance {
+export interface RestaurantInstanceInterface {
   id: string;
   address: string;
   rating?: number;
   price: string;
   restaurantId: string;
-  restaurant: Restaurant;
+  restaurant: RestaurantInterface;
   locationId: string;
-  location: Location;
+  location: LocationInterface;
 }
 
-export interface Location {
+export interface LocationInterface {
   id: string;
   city: string;
   state?: string;
   country: string;
-  restaurants: Restaurant[];
-  restaurantInstances: RestaurantInstance[];
+  restaurants: RestaurantInterface[];
+  restaurantInstances: RestaurantInstanceInterface[];
 }
 
-export interface Cuisine {
+export interface CuisineInterface {
   id: string;
   name: string;
-  restaurants: Restaurant[];
+  restaurants: RestaurantInterface[];
 }

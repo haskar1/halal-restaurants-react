@@ -1,4 +1,3 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { getRestaurantInstance } from "@/utils/get-restaurant-instance";
 

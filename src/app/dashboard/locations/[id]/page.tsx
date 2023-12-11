@@ -1,4 +1,3 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { getLocation } from "@/utils/get-location";
 
@@ -32,7 +31,7 @@ export default async function LocationList({
                   key={restaurantInstance.id}
                   className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
                 >
-                  <Link
+                  <a
                     href={`/dashboard/restaurant-instances/${encodeURIComponent(
                       restaurantInstance.id.toString()
                     )}`}
@@ -80,7 +79,7 @@ export default async function LocationList({
                     )}
 
                     <p>Address: {restaurantInstance.address}</p>
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

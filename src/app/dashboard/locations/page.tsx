@@ -1,4 +1,3 @@
-import Link from "next/link";
 import prisma from "@/lib/prisma";
 
 const locations = await prisma.location.findMany();
@@ -11,7 +10,7 @@ export default function LocationList() {
         {locations.length > 0 ? (
           locations.map((location) => (
             <li key={location.id}>
-              <Link
+              <a
                 href={`/dashboard/locations/${encodeURIComponent(
                   location.id.toString()
                 )}`}
@@ -23,7 +22,7 @@ export default function LocationList() {
                     {location.country}
                   </span>
                 </p>
-              </Link>
+              </a>
             </li>
           ))
         ) : (
