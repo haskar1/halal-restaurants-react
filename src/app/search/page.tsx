@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
-export default function Search() {
+export default function Map() {
   const Map = useMemo(
     () =>
       dynamic(() => import("@/components/Map"), {
