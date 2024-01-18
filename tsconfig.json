@@ -22,7 +22,8 @@
       "@/api/*": ["./src/app/api/*"],
       "@/components/*": ["./src/app/components/*"],
       "@/lib/*": ["./src/app/lib/*"],
-      "@/utils/*": ["./src/app/utils/*"]
+      "@/utils/*": ["./src/app/utils/*"],
+      "@react-leaflet/core": ["./node_modules/@react-leaflet/core"]
     }
   },
   "include": [

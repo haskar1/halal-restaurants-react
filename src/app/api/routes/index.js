@@ -1,8 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("../../../../node_modules/@prisma/client");
-
 const prisma = new PrismaClient();
+const db = require("../database");
+
+/* Search bar */
+router.get("/search", async (req, res) => {
+  try {
+    const query = req.query.s;
+    const result = await db.query(
+      `SELECT name FROM restaurants WHERE name ILIKE '${query}%' OR name ILIKE '% ${query}%' LIMIT 10`
+    );
+    res.send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 /* GET specific cuisine */
 router.get("/cuisines/:id", async (req, res, next) => {

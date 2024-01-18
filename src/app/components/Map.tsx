@@ -6,11 +6,17 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import { LocateControl } from "@/components/LocateControl";
-import { GeoSearchControl, OpenStreetMapProvider } from "leaflet-geosearch";
+import { GeoSearchControl, GoogleProvider } from "leaflet-geosearch";
 import "leaflet-geosearch/assets/css/leaflet.css";
 import "../stylesheets/leaflet-geosearch.css";
 import "leaflet-canvas-marker";
-// import L from "leaflet";
+import L from "leaflet";
+
+import { LeafletSearch } from "leaflet-search";
+import "leaflet-search/src/leaflet-search.css";
+
+//// The below two imports are used for Canvas with circles (to handle large data without lagging)..
+//// and Pixi (to make the circles stick to their location when zooming/panning the map without lagging)
 // import PixiOverlay from "react-leaflet-pixi-overlay";
 // import { renderToString } from "next/dist/compiled/react-dom/cjs/react-dom-server-legacy.browser.development";
 
@@ -94,7 +100,10 @@ export default function MyMap({ defaultPosition, zoom }) {
   */
 
   function SearchBar() {
-    const provider = new OpenStreetMapProvider();
+    // const provider = new OpenStreetMapProvider();
+    const provider = new GoogleProvider({
+      apiKey: "AIzaSyAXyo66CqitiiTSTuqc51Bbk4ASbnR0eVQ",
+    });
 
     // @ts-ignore
     const searchControl = new GeoSearchControl({

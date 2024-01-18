@@ -4,7 +4,7 @@ import { useMemo } from "react";
 export default function Map() {
   const Map = useMemo(
     () =>
-      dynamic(() => import("@/components/Map"), {
+      dynamic(() => import("@/components/Map-maplibre"), {
         loading: () => <p>A map is loading</p>,
         ssr: false,
       }),
@@ -13,7 +13,8 @@ export default function Map() {
 
   return (
     <div>
-      <Map defaultPosition={[51.505, -0.09]} zoom={13} />
+      {/* <Map defaultPosition={[51.505, -0.09]} zoom={13} /> */}
+      <Map />
     </div>
   );
 }
