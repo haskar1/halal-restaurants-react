@@ -7,8 +7,9 @@ import { createMapLibreGlMapController } from "@maptiler/geocoding-control/mapli
 import "@maptiler/geocoding-control/style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../stylesheets/map.css";
-import callAPI_GET from "@/utils/callAPI_GET";
-import axios from "axios";
+import { AsyncTypeahead, Menu, MenuItem } from "react-bootstrap-typeahead";
+import "react-bootstrap-typeahead/css/Typeahead.css";
+import "react-bootstrap-typeahead/css/Typeahead.bs5.css";
 
 const restaurants = [
   {
@@ -84,66 +85,116 @@ export default async function Map() {
     });
   }
 
-  function DatabaseSearchBar() {
-    const [databaseSearchBarText, setDatabaseSearchBarText] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
+  // function DatabaseSearchBar() {
+  //   const [databaseSearchBarText, setDatabaseSearchBarText] = useState("");
+  //   const [searchResults, setSearchResults] = useState([]);
 
-    async function handleSearchDatabase(e) {
-      setDatabaseSearchBarText(e.target.value);
+  //   async function handleSearchDatabase(e) {
+  //     setDatabaseSearchBarText(e.target.value);
 
-      if (e.target.value.trim() === "") return setSearchResults([]);
+  //     if (e.target.value.trim() === "") return setSearchResults([]);
 
-      const databaseSearchResponse = await callAPI_GET(
-        `search?s=${e.target.value}`
-      );
-      const results = databaseSearchResponse.rows;
+  //     try {
+  //       const databaseSearchResponse = await callAPI_GET(
+  //         `search?q=${e.target.value}`
+  //       );
+  //       const results = databaseSearchResponse.rows;
 
-      if (results.length > 0) {
-        let newResultsArr = results.map((result) => {
-          return result.name;
-        });
-        setSearchResults(newResultsArr);
-      } else {
-        setSearchResults([]);
-      }
-    }
+  //       if (results.length > 0) {
+  //         let newResultsArr = results.map((result) => {
+  //           return result.name;
+  //         });
+  //         setSearchResults(newResultsArr);
+  //         console.log(newResultsArr);
+  //       } else {
+  //         setSearchResults([]);
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
 
-    function ResultsList() {
-      return (
-        <div className="results-list">
-          <ul>
-            {searchResults.map((result) => {
-              return <li>{result}</li>;
-            })}
-          </ul>
-        </div>
-      );
-    }
+  //   function ResultsList() {
+  //     return (
+  //       <div className="results-list">
+  //         <ul>
+  //           {searchResults.map((result) => {
+  //             return <li>{result}</li>;
+  //           })}
+  //         </ul>
+  //       </div>
+  //     );
+  //   }
+
+  //   return (
+  //     <div className="absolute top-[50px] left-[10px] text-black">
+  //       <div className="data-searchbar">
+  //         <form onSubmit={(e) => e.preventDefault}>
+  //           <input
+  //             title="restaurant search bar"
+  //             type="text"
+  //             onChange={handleSearchDatabase}
+  //             value={databaseSearchBarText}
+  //           ></input>
+  //         </form>
+  //       </div>
+  //       {searchResults.length > 0 && <ResultsList />}
+  //     </div>
+  //   );
+  // }
+
+  function CustomTypehead() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [options, setOptions] = useState([]);
 
     return (
-      <div className="absolute top-[50px] left-[10px] text-black">
-        <div className="data-searchbar">
-          <form onSubmit={(e) => e.preventDefault}>
-            <input
-              title="restaurant search bar"
-              type="text"
-              onChange={handleSearchDatabase}
-              value={databaseSearchBarText}
-            ></input>
-          </form>
-        </div>
-        {searchResults.length > 0 && <ResultsList />}
-      </div>
+      <AsyncTypeahead
+        id="typehead-result-list"
+        className="text-black top-[100px] left-[10px]"
+        isLoading={isLoading}
+        labelKey={(option) => `${option.name}`}
+        onSearch={(query) => {
+          setIsLoading(true);
+          fetch(`http://localhost:9000/search?q=${query}`)
+            .then((resp) => resp.json())
+            .then((json) => {
+              setOptions(json.rows);
+              setIsLoading(false);
+            });
+        }}
+        options={options}
+        renderMenu={(results) => {
+          return (
+            <Menu id="typehead-menu">
+              {results.map((result, index) => (
+                <MenuItem
+                  key={result.name}
+                  onClick={() => {
+                    map.current.jumpTo({
+                      center: [result.longitude, result.latitude],
+                    });
+                  }}
+                  option={result}
+                  position={index}
+                >
+                  {result.name}
+                </MenuItem>
+              ))}
+            </Menu>
+          );
+        }}
+      />
     );
   }
 
   return (
     <div className="map-wrap">
+      <div ref={mapContainer} className="map" />
       <div className="geocoding">
         <GeocodingControl apiKey={API_KEY} mapController={mapController} />
       </div>
-      <div ref={mapContainer} className="map" />
-      <DatabaseSearchBar />
+      {/* <DatabaseSearchBar /> */}
+      <CustomTypehead />
     </div>
   );
 }

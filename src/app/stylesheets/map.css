@@ -24,3 +24,7 @@
   color: #000;
   font-size: 14px;
 }
+
+#typehead-menu {
+  display: grid !important;
+}

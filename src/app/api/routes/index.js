@@ -7,10 +7,11 @@ const db = require("../database");
 /* Search bar */
 router.get("/search", async (req, res) => {
   try {
-    const query = req.query.s;
-    const result = await db.query(
-      `SELECT name FROM restaurants WHERE name ILIKE '${query}%' OR name ILIKE '% ${query}%' LIMIT 10`
-    );
+    const query = req.query.q;
+    // const result = await db.query(
+    //   `SELECT name FROM restaurants WHERE name ILIKE '${query}%' OR name ILIKE '% ${query}%' LIMIT 10`
+    // );
+    const result = await db.query("SELECT * FROM restaurants");
     res.send(result);
   } catch (err) {
     console.error(err);
