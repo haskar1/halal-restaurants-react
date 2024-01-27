@@ -4,14 +4,52 @@ const { PrismaClient } = require("../../../../node_modules/@prisma/client");
 const prisma = new PrismaClient();
 const db = require("../database");
 
-/* Search bar */
 router.get("/search", async (req, res) => {
   try {
+    const bounds = JSON.parse(req.query.bounds); // Parse the viewport bounds from the request query
+
+    // Query the database to retrieve restaurants within the specified bounds
+    const query = `
+            SELECT id, name, address, address_url, latitude, longitude 
+            FROM restaurants 
+            WHERE ST_Within(location, ST_MakeEnvelope(${bounds._sw.lng}, ${bounds._sw.lat}, ${bounds._ne.lng}, ${bounds._ne.lat}, 4326))
+        `;
+
+    const result = await db.query(query);
+    const rows = result.rows;
+
+    // Convert data to GeoJSON format
+    const geoJsonData = {
+      type: "FeatureCollection",
+      features: rows.map((row) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)],
+        },
+        properties: {
+          id: row.id,
+          name: row.name,
+          address: row.address,
+          address_url: row.address_url,
+        },
+      })),
+    };
+
+    res.json(geoJsonData); // Send the GeoJSON data to the client
+  } catch (error) {
+    console.error("Error fetching restaurant data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Search bar
+router.get("/search/searchbar", async (req, res) => {
+  try {
     const query = req.query.q;
-    // const result = await db.query(
-    //   `SELECT name FROM restaurants WHERE name ILIKE '${query}%' OR name ILIKE '% ${query}%' LIMIT 10`
-    // );
-    const result = await db.query("SELECT * FROM restaurants");
+    const result = await db.query(
+      `SELECT * FROM restaurants WHERE name ILIKE '%${query}%' LIMIT 10`
+    );
     res.send(result);
   } catch (err) {
     console.error(err);

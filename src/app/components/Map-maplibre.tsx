@@ -11,26 +11,6 @@ import { AsyncTypeahead, Menu, MenuItem } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead.bs5.css";
 
-const restaurants = [
-  {
-    name: "Tasty Halal Food Truck",
-    address: "9825 Chapel Hill Rd, Morrisville, NC 27560",
-    googleMapURL: "https://maps.app.goo.gl/DhC1oDgq9sXiVpiYA",
-    latitude: 35.81042856924115,
-    longitude: -78.81729356031344,
-  },
-  {
-    name: "Jasmin & Olivz Mediterranean - Weston",
-    latitude: 35.814950299182506,
-    longitude: -78.82084290855754,
-  },
-  {
-    name: "Meat & Bite",
-    latitude: 35.78960191212204,
-    longitude: -78.6754356299833,
-  },
-];
-
 export default async function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -41,16 +21,179 @@ export default async function Map() {
   const [API_KEY] = useState("IoNQmmCT49OcLZzu6Xp6");
 
   useEffect(() => {
-    if (map.current) return; // stops map from intializing more than once
+    if (map.current) return; // stops map from initializing more than once
 
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${API_KEY}`,
       center: [lng, lat],
       zoom: zoom,
+      maxZoom: 17,
+      minZoom: 5,
     });
 
-    restaurantMarkers(restaurants);
+    map.current.on("load", () => {
+      // Add an image to use as a custom marker
+      map.current.loadImage(
+        "https://maplibre.org/maplibre-gl-js/docs/assets/custom_marker.png",
+
+        (error, image) => {
+          if (error) throw error;
+          map.current.addImage("custom-marker", image);
+
+          const bounds = map.current.getBounds();
+          const data = fetch(
+            `http://localhost:9000/search?bounds=${JSON.stringify(bounds)}`
+          )
+            .then((res) => {
+              return res.json();
+            })
+            .then((json) => {
+              return json;
+            })
+            .catch((error) => {
+              console.error(
+                "Error fetching restaurant data in new bounds:",
+                error
+              );
+            });
+
+          map.current.addSource("restaurants", {
+            type: "geojson",
+            data: data,
+            cluster: true,
+            clusterMaxZoom: 10, // Max zoom to cluster points on
+            clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
+          });
+
+          map.current.addLayer({
+            id: "clusters",
+            type: "circle",
+            source: "restaurants",
+            filter: ["has", "point_count"],
+            paint: {
+              // Use step expressions (https://docs.mapbox.com/style-spec/reference/expressions/#step)
+              // with three steps to implement three types of circles:
+              //   * Blue, 20px circles when point count is less than 100
+              //   * Yellow, 30px circles when point count is between 100 and 750
+              //   * Pink, 40px circles when point count is greater than or equal to 750
+              "circle-color": [
+                "step",
+                ["get", "point_count"],
+                "#51bbd6",
+                100,
+                "#f1f075",
+                750,
+                "#f28cb1",
+              ],
+              "circle-radius": [
+                "step",
+                ["get", "point_count"],
+                20,
+                100,
+                30,
+                750,
+                40,
+              ],
+            },
+          });
+
+          map.current.addLayer({
+            id: "cluster-count",
+            type: "symbol",
+            source: "restaurants",
+            filter: ["has", "point_count"],
+            layout: {
+              "text-field": ["get", "point_count_abbreviated"],
+              "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+              "text-size": 12,
+            },
+          });
+
+          // Add a symbol layer
+          map.current.addLayer({
+            id: "restaurants",
+            type: "symbol",
+            source: "restaurants",
+            filter: ["!", ["has", "point_count"]],
+            layout: {
+              "icon-image": "custom-marker",
+              "icon-allow-overlap": true,
+            },
+          });
+
+          // Zoom into a cluster on click
+          map.current.on("click", "clusters", (e) => {
+            const features = map.current.queryRenderedFeatures(e.point, {
+              layers: ["clusters"],
+            });
+            const clusterId = features[0].properties.cluster_id;
+            map.current
+              .getSource("restaurants")
+              .getClusterExpansionZoom(clusterId, (err, zoom) => {
+                if (err) return;
+
+                map.current.easeTo({
+                  center: features[0].geometry.coordinates,
+                  zoom: zoom,
+                });
+              });
+          });
+
+          // When a click event occurs on a feature in the unclustered-restaurant layer, open a popup at
+          // the location of the feature, with description HTML from its properties.
+          map.current.on("click", "restaurants", (e) => {
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const name = e.features[0].properties.name;
+            const address = e.features[0].properties.address;
+            const address_url = e.features[0].properties.address_url;
+
+            map.current.easeTo({ center: coordinates });
+
+            new maplibregl.Popup()
+              .setLngLat(coordinates)
+              .setHTML(
+                `${name}<br><a href="${address_url}" target="_blank">Address: ${address}</a>`
+              )
+              .addTo(map.current);
+          });
+
+          map.current.on("mouseenter", "clusters", () => {
+            map.current.getCanvas().style.cursor = "pointer";
+          });
+          map.current.on("mouseleave", "clusters", () => {
+            map.current.getCanvas().style.cursor = "";
+          });
+
+          map.current.on("mouseenter", "restaurants", () => {
+            map.current.getCanvas().style.cursor = "pointer";
+          });
+          map.current.on("mouseleave", "restaurants", () => {
+            map.current.getCanvas().style.cursor = "";
+          });
+        }
+      );
+    });
+
+    // Add event listener for moving the map
+    map.current.on("moveend", () => {
+      if (!map.current.getSource("restaurants")) return; // Map hasn't been initialized yet
+
+      // Get the current viewport bounds
+      const bounds = map.current.getBounds();
+
+      // Fetch restaurant data dynamically based on the current viewport
+      fetch(`http://localhost:9000/search?bounds=${JSON.stringify(bounds)}`)
+        .then((res) => {
+          return res.json();
+        })
+        .then((json) => {
+          map.current.getSource("restaurants").setData(json);
+        })
+        .catch((error) => {
+          console.error("Error fetching restaurant data:", error);
+        });
+    });
 
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
@@ -66,125 +209,79 @@ export default async function Map() {
     setMapController(createMapLibreGlMapController(map.current, maplibregl));
   }, [API_KEY, lng, lat, zoom]);
 
-  function restaurantMarkers(restaurants) {
-    return restaurants.map((restaurant) => {
-      new maplibregl.Marker({ color: "#FF0000" })
-        .setLngLat([restaurant.longitude, restaurant.latitude])
-        .setPopup(
-          new maplibregl.Popup({ closeButton: false }).setHTML(
-            `<h2>${restaurant.name}</h2>
-             ${
-               restaurant.address && restaurant.googleMapURL
-                 ? `<a href=${restaurant.googleMapURL} target="_blank">${restaurant.address}</a>`
-                 : ""
-             }
-            `
-          )
-        )
-        .addTo(map.current);
-    });
-  }
-
-  // function DatabaseSearchBar() {
-  //   const [databaseSearchBarText, setDatabaseSearchBarText] = useState("");
-  //   const [searchResults, setSearchResults] = useState([]);
-
-  //   async function handleSearchDatabase(e) {
-  //     setDatabaseSearchBarText(e.target.value);
-
-  //     if (e.target.value.trim() === "") return setSearchResults([]);
-
-  //     try {
-  //       const databaseSearchResponse = await callAPI_GET(
-  //         `search?q=${e.target.value}`
-  //       );
-  //       const results = databaseSearchResponse.rows;
-
-  //       if (results.length > 0) {
-  //         let newResultsArr = results.map((result) => {
-  //           return result.name;
-  //         });
-  //         setSearchResults(newResultsArr);
-  //         console.log(newResultsArr);
-  //       } else {
-  //         setSearchResults([]);
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-
-  //   function ResultsList() {
-  //     return (
-  //       <div className="results-list">
-  //         <ul>
-  //           {searchResults.map((result) => {
-  //             return <li>{result}</li>;
-  //           })}
-  //         </ul>
-  //       </div>
-  //     );
-  //   }
-
-  //   return (
-  //     <div className="absolute top-[50px] left-[10px] text-black">
-  //       <div className="data-searchbar">
-  //         <form onSubmit={(e) => e.preventDefault}>
-  //           <input
-  //             title="restaurant search bar"
-  //             type="text"
-  //             onChange={handleSearchDatabase}
-  //             value={databaseSearchBarText}
-  //           ></input>
-  //         </form>
-  //       </div>
-  //       {searchResults.length > 0 && <ResultsList />}
-  //     </div>
-  //   );
-  // }
-
+  // Searchbar that searches restaurants in the database
   function CustomTypehead() {
     const [isLoading, setIsLoading] = useState(false);
     const [options, setOptions] = useState([]);
 
     return (
-      <AsyncTypeahead
-        id="typehead-result-list"
-        className="text-black top-[100px] left-[10px]"
-        isLoading={isLoading}
-        labelKey={(option) => `${option.name}`}
-        onSearch={(query) => {
-          setIsLoading(true);
-          fetch(`http://localhost:9000/search?q=${query}`)
-            .then((resp) => resp.json())
-            .then((json) => {
-              setOptions(json.rows);
-              setIsLoading(false);
-            });
-        }}
-        options={options}
-        renderMenu={(results) => {
-          return (
-            <Menu id="typehead-menu">
-              {results.map((result, index) => (
-                <MenuItem
-                  key={result.name}
-                  onClick={() => {
-                    map.current.jumpTo({
-                      center: [result.longitude, result.latitude],
-                    });
-                  }}
-                  option={result}
-                  position={index}
-                >
-                  {result.name}
-                </MenuItem>
-              ))}
-            </Menu>
-          );
-        }}
-      />
+      <div className="container">
+        <AsyncTypeahead
+          id="typehead-result-list"
+          className="text-black top-[100px] left-[10px]"
+          isLoading={isLoading}
+          labelKey={(option) => `${option.name}`}
+          onSearch={(query) => {
+            setIsLoading(true);
+            fetch(`http://localhost:9000/search/searchbar?q=${query}`)
+              .then((resp) => resp.json())
+              .then((json) => {
+                setOptions(json.rows);
+                setIsLoading(false);
+              })
+              .catch((error) => {
+                console.error(
+                  "Error fetching restaurant data from searchbar:",
+                  error
+                );
+              });
+          }}
+          options={options}
+          onChange={(selected) => {
+            selected.length > 0 && showPopupOnSearch(selected[0]);
+          }}
+          renderMenu={(results) => {
+            return (
+              <Menu id="typehead-menu">
+                {results.map((result, index) => (
+                  <MenuItem
+                    key={index}
+                    option={result}
+                    position={index}
+                    onClick={() => {
+                      showPopupOnSearch(result);
+                    }}
+                  >
+                    {result.name}
+                  </MenuItem>
+                ))}
+              </Menu>
+            );
+          }}
+        />
+      </div>
     );
+  }
+
+  function showPopupOnSearch(restaurant) {
+    const coordinates = [restaurant.longitude, restaurant.latitude];
+    const name = restaurant.name;
+    const address = restaurant.address;
+    const address_url = restaurant.address_url;
+    const popups = document.getElementsByClassName("maplibregl-popup");
+
+    if (popups.length) {
+      [...popups].map((popup) => popup.remove());
+    }
+
+    map.current.easeTo({ center: coordinates, zoom: zoom });
+
+    new maplibregl.Popup()
+      .setLngLat(coordinates)
+      .setHTML(
+        `${name}<br><a href="${address_url}" target="_blank">Address: ${address}</a>`
+      )
+      .addTo(map.current);
   }
 
   return (
@@ -193,7 +290,6 @@ export default async function Map() {
       <div className="geocoding">
         <GeocodingControl apiKey={API_KEY} mapController={mapController} />
       </div>
-      {/* <DatabaseSearchBar /> */}
       <CustomTypehead />
     </div>
   );

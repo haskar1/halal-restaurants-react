@@ -13,7 +13,6 @@ export default function Map() {
 
   return (
     <div>
-      {/* <Map defaultPosition={[51.505, -0.09]} zoom={13} /> */}
       <Map />
     </div>
   );
