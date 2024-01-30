@@ -32,6 +32,8 @@ router.get("/search", async (req, res) => {
           name: row.name,
           address: row.address,
           address_url: row.address_url,
+          latitude: row.latitude,
+          longitude: row.longitude,
         },
       })),
     };

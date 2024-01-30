@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import maplibregl from "maplibre-gl";
 import { GeocodingControl } from "@maptiler/geocoding-control/react";
 import { createMapLibreGlMapController } from "@maptiler/geocoding-control/maplibregl-controller";
@@ -15,10 +15,11 @@ export default async function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [mapController, setMapController] = useState();
-  const [lng] = useState(-78.78171007890153);
-  const [lat] = useState(35.79141875623884);
+  const [lng] = useState(-78.81729);
+  const [lat] = useState(35.81043);
   const [zoom] = useState(14);
   const [API_KEY] = useState("IoNQmmCT49OcLZzu6Xp6");
+  // const [initialRestaurants, setInitialRestaurants] = useState({});
 
   useEffect(() => {
     if (map.current) return; // stops map from initializing more than once
@@ -41,26 +42,17 @@ export default async function Map() {
           if (error) throw error;
           map.current.addImage("custom-marker", image);
 
-          const bounds = map.current.getBounds();
-          const data = fetch(
-            `http://localhost:9000/search?bounds=${JSON.stringify(bounds)}`
-          )
-            .then((res) => {
-              return res.json();
-            })
-            .then((json) => {
-              return json;
-            })
-            .catch((error) => {
-              console.error(
-                "Error fetching restaurant data in new bounds:",
-                error
-              );
-            });
+          // const bounds = map.current.getBounds();
+          // fetch(`http://localhost:9000/search?bounds=${JSON.stringify(bounds)}`)
+          //   .then((res) => {
+          //     return res.json();
+          //   })
+          //   .then((json) => {
+          // setInitialRestaurants(json);
 
           map.current.addSource("restaurants", {
             type: "geojson",
-            data: data,
+            data: {},
             cluster: true,
             clusterMaxZoom: 10, // Max zoom to cluster points on
             clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
@@ -121,6 +113,13 @@ export default async function Map() {
               "icon-allow-overlap": true,
             },
           });
+          // })
+          // .catch((error) => {
+          //   console.error(
+          //     "Error fetching restaurant data in new bounds:",
+          //     error
+          //   );
+          // });
 
           // Zoom into a cluster on click
           map.current.on("click", "clusters", (e) => {
@@ -175,26 +174,6 @@ export default async function Map() {
       );
     });
 
-    // Add event listener for moving the map
-    map.current.on("moveend", () => {
-      if (!map.current.getSource("restaurants")) return; // Map hasn't been initialized yet
-
-      // Get the current viewport bounds
-      const bounds = map.current.getBounds();
-
-      // Fetch restaurant data dynamically based on the current viewport
-      fetch(`http://localhost:9000/search?bounds=${JSON.stringify(bounds)}`)
-        .then((res) => {
-          return res.json();
-        })
-        .then((json) => {
-          map.current.getSource("restaurants").setData(json);
-        })
-        .catch((error) => {
-          console.error("Error fetching restaurant data:", error);
-        });
-    });
-
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
     map.current.addControl(
@@ -209,7 +188,7 @@ export default async function Map() {
     setMapController(createMapLibreGlMapController(map.current, maplibregl));
   }, [API_KEY, lng, lat, zoom]);
 
-  // Searchbar that searches restaurants in the database
+  // Searchbar that searches the database for restaurants
   function CustomTypehead() {
     const [isLoading, setIsLoading] = useState(false);
     const [options, setOptions] = useState([]);
@@ -218,7 +197,6 @@ export default async function Map() {
       <div className="container">
         <AsyncTypeahead
           id="typehead-result-list"
-          className="text-black top-[100px] left-[10px]"
           isLoading={isLoading}
           labelKey={(option) => `${option.name}`}
           onSearch={(query) => {
@@ -263,6 +241,107 @@ export default async function Map() {
     );
   }
 
+  function SearchResultsList() {
+    const [searchResults, setSearchResults] = useState({});
+
+    useEffect(() => {
+      if (!map.current) return;
+
+      map.current.on("load", () => {
+        // setSearchResults(initialRestaurants);
+
+        const initialBounds = map.current.getBounds();
+        fetch(
+          `http://localhost:9000/search?bounds=${JSON.stringify(initialBounds)}`
+        )
+          .then((res) => {
+            return res.json();
+          })
+          .then((json) => {
+            map.current.getSource("restaurants").setData(json);
+            setSearchResults(json);
+          })
+          .catch((error) => {
+            console.error("Error fetching restaurant data:", error);
+          });
+      });
+
+      // Add event listener for moving the map
+      map.current.on("moveend", () => {
+        // Map hasn't been initialized yet
+        if (!map.current.getSource("restaurants")) return;
+
+        // Get the current viewport bounds
+        const bounds = map.current.getBounds();
+
+        // Fetch restaurant data dynamically based on the current viewport
+        fetch(`http://localhost:9000/search?bounds=${JSON.stringify(bounds)}`)
+          .then((res) => {
+            return res.json();
+          })
+          .then((json) => {
+            map.current.getSource("restaurants").setData(json);
+            setSearchResults(json);
+          })
+          .catch((error) => {
+            console.error("Error fetching restaurant data:", error);
+          });
+      });
+    }, [API_KEY, lng, lat, zoom]);
+
+    return (
+      <div className="sidebar">
+        <div className="heading bg-slate-800">
+          {/* <h1>Our locations</h1> */}
+        </div>
+        <div id="listings" className="listings">
+          {searchResults.features &&
+            searchResults.features.map((restaurant) => (
+              <div
+                key={restaurant.properties.id}
+                id={restaurant.properties.id}
+                className="item"
+              >
+                <a
+                  href="#"
+                  onClick={() => {
+                    searchResults.features.map((restaurantOnMap) => {
+                      if (
+                        restaurantOnMap.properties.id ===
+                        restaurant.properties.id
+                      ) {
+                        flyToStore(restaurant);
+                        showPopupOnSearch(restaurant.properties);
+                      }
+                    });
+                  }}
+                >
+                  <span className="text-[#003089]">
+                    {restaurant.properties.name}
+                  </span>
+                  <span>{restaurant.properties.address}</span>
+                  {restaurant.properties.distance && (
+                    <div>
+                      <strong>${restaurant.properties.distance}</strong>
+                    </div>
+                  )}
+                </a>
+              </div>
+            ))}
+        </div>
+      </div>
+    );
+  }
+
+  function flyToStore(currentFeature) {
+    map.current.easeTo({
+      center: currentFeature.geometry.coordinates,
+      zoom: 15,
+    });
+
+    console.log("flew to restaurant");
+  }
+
   function showPopupOnSearch(restaurant) {
     const coordinates = [restaurant.longitude, restaurant.latitude];
     const name = restaurant.name;
@@ -291,6 +370,7 @@ export default async function Map() {
         <GeocodingControl apiKey={API_KEY} mapController={mapController} />
       </div>
       <CustomTypehead />
+      <SearchResultsList />
     </div>
   );
 }
