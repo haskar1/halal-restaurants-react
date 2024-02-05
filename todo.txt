@@ -1,0 +1,5 @@
+allow zooming while mouse hovered over popup
+
+display distance to each restaurant in sidebar
+
+sort search results by distance
