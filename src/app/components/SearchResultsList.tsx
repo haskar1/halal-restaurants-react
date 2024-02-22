@@ -8,6 +8,7 @@ export default function SearchResultsList({
   setIsActive,
   clickedOnRestaurant,
   showPopup,
+  showDistance,
 }) {
   const [searchResults, setSearchResults] = useState({});
 
@@ -26,10 +27,13 @@ export default function SearchResultsList({
             }
 
             const initialBounds = map.current.getBounds();
+            const center = map.current.getCenter();
+
             fetch(
               `http://localhost:9000/search?bounds=${JSON.stringify(
                 initialBounds
-              )}`
+              )}&lat=${center.lat}&lon=${center.lng}
+              `
             )
               .then((res) => {
                 return res.json();
@@ -208,14 +212,19 @@ export default function SearchResultsList({
                   // });
                 });
 
+                map.current.on("movestart", () => {
+                  showDistance.current = false;
+                });
+
                 map.current.on("moveend", () => {
                   const bounds = map.current.getBounds();
+                  const center = map.current.getCenter();
 
                   // Fetch restaurants dynamically based on the current viewport
                   fetch(
                     `http://localhost:9000/search?bounds=${JSON.stringify(
                       bounds
-                    )}`
+                    )}&lat=${center.lat}&lon=${center.lng}`
                   )
                     .then((res) => {
                       return res.json();
@@ -278,9 +287,9 @@ export default function SearchResultsList({
                   {restaurant.properties.name}
                 </span>
                 <span>{restaurant.properties.address}</span>
-                {restaurant.properties.distance && (
+                {showDistance.current && (
                   <span>
-                    <strong>${restaurant.properties.distance}</strong>
+                    <strong>{restaurant.properties.distance} miles</strong>
                   </span>
                 )}
               </a>

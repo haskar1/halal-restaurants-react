@@ -148,6 +148,7 @@ a:hover {
 .maplibregl-popup {
   color: #000;
   font-size: 14px;
+  padding-bottom: 30px;
 }
 
 /*** RESTAURANT SEARCH BAR ***/

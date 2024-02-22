@@ -7,12 +7,15 @@ const db = require("../database");
 router.get("/search", async (req, res) => {
   try {
     const bounds = JSON.parse(req.query.bounds); // Parse the viewport bounds from the request query
+    const lat = req.query.lat;
+    const lon = req.query.lon;
 
     // Query the database to retrieve restaurants within the specified bounds
     const query = `
-            SELECT id, name, address, address_url, latitude, longitude 
+            SELECT id, name, address, address_url, latitude, longitude, ROUND((ST_DistanceSphere(ST_MakePoint(${lon}, ${lat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
             FROM restaurants 
             WHERE ST_Within(location, ST_MakeEnvelope(${bounds._sw.lng}, ${bounds._sw.lat}, ${bounds._ne.lng}, ${bounds._ne.lat}, 4326))
+            ORDER BY distance
         `;
 
     const result = await db.query(query);
@@ -34,6 +37,7 @@ router.get("/search", async (req, res) => {
           address_url: row.address_url,
           latitude: row.latitude,
           longitude: row.longitude,
+          distance: row.distance,
         },
       })),
     };

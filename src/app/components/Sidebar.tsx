@@ -3,7 +3,7 @@ import CustomTypehead from "./CustomTypehead";
 import SearchResultsList from "./SearchResultsList";
 import maplibregl from "maplibre-gl";
 
-export default function Sidebar({ map, isMapLoaded, zoom }) {
+export default function Sidebar({ map, isMapLoaded, zoom, showDistance }) {
   const [isActive, setIsActive] = useState("");
   const clickedOnRestaurant = useRef(false);
 
@@ -57,6 +57,7 @@ export default function Sidebar({ map, isMapLoaded, zoom }) {
         setIsActive={setIsActive}
         clickedOnRestaurant={clickedOnRestaurant}
         showPopup={showPopup}
+        showDistance={showDistance}
       />
     </>
   );
