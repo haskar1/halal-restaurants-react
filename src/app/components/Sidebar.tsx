@@ -2,9 +2,24 @@ import { useRef, useState } from "react";
 import CustomTypehead from "./CustomTypehead";
 import SearchResultsList from "./SearchResultsList";
 import maplibregl from "maplibre-gl";
+import SearchResultsFilters from "./SearchResultsFilters";
 
-export default function Sidebar({ map, isMapLoaded, zoom, showDistance }) {
-  const [isActive, setIsActive] = useState("");
+export default function Sidebar({
+  map,
+  isMapLoaded,
+  lat,
+  lon,
+  zoom,
+  showDistance,
+  setShowDistance,
+  showDistanceBtnIsDisabled,
+  showSearchButton,
+  setShowSearchButton,
+  searchResults,
+  setSearchResults,
+  isActive,
+  setIsActive,
+}) {
   const clickedOnRestaurant = useRef(false);
 
   function showPopup(restaurant) {
@@ -48,17 +63,35 @@ export default function Sidebar({ map, isMapLoaded, zoom, showDistance }) {
   }
 
   return (
-    <>
-      <CustomTypehead showPopup={showPopup} />
+    <div className="sidebar">
+      <CustomTypehead
+        map={map}
+        lat={lat}
+        lon={lon}
+        showPopup={showPopup}
+        setSearchResults={setSearchResults}
+        isMapLoaded={isMapLoaded}
+      />
+      <SearchResultsFilters
+        showDistance={showDistance}
+        setShowDistance={setShowDistance}
+        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+      />
       <SearchResultsList
         map={map}
         isMapLoaded={isMapLoaded}
+        lat={lat}
+        lon={lon}
         isActive={isActive}
         setIsActive={setIsActive}
         clickedOnRestaurant={clickedOnRestaurant}
         showPopup={showPopup}
         showDistance={showDistance}
+        showSearchButton={showSearchButton}
+        setShowSearchButton={setShowSearchButton}
+        searchResults={searchResults}
+        setSearchResults={setSearchResults}
       />
-    </>
+    </div>
   );
 }

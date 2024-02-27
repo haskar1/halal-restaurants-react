@@ -13,12 +13,17 @@ export default function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [mapController, setMapController] = useState();
-  const [lon] = useState(-78.81729);
-  const [lat] = useState(35.81043);
+  const [lon, setLon] = useState(-78.81729);
+  const [lat, setLat] = useState(35.81043);
   const [zoom] = useState(14);
   const [API_KEY] = useState("IoNQmmCT49OcLZzu6Xp6");
+  const [showDistance, setShowDistance] = useState(false);
+  const [showDistanceBtnIsDisabled, setShowDistanceBtnIsDisabled] =
+    useState(true);
+  const [showSearchButton, setShowSearchButton] = useState(false);
+  const [searchResults, setSearchResults] = useState({});
+  const [isActive, setIsActive] = useState("");
   const isMapLoaded = useRef(false);
-  const showDistance = useRef(false);
 
   useEffect(() => {
     if (map.current) return; // stops map from initializing more than once
@@ -39,56 +44,123 @@ export default function Map() {
         enableHighAccuracy: true,
       },
       trackUserLocation: true,
+      fitBoundsOptions: { maxZoom: 14, animate: false },
+      showAccuracyCircle: false,
     });
 
     map.current.addControl(geolocate);
 
-    geolocate.on("geolocate", () => {
-      if (showDistance.current === false) {
-        showDistance.current = true;
+    geolocate.once("geolocate", (e) => {
+      console.log("geolocate fired");
+      const lat = e.coords.latitude;
+      const lon = e.coords.longitude;
+      setLat(lat);
+      setLon(lon);
+      fetchStores(lat, lon);
+
+      if (!showDistance) {
+        setShowDistance(true);
+        setShowDistanceBtnIsDisabled(false);
       }
     });
 
-    geolocate.on("trackuserlocationstart", () => {
-      if (showDistance.current === false) {
-        showDistance.current = true;
-      }
+    map.current.on("load", () => {
+      geolocate.trigger();
     });
 
     isMapLoaded.current = true;
     setMapController(
       createMapLibreGlMapController(map.current, maplibregl, false)
     );
-  }, [API_KEY, lon, lat, zoom]);
+  }, []);
+
+  function fetchStores(currentLat, currentLon) {
+    if (isActive !== "") {
+      const popups = document.getElementsByClassName("maplibregl-popup");
+
+      if (popups.length) {
+        [...popups].map((popup) => popup.remove());
+      }
+
+      setIsActive("");
+    }
+
+    const bounds = map.current.getBounds();
+
+    // Fetch restaurants dynamically based on the current viewport
+    fetch(
+      `http://localhost:9000/search?bounds=${JSON.stringify(
+        bounds
+      )}&lat=${currentLat}&lon=${currentLon}`
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        map.current.getSource("restaurants").setData(json);
+        setSearchResults(json);
+      })
+      .catch((error) => {
+        console.error("Error fetching restaurant data:", error);
+      });
+
+    setShowSearchButton(false);
+  }
 
   return (
-    <div className="map-wrap">
-      <div ref={mapContainer} className="map" />
-      <div className="geocoding">
-        <GeocodingControl
-          apiKey={API_KEY}
-          mapController={mapController}
-          proximity={[{ type: "map-center" }]}
-          placeholder="Search Location (City, Address, etc.)"
-          noResultsMessage="Location not found"
-          showFullGeometry={false}
-          markerOnSelected={false}
-          flyTo={false}
-          onPick={(e) => {
-            // check if e is not null, otherwise bug happens where the map glitches when you search location
-            if (e) {
-              map.current.jumpTo({ center: e?.center, zoom: 14 });
-              showDistance.current = true;
-            }
-          }}
-        />
-      </div>
+    <div className="map-and-results-container">
       <Sidebar
         map={map}
         isMapLoaded={isMapLoaded}
+        lat={lat}
+        lon={lon}
         zoom={zoom}
         showDistance={showDistance}
+        setShowDistance={setShowDistance}
+        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+        showSearchButton={showSearchButton}
+        setShowSearchButton={setShowSearchButton}
+        searchResults={searchResults}
+        setSearchResults={setSearchResults}
+        isActive={isActive}
+        setIsActive={setIsActive}
       />
+
+      <div className="map-wrap">
+        <div ref={mapContainer} className="map" />
+
+        <div className="geocoding">
+          <GeocodingControl
+            apiKey={API_KEY}
+            mapController={mapController}
+            proximity={[{ type: "map-center" }]}
+            placeholder="Search Location (City, Address, etc.)"
+            noResultsMessage="Location not found"
+            showFullGeometry={false}
+            markerOnSelected={false}
+            flyTo={false}
+            onPick={(e) => {
+              // check if e is not null, otherwise bug happens where the map glitches when you search location
+              if (e) {
+                map.current.jumpTo({ center: e?.center, zoom: 14 });
+                fetchStores(lat, lon);
+              }
+            }}
+          />
+        </div>
+
+        {showSearchButton && (
+          <button
+            type="button"
+            className="search-area-btn bg-slate-700"
+            onClick={() => {
+              fetchStores(lat, lon);
+            }}
+          >
+            Search this area
+          </button>
+        )}
+      </div>
     </div>
   );
 }

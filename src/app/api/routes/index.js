@@ -53,10 +53,42 @@ router.get("/search", async (req, res) => {
 router.get("/search/searchbar", async (req, res) => {
   try {
     const query = req.query.q;
+    const lat = req.query.lat;
+    const lon = req.query.lon;
+
     const result = await db.query(
-      `SELECT * FROM restaurants WHERE name ILIKE '%${query}%' LIMIT 10`
+      `SELECT id, name, address, address_url, latitude, longitude, ROUND((ST_DistanceSphere(ST_MakePoint(${lon}, ${lat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
+       FROM restaurants 
+       WHERE name ILIKE '%${query}%' 
+       LIMIT 10
+      `
     );
-    res.send(result);
+    // res.send(result);
+
+    const rows = result.rows;
+
+    // Convert data to GeoJSON format
+    const geoJsonData = {
+      type: "FeatureCollection",
+      features: rows.map((row) => ({
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)],
+        },
+        properties: {
+          id: row.id,
+          name: row.name,
+          address: row.address,
+          address_url: row.address_url,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          distance: row.distance,
+        },
+      })),
+    };
+
+    res.json(geoJsonData); // Send the GeoJSON data to the client
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");

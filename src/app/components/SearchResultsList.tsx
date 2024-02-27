@@ -4,13 +4,19 @@ import maplibregl from "maplibre-gl";
 export default function SearchResultsList({
   map,
   isMapLoaded,
+  lat,
+  lon,
   isActive,
   setIsActive,
   clickedOnRestaurant,
   showPopup,
   showDistance,
+  showSearchButton,
+  setShowSearchButton,
+  searchResults,
+  setSearchResults,
 }) {
-  const [searchResults, setSearchResults] = useState({});
+  // const [searchResults, setSearchResults] = useState({});
 
   useEffect(() => {
     if (isMapLoaded.current) {
@@ -27,12 +33,11 @@ export default function SearchResultsList({
             }
 
             const initialBounds = map.current.getBounds();
-            const center = map.current.getCenter();
 
             fetch(
               `http://localhost:9000/search?bounds=${JSON.stringify(
                 initialBounds
-              )}&lat=${center.lat}&lon=${center.lng}
+              )}&lat=${lat}&lon=${lon}
               `
             )
               .then((res) => {
@@ -212,30 +217,10 @@ export default function SearchResultsList({
                   // });
                 });
 
-                map.current.on("movestart", () => {
-                  showDistance.current = false;
-                });
-
                 map.current.on("moveend", () => {
-                  const bounds = map.current.getBounds();
-                  const center = map.current.getCenter();
-
-                  // Fetch restaurants dynamically based on the current viewport
-                  fetch(
-                    `http://localhost:9000/search?bounds=${JSON.stringify(
-                      bounds
-                    )}&lat=${center.lat}&lon=${center.lng}`
-                  )
-                    .then((res) => {
-                      return res.json();
-                    })
-                    .then((json) => {
-                      map.current.getSource("restaurants").setData(json);
-                      setSearchResults(json);
-                    })
-                    .catch((error) => {
-                      console.error("Error fetching restaurant data:", error);
-                    });
+                  if (showSearchButton === false) {
+                    setShowSearchButton(true);
+                  }
                 });
 
                 setSearchResults(json);
@@ -258,44 +243,46 @@ export default function SearchResultsList({
   }
 
   return (
-    <div className="sidebar">
-      <div className="heading bg-slate-800"></div>
-      <div id="listings" className="listings">
-        {searchResults.features &&
-          searchResults.features.map((restaurant) => (
-            <div
-              key={restaurant.properties.id}
-              id={restaurant.properties.id}
-              className={
-                isActive === restaurant.properties.id ? "item active" : "item"
-              }
-            >
-              <a
-                href="#"
-                onClick={() => {
-                  searchResults.features.map((restaurantOnMap) => {
-                    if (
-                      restaurantOnMap.properties.id === restaurant.properties.id
-                    ) {
-                      flyToStore(restaurant);
-                      showPopup(restaurant.properties);
-                    }
-                  });
-                }}
+    <>
+      <div className="search-list">
+        <div id="listings" className="listings">
+          {searchResults.features &&
+            searchResults.features.map((restaurant) => (
+              <div
+                key={restaurant.properties.id}
+                id={restaurant.properties.id}
+                className={
+                  isActive === restaurant.properties.id ? "item active" : "item"
+                }
               >
-                <span className="text-[#003089]">
-                  {restaurant.properties.name}
-                </span>
-                <span>{restaurant.properties.address}</span>
-                {showDistance.current && (
-                  <span>
-                    <strong>{restaurant.properties.distance} miles</strong>
+                <a
+                  href="#"
+                  onClick={() => {
+                    searchResults.features.map((restaurantOnMap) => {
+                      if (
+                        restaurantOnMap.properties.id ===
+                        restaurant.properties.id
+                      ) {
+                        flyToStore(restaurant);
+                        showPopup(restaurant.properties);
+                      }
+                    });
+                  }}
+                >
+                  <span className="text-[#003089]">
+                    {restaurant.properties.name}
                   </span>
-                )}
-              </a>
-            </div>
-          ))}
+                  <span>{restaurant.properties.address}</span>
+                  {showDistance && (
+                    <span>
+                      <strong>{restaurant.properties.distance} miles</strong>
+                    </span>
+                  )}
+                </a>
+              </div>
+            ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
