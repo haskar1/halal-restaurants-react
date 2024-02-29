@@ -53,11 +53,12 @@ a:hover {
 .sidebar {
   display: grid;
   grid-template-rows: auto auto 1fr;
-}
-
-.search-list {
   background-color: #faf9f6;
 }
+
+/* .search-list {
+  background-color: #faf9f6;
+} */
 
 .listings .item {
   border-bottom: 2px solid #eee;
@@ -109,10 +110,15 @@ a:hover {
 /*** LOCATION SEARCH BAR ***/
 
 .geocoding {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(50%);
+  position: relative;
+  top: -95%;
+  margin: 0 auto;
+  width: 22rem;
+}
+
+.geocoding form {
+  width: auto !important;
+  max-width: none !important;
 }
 
 .geocoding input {
@@ -129,13 +135,20 @@ a:hover {
 
 /*** RESTAURANT SEARCH BAR ***/
 
-#typehead-menu {
+#typeahead-menu {
   display: grid !important;
 }
 
-.container {
+.typeahead-container {
   color: black;
   padding: 20px;
+}
+
+.typeahead-container .form-control {
+  width: 100%;
+  padding-left: 0.5rem;
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
 .typeahead-text-input {
@@ -161,6 +174,11 @@ a:hover {
 
 .typeahead-active {
   background: #eaeaea;
+}
+
+/* Loading... div. Hidden because it is rendered to the side so I made my own */
+.rbt-aux {
+  display: none;
 }
 
 /* SEARCH THIS AREA BUTTON */

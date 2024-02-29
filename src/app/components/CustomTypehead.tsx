@@ -16,9 +16,10 @@ export default function CustomTypehead({
   const [GeoJSON, setGeoJSON] = useState({});
 
   return (
-    <div className="container">
+    <div className="typeahead-container">
       <AsyncTypeahead
-        id="typehead-result-list"
+        id="typeahead-result-list"
+        placeholder="Search Restaurants"
         isLoading={isLoading}
         labelKey={(option) => `${option.name}`}
         onSearch={(query) => {
@@ -55,7 +56,7 @@ export default function CustomTypehead({
                 }
               });
 
-              // Adds restaurants to GeoJSON if they're not already in there
+              // Adds restaurant(s) to GeoJSON if they're not already in there
               if (newGeoJsonFeatures !== GeoJSON.features) {
                 setGeoJSON({
                   ...GeoJSON,
@@ -90,8 +91,12 @@ export default function CustomTypehead({
           }
         }}
         renderMenu={(results) => {
-          return (
-            <Menu id="typehead-menu">
+          return isLoading ? (
+            <div>
+              <span>Loading...</span>
+            </div>
+          ) : (
+            <Menu id="typeahead-menu" emptyLabel="Restaurant not found">
               {results.map((result, index) => (
                 <MenuItem key={index} option={result} position={index}>
                   {result.name}

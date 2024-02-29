@@ -60,6 +60,10 @@ export default function Sidebar({
     popup._closeButton.onclick = () => {
       setIsActive("");
     };
+
+    popup._container.onwheel = (e) => {
+      map.current.scrollZoom.wheel(e);
+    };
   }
 
   return (

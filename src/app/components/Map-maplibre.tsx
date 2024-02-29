@@ -51,7 +51,6 @@ export default function Map() {
     map.current.addControl(geolocate);
 
     geolocate.once("geolocate", (e) => {
-      console.log("geolocate fired");
       const lat = e.coords.latitude;
       const lon = e.coords.longitude;
       setLat(lat);

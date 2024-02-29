@@ -11,7 +11,7 @@ export default function SearchResultsFilters({
     <FormGroup>
       {!showDistanceBtnIsDisabled && (
         <FormControlLabel
-          className="p-2"
+          className="p-2 text-black"
           control={
             <Switch
               checked={showDistance}

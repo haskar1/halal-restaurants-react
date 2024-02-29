@@ -166,7 +166,7 @@ export default function SearchResultsList({
                     layers: ["restaurants"],
                   });
 
-                  // /* If you click on a restaurant marker */
+                  // If you click on a restaurant marker
                   if (features && features.length) {
                     clickedOnRestaurant.current = true;
                   } else {
@@ -211,10 +211,9 @@ export default function SearchResultsList({
                     setIsActive("");
                   };
 
-                  // Doesn't work. It's supposed to let you zoom map when mouse is over the popup
-                  // popup.on("wheel", (e) => {
-                  //   map.current.scrollZoom.wheel(e);
-                  // });
+                  popup._container.onwheel = (e) => {
+                    map.current.scrollZoom.wheel(e);
+                  };
                 });
 
                 map.current.on("moveend", () => {
@@ -245,9 +244,9 @@ export default function SearchResultsList({
   return (
     <>
       <div className="search-list">
-        <div id="listings" className="listings">
-          {searchResults.features &&
-            searchResults.features.map((restaurant) => (
+        {searchResults.features && searchResults.features.length > 0 ? (
+          <div id="listings" className="listings">
+            {searchResults.features.map((restaurant) => (
               <div
                 key={restaurant.properties.id}
                 id={restaurant.properties.id}
@@ -281,7 +280,14 @@ export default function SearchResultsList({
                 </a>
               </div>
             ))}
-        </div>
+          </div>
+        ) : (
+          <div>
+            <span className="text-black">
+              No restaurants found in this area
+            </span>
+          </div>
+        )}
       </div>
     </>
   );
