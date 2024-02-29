@@ -24,6 +24,7 @@ export default function Map() {
   const [searchResults, setSearchResults] = useState({});
   const [isActive, setIsActive] = useState("");
   const isMapLoaded = useRef(false);
+  const geolocate = useRef(null);
 
   useEffect(() => {
     if (map.current) return; // stops map from initializing more than once
@@ -39,7 +40,7 @@ export default function Map() {
 
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
-    let geolocate = new maplibregl.GeolocateControl({
+    geolocate.current = new maplibregl.GeolocateControl({
       positionOptions: {
         enableHighAccuracy: true,
       },
@@ -48,9 +49,11 @@ export default function Map() {
       showAccuracyCircle: false,
     });
 
-    map.current.addControl(geolocate);
+    map.current.addControl(geolocate.current);
 
-    geolocate.once("geolocate", (e) => {
+    // Only once because geolocate event randomly fires even if nothing is happening.
+    // Only fires on map load
+    geolocate.current.once("geolocate", (e) => {
       const lat = e.coords.latitude;
       const lon = e.coords.longitude;
       setLat(lat);
@@ -64,7 +67,7 @@ export default function Map() {
     });
 
     map.current.on("load", () => {
-      geolocate.trigger();
+      geolocate.current.trigger();
     });
 
     isMapLoaded.current = true;
@@ -153,7 +156,18 @@ export default function Map() {
             type="button"
             className="search-area-btn bg-slate-700"
             onClick={() => {
-              fetchStores(lat, lon);
+              if (geolocate.current._lastKnownPosition) {
+                const lat =
+                  geolocate.current._lastKnownPosition.coords.latitude;
+                const lon =
+                  geolocate.current._lastKnownPosition.coords.longitude;
+                setLat(lat);
+                setLon(lon);
+                fetchStores(lat, lon);
+              } else {
+                // User doesn't want to share location, so use the default lat and lon
+                fetchStores(lat, lon);
+              }
             }}
           >
             Search this area
