@@ -8,6 +8,7 @@ export default function CustomTypehead({
   map,
   showPopup,
   setSearchResults,
+  searchedRestaurantSelected,
   lat,
   lon,
 }) {
@@ -88,6 +89,7 @@ export default function CustomTypehead({
             map.current.getSource("restaurants").setData(updatedGeoJSON);
             setSearchResults(updatedGeoJSON);
             showPopup(selected[0]);
+            searchedRestaurantSelected.current = true;
           }
         }}
         renderMenu={(results) => {

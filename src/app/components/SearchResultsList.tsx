@@ -8,13 +8,14 @@ export default function SearchResultsList({
   lon,
   isActive,
   setIsActive,
-  clickedOnRestaurant,
+  clickedOnRestaurantPopup,
   showPopup,
   showDistance,
-  showSearchButton,
-  setShowSearchButton,
+  showSearchAreaButton,
+  setShowSearchAreaButton,
   searchResults,
   setSearchResults,
+  searchedRestaurantSelected,
 }) {
   // const [searchResults, setSearchResults] = useState({});
 
@@ -168,9 +169,9 @@ export default function SearchResultsList({
 
                   // If you click on a restaurant marker
                   if (features && features.length) {
-                    clickedOnRestaurant.current = true;
+                    clickedOnRestaurantPopup.current = true;
                   } else {
-                    clickedOnRestaurant.current = false;
+                    clickedOnRestaurantPopup.current = false;
                     return; // Return, otherwise the below consts will throw an error
                   }
 
@@ -197,17 +198,18 @@ export default function SearchResultsList({
 
                   setIsActive(id);
 
-                  // clickedOnRestaurant.current check is needed because setIsActive runs first and then popup.on('close') fires,
+                  // clickedOnRestaurantPopup.current check is needed because setIsActive runs first and then popup.on('close') fires,
                   // so if you click on a restaurant marker while another marker was already open, then it runs setIsActive for the new marker,
                   // but then immediately fires the close event for the previous marker and runs setIsActive("").
                   popup.on("close", () => {
-                    if (clickedOnRestaurant.current) return;
+                    if (clickedOnRestaurantPopup.current) return;
                     setIsActive("");
                   });
 
-                  // Separate closeButton event because clickedOnRestaurant.current returns 'true' when
+                  // Separate closeButton event because clickedOnRestaurantPopup.current returns 'true' when
                   // you click on the close button because you're not actually clicking on the map.
                   popup._closeButton.onclick = () => {
+                    clickedOnRestaurantPopup.current = false;
                     setIsActive("");
                   };
 
@@ -217,8 +219,17 @@ export default function SearchResultsList({
                 });
 
                 map.current.on("moveend", () => {
-                  if (showSearchButton === false) {
-                    setShowSearchButton(true);
+                  if (searchedRestaurantSelected.current) {
+                    searchedRestaurantSelected.current = false;
+                    return;
+                  }
+
+                  if (clickedOnRestaurantPopup.current) {
+                    return;
+                  }
+
+                  if (!showSearchAreaButton) {
+                    setShowSearchAreaButton(true);
                   }
                 });
 

@@ -20,11 +20,12 @@ export default function Map() {
   const [showDistance, setShowDistance] = useState(false);
   const [showDistanceBtnIsDisabled, setShowDistanceBtnIsDisabled] =
     useState(true);
-  const [showSearchButton, setShowSearchButton] = useState(false);
+  const [showSearchAreaButton, setShowSearchAreaButton] = useState(false);
   const [searchResults, setSearchResults] = useState({});
   const [isActive, setIsActive] = useState("");
   const isMapLoaded = useRef(false);
   const geolocate = useRef(null);
+  const clickedOnRestaurantPopup = useRef(false);
 
   useEffect(() => {
     if (map.current) return; // stops map from initializing more than once
@@ -36,6 +37,7 @@ export default function Map() {
       zoom: zoom,
       maxZoom: 17,
       minZoom: 5,
+      // attributionControl: false,
     });
 
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -106,28 +108,11 @@ export default function Map() {
         console.error("Error fetching restaurant data:", error);
       });
 
-    setShowSearchButton(false);
+    setShowSearchAreaButton(false);
   }
 
   return (
-    <div className="map-and-results-container">
-      <Sidebar
-        map={map}
-        isMapLoaded={isMapLoaded}
-        lat={lat}
-        lon={lon}
-        zoom={zoom}
-        showDistance={showDistance}
-        setShowDistance={setShowDistance}
-        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
-        showSearchButton={showSearchButton}
-        setShowSearchButton={setShowSearchButton}
-        searchResults={searchResults}
-        setSearchResults={setSearchResults}
-        isActive={isActive}
-        setIsActive={setIsActive}
-      />
-
+    <div className="map-and-sidebar-container">
       <div className="map-wrap">
         <div ref={mapContainer} className="map" />
 
@@ -146,16 +131,19 @@ export default function Map() {
               if (e) {
                 map.current.jumpTo({ center: e?.center, zoom: 14 });
                 fetchStores(lat, lon);
+                clickedOnRestaurantPopup.current = false;
               }
             }}
           />
         </div>
 
-        {showSearchButton && (
+        {showSearchAreaButton && (
           <button
             type="button"
             className="search-area-btn bg-slate-700"
             onClick={() => {
+              // Use last known position in case user has physically moved to another location,
+              // so it sets lat and lon to actual current position to get accurate distances to restaurants
               if (geolocate.current._lastKnownPosition) {
                 const lat =
                   geolocate.current._lastKnownPosition.coords.latitude;
@@ -168,12 +156,32 @@ export default function Map() {
                 // User doesn't want to share location, so use the default lat and lon
                 fetchStores(lat, lon);
               }
+              // When you click on the search area button, the restaurant popup closes if it's open
+              clickedOnRestaurantPopup.current = false;
             }}
           >
             Search this area
           </button>
         )}
       </div>
+
+      <Sidebar
+        map={map}
+        isMapLoaded={isMapLoaded}
+        lat={lat}
+        lon={lon}
+        zoom={zoom}
+        showDistance={showDistance}
+        setShowDistance={setShowDistance}
+        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+        showSearchAreaButton={showSearchAreaButton}
+        setShowSearchAreaButton={setShowSearchAreaButton}
+        searchResults={searchResults}
+        setSearchResults={setSearchResults}
+        isActive={isActive}
+        setIsActive={setIsActive}
+        clickedOnRestaurantPopup={clickedOnRestaurantPopup}
+      />
     </div>
   );
 }

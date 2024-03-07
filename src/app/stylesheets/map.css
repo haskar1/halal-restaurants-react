@@ -11,6 +11,7 @@ body {
   margin: 0;
   padding: 0;
   color: #404040;
+  background-color: #faf9f6;
   font:
     400 15px/22px "Source Sans Pro",
     "Helvetica Neue",
@@ -35,25 +36,54 @@ a:hover {
   color: #101010;
 }
 
-.map-and-results-container {
+button {
+  background-color: rgb(51 65 85);
+  color: #faf9f6;
+  padding: 0.25em 0.75em;
+  border-radius: 8px;
+}
+
+.map-and-sidebar-container {
   display: grid;
+  /* grid-template-rows: 1fr 2fr; */
   height: 100vh;
 }
 
-@media screen and (min-width: 768px) {
-  .map-and-results-container {
-    grid-template-columns: 1fr 3fr;
-  }
-}
-
-.map {
-  height: 100%;
+.map-wrap {
+  position: fixed;
+  height: 70vh;
+  width: 100%;
 }
 
 .sidebar {
   display: grid;
   grid-template-rows: auto auto 1fr;
+  /* overflow: auto; */
+  z-index: 1;
+  margin-top: 70vh;
   background-color: #faf9f6;
+}
+
+@media screen and (min-width: 768px) {
+  .map-and-sidebar-container {
+    /* grid-template-rows: none; */
+    grid-template-columns: 1fr 2fr;
+  }
+
+  .map-wrap {
+    position: relative;
+    order: 1;
+    height: auto;
+    width: auto;
+  }
+
+  .sidebar {
+    margin-top: 0;
+  }
+}
+
+.map {
+  height: 100%;
 }
 
 /* .search-list {
@@ -110,9 +140,11 @@ a:hover {
 /*** LOCATION SEARCH BAR ***/
 
 .geocoding {
-  position: relative;
-  top: -95%;
-  margin: 0 auto;
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
   width: 22rem;
 }
 
@@ -131,6 +163,10 @@ a:hover {
   color: #000;
   font-size: 14px;
   padding-bottom: 30px;
+}
+
+.maplibregl-popup-close-button {
+  color: inherit;
 }
 
 /*** RESTAURANT SEARCH BAR ***/
@@ -184,9 +220,7 @@ a:hover {
 /* SEARCH THIS AREA BUTTON */
 .search-area-btn {
   position: absolute;
-  bottom: 75px;
+  top: 60px;
   left: 50%;
-  transform: translateX(50%);
-  padding: 0.25em 0.75em;
-  border-radius: 8px;
+  transform: translateX(-50%);
 }

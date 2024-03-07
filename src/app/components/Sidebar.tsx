@@ -13,14 +13,15 @@ export default function Sidebar({
   showDistance,
   setShowDistance,
   showDistanceBtnIsDisabled,
-  showSearchButton,
-  setShowSearchButton,
+  showSearchAreaButton,
+  setShowSearchAreaButton,
   searchResults,
   setSearchResults,
   isActive,
   setIsActive,
+  clickedOnRestaurantPopup,
 }) {
-  const clickedOnRestaurant = useRef(false);
+  const searchedRestaurantSelected = useRef(false);
 
   function showPopup(restaurant) {
     const id = restaurant.id;
@@ -30,7 +31,7 @@ export default function Sidebar({
     const address_url = restaurant.address_url;
     const popups = document.getElementsByClassName("maplibregl-popup");
 
-    clickedOnRestaurant.current = true;
+    clickedOnRestaurantPopup.current = true;
 
     if (popups.length) {
       [...popups].map((popup) => popup.remove());
@@ -47,17 +48,18 @@ export default function Sidebar({
 
     setIsActive(id);
 
-    // clickedOnRestaurant.current check is needed because setIsActive runs first and then popup.on('close') fires,
+    // clickedOnRestaurantPopup.current check is needed because setIsActive runs first and then popup.on('close') fires,
     // so if you click on a restaurant marker while another marker was already open, then it runs setIsActive for the new marker,
     // but then immediately fires the close event for the previous marker and runs setIsActive("").
     popup.on("close", () => {
-      if (clickedOnRestaurant.current) return;
+      if (clickedOnRestaurantPopup.current) return;
       setIsActive("");
     });
 
-    // Separate closeButton event because clickedOnRestaurant.current returns 'true' when
+    // Separate closeButton event because clickedOnRestaurantPopup.current returns 'true' when
     // you click on the close button because you're not actually clicking on the map.
     popup._closeButton.onclick = () => {
+      clickedOnRestaurantPopup.current = false;
       setIsActive("");
     };
 
@@ -74,7 +76,7 @@ export default function Sidebar({
         lon={lon}
         showPopup={showPopup}
         setSearchResults={setSearchResults}
-        isMapLoaded={isMapLoaded}
+        searchedRestaurantSelected={searchedRestaurantSelected}
       />
       <SearchResultsFilters
         showDistance={showDistance}
@@ -88,13 +90,14 @@ export default function Sidebar({
         lon={lon}
         isActive={isActive}
         setIsActive={setIsActive}
-        clickedOnRestaurant={clickedOnRestaurant}
+        clickedOnRestaurantPopup={clickedOnRestaurantPopup}
         showPopup={showPopup}
         showDistance={showDistance}
-        showSearchButton={showSearchButton}
-        setShowSearchButton={setShowSearchButton}
+        showSearchAreaButton={showSearchAreaButton}
+        setShowSearchAreaButton={setShowSearchAreaButton}
         searchResults={searchResults}
         setSearchResults={setSearchResults}
+        searchedRestaurantSelected={searchedRestaurantSelected}
       />
     </div>
   );
