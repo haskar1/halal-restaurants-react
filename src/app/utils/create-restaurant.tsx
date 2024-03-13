@@ -5,16 +5,21 @@ import { z } from "zod";
 // import axios from "axios";
 import { sql } from "@vercel/postgres";
 
-export async function createCuisine(prevState: any, formData: FormData) {
+export async function createRestaurant(prevState: any, formData: FormData) {
   const schema = z.object({
     name: z
       .string()
       .trim()
-      .min(1, { message: "Cuisine name cannot be empty." }),
+      .min(1, { message: "Restaurant name cannot be empty." }),
+    restaurant_tag: z
+      .string()
+      .trim()
+      .min(1, { message: "Restaurant tag cannot be empty." }),
   });
 
   const parse = schema.safeParse({
     name: formData.get("name"),
+    restaurant_tag: formData.get("restaurant_tag"),
   });
 
   if (!parse.success) {
@@ -28,26 +33,27 @@ export async function createCuisine(prevState: any, formData: FormData) {
   const data = parse.data;
 
   try {
-    // const cuisine = await axios
-    //   .post("http://localhost:9000/cuisines/create", {
+    // const restaurant = await axios
+    //   .post("../api/restaurants/create", {
     //     name: `${data.name}`,
+    //     restaurant_tag: `${data.restaurant_tag}`,
     //   })
     //   .then((res) => {
     //     return {
     //       id: res.data.id,
     //     };
     //   });
-    const cuisine = await sql`
-    INSERT INTO cuisines (name)
-    VALUES (${data.name})
+    const result = await sql`
+    INSERT INTO restaurants (name, restaurant_tag)
+    VALUES (${data.name}, ${data.restaurant_tag})
     RETURNING id;
   `;
-    const newCuisineId = cuisine.rows[0].id;
+    const newRestaurantId = result.rows[0].id;
     revalidatePath("/");
     return {
-      id: newCuisineId,
+      id: newRestaurantId,
     };
   } catch (e) {
-    return { message: "Failed to create cuisine" };
+    return { message: "Failed to create restaurant" };
   }
 }

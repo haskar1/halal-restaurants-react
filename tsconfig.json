@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -8,7 +9,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -19,7 +20,7 @@
       }
     ],
     "paths": {
-      "@/api/*": ["./src/app/api/*"],
+      "@/api/*": ["src/app/pages/api/*"],
       "@/components/*": ["./src/app/components/*"],
       "@/lib/*": ["./src/app/lib/*"],
       "@/utils/*": ["./src/app/utils/*"],
@@ -31,7 +32,23 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/dashboard/restaurants/[id]"
+    "src/app/dashboard/restaurants/[id]",
+    "src/app/search/page.jsx",
+    "src/app/components/DashboardNav.jsx",
+    "src/app/dashboard/page.jsx",
+    "src/app/dashboard/layout.jsx",
+    "src/app/dashboard/restaurants/page.jsx",
+    "src/app/dashboard/restaurants/create/page.jsx",
+    "src/app/dashboard/cuisines/page.jsx",
+    "src/app/dashboard/cuisines/create/page.jsx",
+    "src/app/dashboard/cuisines/[id]/page.jsx",
+    "src/app/components/Sidebar.jsx",
+    "src/app/components/SearchResultsList.jsx",
+    "src/app/components/SearchResultsFilters.jsx",
+    "src/app/components/Map-maplibre.jsx",
+    "src/app/components/CustomTypehead.jsx",
+    "src/app/pages/api/get-cuisines/route.js",
+    "src/app/pages/api/get-cuisine/route.js"
   ],
   "exclude": ["node_modules"]
 }

@@ -132,3 +132,4 @@ dist
 .vercel
 
 dev.db*
+.env*.local

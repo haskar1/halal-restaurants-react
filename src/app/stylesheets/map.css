@@ -1,10 +1,10 @@
+/*** CSS RESET ***/
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
-/*** SIDEBAR RESTAURANT LISTINGS ***/
 
 body {
   min-height: 100vh;
@@ -43,6 +43,27 @@ button {
   border-radius: 8px;
 }
 
+input[type="color"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="email"],
+input[type="month"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="tel"],
+input[type="text"],
+input[type="time"],
+input[type="url"],
+input[type="week"],
+select:focus,
+textarea {
+  font-size: 16px;
+}
+
+/*** SIDEBAR RESTAURANT LISTINGS ***/
+
 .map-and-sidebar-container {
   display: grid;
   /* grid-template-rows: 1fr 2fr; */
@@ -51,22 +72,20 @@ button {
 
 .map-wrap {
   position: fixed;
-  height: 70vh;
+  height: 60vh;
   width: 100%;
 }
 
 .sidebar {
   display: grid;
   grid-template-rows: auto auto 1fr;
-  /* overflow: auto; */
   z-index: 1;
-  margin-top: 70vh;
+  margin-top: 60vh;
   background-color: #faf9f6;
 }
 
 @media screen and (min-width: 768px) {
   .map-and-sidebar-container {
-    /* grid-template-rows: none; */
     grid-template-columns: 1fr 2fr;
   }
 
@@ -85,10 +104,6 @@ button {
 .map {
   height: 100%;
 }
-
-/* .search-list {
-  background-color: #faf9f6;
-} */
 
 .listings .item {
   border-bottom: 2px solid #eee;
@@ -146,6 +161,7 @@ button {
   transform: translateX(-50%);
   z-index: 1;
   width: 22rem;
+  max-width: 90%;
 }
 
 .geocoding form {
@@ -187,15 +203,6 @@ button {
   border-radius: 5px;
 }
 
-.typeahead-text-input {
-  width: 100%;
-  height: 36px;
-  line-height: 36px;
-  padding: 0 5px;
-  border: 2px solid blue;
-  font-size: 1em;
-}
-
 .typeahead-list__container {
   margin: 0;
   padding: 0;
@@ -223,4 +230,10 @@ button {
   top: 60px;
   left: 50%;
   transform: translateX(-50%);
+}
+
+/* ZOOM AND GEOLOCATE BUTTONS */
+
+.maplibregl-ctrl-top-right {
+  top: 15%;
 }

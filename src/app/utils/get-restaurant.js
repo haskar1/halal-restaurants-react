@@ -1,0 +1,46 @@
+// import axios from "axios";
+import { sql } from "@vercel/postgres";
+
+export default async function getRestaurant(id) {
+  try {
+    const result = await sql`
+      SELECT
+        r.*,
+        STRING_AGG(c.id || ':' || c.name, ', ') AS cuisines
+      FROM
+        restaurants r
+      LEFT JOIN
+        restaurant_cuisines rc ON r.id = rc.restaurant_id
+      LEFT JOIN
+        cuisines c ON rc.cuisine_id = c.id
+      WHERE
+        r.id = ${id}
+      GROUP BY
+        r.id
+    `;
+
+    const restaurant = result.rows[0];
+
+    if (!restaurant) {
+      throw new Error("Restaurant not found");
+    }
+
+    let cuisinesArray = [];
+    if (restaurant.cuisines) {
+      // Split the concatenated string of cuisines into an array of objects
+      cuisinesArray = restaurant.cuisines.split(", ").map((cuisine) => {
+        const [id, name] = cuisine.split(":");
+        return { id: parseInt(id), name: name };
+      });
+    }
+    restaurant.cuisines = cuisinesArray;
+
+    return restaurant;
+  } catch (error) {
+    console.error(
+      "Error fetching restaurant:",
+      error.response?.data?.message || error.message
+    );
+    return;
+  }
+}
