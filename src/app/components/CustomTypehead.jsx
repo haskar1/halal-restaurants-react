@@ -1,4 +1,10 @@
-import { AsyncTypeahead, Menu, MenuItem } from "react-bootstrap-typeahead";
+import {
+  AsyncTypeahead,
+  Menu,
+  MenuItem,
+  ClearButton,
+} from "react-bootstrap-typeahead";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead.bs5.css";
 import { useState } from "react";
@@ -95,22 +101,24 @@ export default function CustomTypehead({
             searchedRestaurantSelected.current = true;
           }
         }}
-        renderMenu={(results) => {
-          return isLoading ? (
-            <div>
-              <span>Loading...</span>
-            </div>
-          ) : (
-            <Menu id="typeahead-menu" emptyLabel="Restaurant not found">
-              {results.map((result, index) => (
-                <MenuItem key={index} option={result} position={index}>
-                  {result.name}
-                </MenuItem>
-              ))}
-            </Menu>
-          );
-        }}
-      />
+        renderMenu={(results) => (
+          <Menu id="typeahead-menu" emptyLabel="Restaurant not found">
+            {results.map((result, index) => (
+              <MenuItem key={index} option={result} position={index}>
+                <b>{result.name}</b>
+                {" - "}
+                {result.address}
+              </MenuItem>
+            ))}
+          </Menu>
+        )}
+      >
+        {({ onClear, selected }) => (
+          <div className="rbt-aux">
+            {!!selected.length && <ClearButton onClick={onClear} />}
+          </div>
+        )}
+      </AsyncTypeahead>
     </div>
   );
 }

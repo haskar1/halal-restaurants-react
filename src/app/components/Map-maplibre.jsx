@@ -23,7 +23,6 @@ export default function Map() {
   const [showSearchAreaButton, setShowSearchAreaButton] = useState(false);
   const [searchResults, setSearchResults] = useState({});
   const [isActive, setIsActive] = useState("");
-  const isMapLoaded = useRef(false);
   const geolocate = useRef(null);
   const clickedOnRestaurantPopup = useRef(false);
   const searchedRestaurantSelected = useRef(false);
@@ -291,7 +290,6 @@ export default function Map() {
       }
     });
 
-    isMapLoaded.current = true;
     setMapController(
       createMapLibreGlMapController(map.current, maplibregl, false)
     );
@@ -386,7 +384,6 @@ export default function Map() {
 
       <Sidebar
         map={map}
-        isMapLoaded={isMapLoaded}
         lat={lat}
         lon={lon}
         zoom={zoom}

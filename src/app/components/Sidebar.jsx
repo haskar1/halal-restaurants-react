@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import CustomTypehead from "./CustomTypehead";
 import SearchResultsList from "./SearchResultsList";
 import maplibregl from "maplibre-gl";
@@ -6,15 +5,12 @@ import SearchResultsFilters from "./SearchResultsFilters";
 
 export default function Sidebar({
   map,
-  isMapLoaded,
   lat,
   lon,
   zoom,
   showDistance,
   setShowDistance,
   showDistanceBtnIsDisabled,
-  showSearchAreaButton,
-  setShowSearchAreaButton,
   searchResults,
   setSearchResults,
   isActive,
@@ -22,8 +18,6 @@ export default function Sidebar({
   clickedOnRestaurantPopup,
   searchedRestaurantSelected,
 }) {
-  // const searchedRestaurantSelected = useRef(false);
-
   function showPopup(restaurant) {
     const id = restaurant.id;
     const coordinates = [restaurant.longitude, restaurant.latitude];
@@ -86,19 +80,10 @@ export default function Sidebar({
       />
       <SearchResultsList
         map={map}
-        isMapLoaded={isMapLoaded}
-        lat={lat}
-        lon={lon}
         isActive={isActive}
-        setIsActive={setIsActive}
-        clickedOnRestaurantPopup={clickedOnRestaurantPopup}
         showPopup={showPopup}
         showDistance={showDistance}
-        showSearchAreaButton={showSearchAreaButton}
-        setShowSearchAreaButton={setShowSearchAreaButton}
         searchResults={searchResults}
-        setSearchResults={setSearchResults}
-        searchedRestaurantSelected={searchedRestaurantSelected}
       />
     </div>
   );

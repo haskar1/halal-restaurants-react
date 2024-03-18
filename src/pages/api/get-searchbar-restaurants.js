@@ -7,7 +7,7 @@ export default async function handler(request, response) {
 
   try {
     const result = await sql`
-      SELECT id, name, address, address_url, latitude, longitude, ROUND((ST_DistanceSphere(ST_MakePoint(${lon}, ${lat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
+      SELECT id, name, address, address_url, latitude, longitude, cover_photo_url, ROUND((ST_DistanceSphere(ST_MakePoint(${lon}, ${lat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
       FROM restaurants
       WHERE name ILIKE '%' || ${query} || '%'
       LIMIT 10
@@ -31,6 +31,7 @@ export default async function handler(request, response) {
           address_url: row.address_url,
           latitude: row.latitude,
           longitude: row.longitude,
+          cover_photo_url: row.cover_photo_url,
           distance: row.distance,
         },
       })),
