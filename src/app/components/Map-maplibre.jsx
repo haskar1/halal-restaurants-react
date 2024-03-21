@@ -4,7 +4,7 @@ import React, { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { GeocodingControl } from "@maptiler/geocoding-control/react";
 import { createMapLibreGlMapController } from "@maptiler/geocoding-control/maplibregl-controller";
-import Sidebar from "./Sidebar";
+import Sidebar from "@/components/Sidebar";
 import "@maptiler/geocoding-control/style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../stylesheets/map.css";

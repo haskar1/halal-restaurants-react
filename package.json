@@ -20,6 +20,7 @@
     "axios": "^1.6.2",
     "bootstrap": "^5.3.2",
     "dotenv": "^16.4.5",
+    "framer-motion": "^11.0.15",
     "leaflet": "^1.9.4",
     "leaflet-canvas-marker": "^0.2.0",
     "leaflet-defaulticon-compatibility": "^0.1.2",
@@ -35,6 +36,8 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "react-leaflet-pixi-overlay": "^3.0.2",
+    "react-modal-sheet": "^2.2.0",
+    "react-spring-bottom-sheet": "^3.4.1",
     "tw-elements": "^1.0.0",
     "zod": "^3.22.4"
   },

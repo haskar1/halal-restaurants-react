@@ -2,6 +2,9 @@ import CustomTypehead from "./CustomTypehead";
 import SearchResultsList from "./SearchResultsList";
 import maplibregl from "maplibre-gl";
 import SearchResultsFilters from "./SearchResultsFilters";
+import { useEffect, useState } from "react";
+import { BottomSheet } from "react-spring-bottom-sheet";
+import "react-spring-bottom-sheet/dist/style.css";
 
 export default function Sidebar({
   map,
@@ -18,6 +21,12 @@ export default function Sidebar({
   clickedOnRestaurantPopup,
   searchedRestaurantSelected,
 }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(true);
+  }, []);
+
   function showPopup(restaurant) {
     const id = restaurant.id;
     const coordinates = [restaurant.longitude, restaurant.latitude];
@@ -65,26 +74,40 @@ export default function Sidebar({
 
   return (
     <div className="sidebar">
-      <CustomTypehead
-        map={map}
-        lat={lat}
-        lon={lon}
-        showPopup={showPopup}
-        setSearchResults={setSearchResults}
-        searchedRestaurantSelected={searchedRestaurantSelected}
-      />
-      <SearchResultsFilters
-        showDistance={showDistance}
-        setShowDistance={setShowDistance}
-        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
-      />
-      <SearchResultsList
-        map={map}
-        isActive={isActive}
-        showPopup={showPopup}
-        showDistance={showDistance}
-        searchResults={searchResults}
-      />
+      <BottomSheet
+        open={open}
+        blocking={false}
+        snapPoints={({ minHeight, maxHeight, headerHeight }) => [
+          minHeight,
+          maxHeight * 0.5,
+          headerHeight,
+        ]}
+        defaultSnap={({ snapPoints }) => snapPoints[1]}
+        expandOnContentDrag={true}
+        header={
+          <CustomTypehead
+            map={map}
+            lat={lat}
+            lon={lon}
+            showPopup={showPopup}
+            setSearchResults={setSearchResults}
+            searchedRestaurantSelected={searchedRestaurantSelected}
+          />
+        }
+      >
+        <SearchResultsFilters
+          showDistance={showDistance}
+          setShowDistance={setShowDistance}
+          showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+        />
+        <SearchResultsList
+          map={map}
+          isActive={isActive}
+          showPopup={showPopup}
+          showDistance={showDistance}
+          searchResults={searchResults}
+        />
+      </BottomSheet>
     </div>
   );
 }
