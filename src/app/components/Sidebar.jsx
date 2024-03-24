@@ -21,7 +21,7 @@ export default function Sidebar({
   setIsActive,
   clickedOnRestaurantPopup,
   searchedRestaurantSelected,
-  bottomSheetSnapped,
+  bottomSheetSnapping,
   mapBounds,
   mobileSidebarBottomSheetIsSnapping,
   snapPoint,
@@ -94,52 +94,10 @@ export default function Sidebar({
             return snapPoints;
           }}
           onSpringStart={() => {
-            const transitionFrom = sheetRef.current.height;
-            mobileSidebarBottomSheetIsSnapping.current = true;
-
-            requestAnimationFrame(() => {
-              if (transitionFrom === sheetRef.current.height) return;
-
-              if (
-                sheetRef.current.height === Math.round(snapPointsRef.current[2])
-              ) {
-                snapPoint.current = 2;
-
-                map.current.fitBounds([
-                  [mapBounds.current._sw.lng, mapBounds.current._sw.lat],
-                  [mapBounds.current._ne.lng, mapBounds.current._ne.lat],
-                ]);
-              }
-
-              if (
-                sheetRef.current.height ===
-                  Math.round(snapPointsRef.current[0]) ||
-                sheetRef.current.height === Math.round(snapPointsRef.current[1])
-              ) {
-                snapPoint.current = 1;
-
-                const newMapBounds = {
-                  ...mapBounds.current,
-                };
-
-                const south = newMapBounds._sw.lat;
-                const west = newMapBounds._sw.lng;
-                const north = newMapBounds._ne.lat;
-                const east = newMapBounds._ne.lng;
-
-                const newSouth = south - (north - south);
-
-                map.current.fitBounds([
-                  [west, newSouth],
-                  [east, north],
-                ]);
-              }
-
-              bottomSheetSnapped.current = true;
-            });
+            bottomSheetSnapping.current = true;
           }}
           onSpringEnd={() => {
-            mobileSidebarBottomSheetIsSnapping.current = false;
+            bottomSheetSnapping.current = false;
           }}
           defaultSnap={({ snapPoints }) => snapPoints[1]}
           expandOnContentDrag={true}

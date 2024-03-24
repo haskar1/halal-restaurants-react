@@ -29,10 +29,7 @@ export default function Map() {
   const clickedOnRestaurantPopup = useRef(false);
   const searchedRestaurantSelected = useRef(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const bottomSheetSnapped = useRef(false);
-  const mapBounds = useRef({});
-  const mobileSidebarBottomSheetIsSnapping = useRef(false);
-  const snapPoint = useRef(1);
+  const bottomSheetSnapping = useRef(false);
 
   const isMobile = useMediaQuery("(max-width:767px)", { noSsr: true });
 
@@ -61,26 +58,7 @@ export default function Map() {
             map.current.addImage("custom-marker", image);
           }
 
-          let initialBounds = map.current.getBounds();
-
-          // Sets the bounds to the top half of viewport on mobile
-          if (isMobile) {
-            const north = initialBounds._ne.lat;
-            const south = initialBounds._sw.lat;
-            const newSouth = (north + south) / 2;
-
-            const newInitialBounds = {
-              ...initialBounds,
-              _sw: {
-                ...initialBounds._sw,
-                lat: newSouth,
-              },
-            };
-
-            initialBounds = newInitialBounds;
-          }
-
-          mapBounds.current = initialBounds;
+          const initialBounds = map.current.getBounds();
 
           fetch(
             `/api/get-map-restaurants?bounds=${JSON.stringify(
@@ -274,37 +252,6 @@ export default function Map() {
                 if (clickedOnRestaurantPopup.current) {
                   return;
                 }
-
-                if (!isMobile) {
-                  mapBounds.current = map.current.getBounds();
-                }
-
-                if (isMobile && !mobileSidebarBottomSheetIsSnapping.current) {
-                  // Bottom shelf is snapped to middle or full screen
-                  // Sets the bounds to the top half of viewport so it only fetches restaurants from there
-                  if (snapPoint.current === 1) {
-                    const bounds = map.current.getBounds();
-
-                    const north = bounds._ne.lat;
-                    const south = bounds._sw.lat;
-                    const newSouth = (north + south) / 2;
-
-                    const newBounds = {
-                      ...bounds,
-                      _sw: {
-                        ...bounds._sw,
-                        lat: newSouth,
-                      },
-                    };
-
-                    mapBounds.current = newBounds;
-                  }
-                  // Bottom shelf is snapped to bottom of screen
-                  // Sets the bounds to the full screen map's bounds
-                  else if (snapPoint.current === 2) {
-                    mapBounds.current = map.current.getBounds();
-                  }
-                }
               });
 
               setSearchResults(json.geoJsonData);
@@ -375,9 +322,7 @@ export default function Map() {
       setIsActive("");
     }
 
-    const bounds = {
-      ...mapBounds.current,
-    };
+    const bounds = map.current.getBounds();
 
     // Fetch restaurants dynamically based on the current viewport
     fetch(
@@ -402,10 +347,7 @@ export default function Map() {
   }
 
   function delayShowSearchAreaButton() {
-    if (bottomSheetSnapped.current) {
-      bottomSheetSnapped.current = false;
-      return;
-    }
+    if (bottomSheetSnapping.current) return;
 
     if (!showSearchAreaButton || !showSearchAreaButtonRef.current) {
       const timeoutId = setTimeout(() => {
@@ -488,10 +430,7 @@ export default function Map() {
         setIsActive={setIsActive}
         clickedOnRestaurantPopup={clickedOnRestaurantPopup}
         searchedRestaurantSelected={searchedRestaurantSelected}
-        bottomSheetSnapped={bottomSheetSnapped}
-        mapBounds={mapBounds}
-        mobileSidebarBottomSheetIsSnapping={mobileSidebarBottomSheetIsSnapping}
-        snapPoint={snapPoint}
+        bottomSheetSnapping={bottomSheetSnapping}
       />
     </div>
   );
