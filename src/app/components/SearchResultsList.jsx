@@ -15,7 +15,7 @@ export default function SearchResultsList({
   return (
     <>
       <div className="search-list">
-        {searchResults.features && searchResults.features.length > 0 ? (
+        {searchResults?.features && searchResults.features.length > 0 ? (
           <>
             <div>
               <span>

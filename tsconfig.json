@@ -42,7 +42,7 @@
     "src/app/dashboard/cuisines/page.jsx",
     "src/app/dashboard/cuisines/create/page.jsx",
     "src/app/dashboard/cuisines/[id]/page.jsx",
-    "src/app/components/Sidebar.jsx",
+    "src/app/components/Sidebar.tsx",
     "src/app/components/SearchResultsList.jsx",
     "src/app/components/SearchResultsFilters.jsx",
     "src/app/components/Map-maplibre.jsx",
