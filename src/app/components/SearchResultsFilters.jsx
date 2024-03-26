@@ -11,6 +11,7 @@ export default function SearchResultsFilters({
     <FormGroup>
       {!showDistanceBtnIsDisabled && (
         <FormControlLabel
+          // class p-2 is tailwind padding 0.5rem
           className="p-2 text-black"
           control={
             <Switch
@@ -24,5 +25,3 @@ export default function SearchResultsFilters({
     </FormGroup>
   );
 }
-
-// class p-2 is tailwind padding 0.5rem

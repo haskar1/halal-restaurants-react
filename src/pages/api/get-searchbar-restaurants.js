@@ -2,14 +2,18 @@ import { sql } from "@vercel/postgres";
 
 export default async function handler(request, response) {
   const query = JSON.parse(request.query.q);
-  const lat = request.query.lat;
-  const lon = request.query.lon;
+  const userLat = request.query.userLat;
+  const userLon = request.query.userLon;
+  const mapCenterLat = request.query.mapCenterLat;
+  const mapCenterLon = request.query.mapCenterLon;
 
   try {
     const result = await sql`
-      SELECT id, name, address, address_url, latitude, longitude, cover_photo_url, ROUND((ST_DistanceSphere(ST_MakePoint(${lon}, ${lat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
+      SELECT id, name, address, address_url, latitude, longitude, cover_photo_url
+        ,ROUND((ST_DistanceSphere(ST_MakePoint(${userLon}, ${userLat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
       FROM restaurants
       WHERE name ILIKE '%' || ${query} || '%'
+      ORDER BY ROUND(ST_DistanceSphere(ST_MakePoint(${mapCenterLon}, ${mapCenterLat}), location))
       LIMIT 10
     `;
 

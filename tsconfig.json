@@ -46,7 +46,7 @@
     "src/app/components/SearchResultsList.jsx",
     "src/app/components/SearchResultsFilters.jsx",
     "src/app/components/Map-maplibre.jsx",
-    "src/app/components/CustomTypehead.jsx",
+    "src/app/components/RestaurantSearch.jsx",
     "src/app/pages/api/get-cuisines/route.js",
     "src/app/pages/api/get-cuisine/route.js",
     "src/app/components/BottomModalSheet.jsx"

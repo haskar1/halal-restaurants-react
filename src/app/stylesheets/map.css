@@ -73,41 +73,12 @@ textarea {
   position: fixed;
   height: 100vh;
   width: 100%;
+  background-color: #f6f1e4;
 }
 
 .sidebar {
-  display: grid;
-  grid-template-rows: auto auto 1fr;
-  /* z-index: 9; */
-  /* margin-top: 50vh; */
-  background-color: #faf9f6;
+  display: none;
 }
-
-/* .sidebar {
-  display: grid;
-  grid-template-rows: auto auto 1fr;
-  z-index: 99;
-  position: relative;
-  top: 50%; 
-  min-height: 50%;
-  width: 100%;
-  background-color: #faf9f6;
-  transform: translateY(0);
-  transition: transform 0.3s ease-in-out;
-} */
-
-/* .sidebar.snapped { */
-/* transform: translateY(-100%);
-  transition: transform 0.3s ease-in-out; */
-
-/* margin-top: 0; */
-/* transition: margin-top 0.3s ease-in-out; */
-
-/* top: 90%; */
-/* transform: translateY(20vh); Adjust as needed */
-
-/* transition: top 0.3s ease-in-out; */
-/* } */
 
 .search-list {
   padding: 1rem;
@@ -132,12 +103,14 @@ textarea {
   .map-wrap {
     position: relative;
     order: 1;
-    height: auto;
     width: auto;
+    height: auto;
   }
 
   .sidebar {
-    margin-top: 0;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    background-color: #faf9f6;
     overflow: auto;
   }
 }
@@ -226,6 +199,15 @@ textarea {
   max-width: none !important;
 }
 
+.geocoding form li {
+  animation: none !important;
+  padding-left: 1rem !important;
+}
+
+.geocoding form li img {
+  display: none;
+}
+
 .geocoding input {
   font-size: 16px !important;
 }
@@ -262,6 +244,11 @@ textarea {
   white-space: normal;
 }
 
+/* Spinner loader when searching restaurant, moves it to the left of the X button */
+.typeahead-container .rbt-aux:has(.rbt-loader) {
+  right: 2rem !important;
+}
+
 @media screen and (min-width: 768px) {
   .typeahead-container .rbt {
     max-width: 20rem;
@@ -271,14 +258,6 @@ textarea {
     width: max-content;
     max-width: 50vw;
   }
-}
-
-/* SEARCH THIS AREA BUTTON */
-.search-area-btn {
-  position: absolute;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 /* ZOOM AND GEOLOCATE BUTTONS */

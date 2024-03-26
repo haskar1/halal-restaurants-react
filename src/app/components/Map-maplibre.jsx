@@ -2,11 +2,10 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
-import { GeocodingControl } from "@maptiler/geocoding-control/react";
+import GeocodingControlCustom from "@/components/GeocodingControlCustom";
 import { createMapLibreGlMapController } from "@maptiler/geocoding-control/maplibregl-controller";
 import Sidebar from "@/components/Sidebar";
 import { useMediaQuery } from "@mui/material";
-import "@maptiler/geocoding-control/style.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../stylesheets/map.css";
 
@@ -21,14 +20,13 @@ export default function Map() {
   const [showDistance, setShowDistance] = useState(false);
   const [showDistanceBtnIsDisabled, setShowDistanceBtnIsDisabled] =
     useState(true);
-  const [showSearchAreaButton, setShowSearchAreaButton] = useState(false);
-  const showSearchAreaButtonRef = useRef(false);
   const [searchResults, setSearchResults] = useState({});
   const [isActive, setIsActive] = useState("");
   const geolocate = useRef(null);
   const clickedOnRestaurantPopup = useRef(false);
   const searchedRestaurantSelected = useRef(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const bottomSheetRef = useRef();
   const bottomSheetSnapping = useRef(false);
 
   const isMobile = useMediaQuery("(max-width:767px)", { noSsr: true });
@@ -59,11 +57,14 @@ export default function Map() {
           }
 
           const initialBounds = map.current.getBounds();
+          const mapCenter = map.current.getCenter();
 
           fetch(
             `/api/get-map-restaurants?bounds=${JSON.stringify(
               initialBounds
-            )}&lat=${lat}&lon=${lon}
+            )}&userLat=${lat}&userLon=${lon}&mapCenterLat=${
+              mapCenter.lat
+            }&mapCenterLon=${mapCenter.lng}
               `
           )
             .then((res) => {
@@ -273,6 +274,7 @@ export default function Map() {
       trackUserLocation: true,
       fitBoundsOptions: { maxZoom: 14, animate: false },
       showAccuracyCircle: false,
+      showUserLocation: false,
     });
 
     map.current.addControl(geolocate.current);
@@ -290,26 +292,47 @@ export default function Map() {
         setShowDistance(true);
         setShowDistanceBtnIsDisabled(false);
       }
-
-      setIsMapLoaded(true);
     });
 
     setMapController(
       createMapLibreGlMapController(map.current, maplibregl, false)
     );
-  }, [isMobile]);
+
+    setIsMapLoaded(true);
+  }, []);
 
   useEffect(() => {
     if (!map?.current || !isMapLoaded) return;
-
-    map.current.off("moveend", delayShowSearchAreaButton);
-
-    map.current.on("moveend", delayShowSearchAreaButton);
-
+    map.current.off("moveend", delaySearchArea);
+    map.current.on("moveend", delaySearchArea);
     return () => {
-      map.current.off("moveend", delayShowSearchAreaButton);
+      map.current.off("moveend", delaySearchArea);
     };
-  }, [showSearchAreaButton, showSearchAreaButtonRef.current, isMapLoaded]);
+  }, [isMapLoaded]);
+
+  function delaySearchArea() {
+    if (bottomSheetSnapping.current) return;
+
+    const timeoutId = setTimeout(() => {
+      // Use last known position in case user has physically moved to another location,
+      // so it sets lat and lon to actual current position to get accurate distances to restaurants
+      if (geolocate.current._lastKnownPosition) {
+        const lat = geolocate.current._lastKnownPosition.coords.latitude;
+        const lon = geolocate.current._lastKnownPosition.coords.longitude;
+        setLat(lat);
+        setLon(lon);
+        fetchStores(lat, lon);
+      } else {
+        // User doesn't want to share location, so use the default lat and lon
+        fetchStores(lat, lon);
+      }
+      // When you click on the search area button, the restaurant popup closes if it's open
+      clickedOnRestaurantPopup.current = false;
+    }, 1000);
+    map.current.once("movestart", () => {
+      clearTimeout(timeoutId);
+    });
+  }
 
   function fetchStores(currentLat, currentLon) {
     if (isActive !== "") {
@@ -323,12 +346,15 @@ export default function Map() {
     }
 
     const bounds = map.current.getBounds();
+    const mapCenter = map.current.getCenter();
 
     // Fetch restaurants dynamically based on the current viewport
     fetch(
       `/api/get-map-restaurants?bounds=${JSON.stringify(
         bounds
-      )}&lat=${currentLat}&lon=${currentLon}`
+      )}&userLat=${currentLat}&userLon=${currentLon}&mapCenterLat=${
+        mapCenter.lat
+      }&mapCenterLon=${mapCenter.lng}`
     )
       .then((res) => {
         return res.json();
@@ -340,24 +366,6 @@ export default function Map() {
       .catch((error) => {
         console.error("Error fetching restaurant data:", error);
       });
-
-    if (showSearchAreaButton) {
-      setShowSearchAreaButton(false);
-    }
-  }
-
-  function delayShowSearchAreaButton() {
-    if (bottomSheetSnapping.current) return;
-
-    if (!showSearchAreaButton || !showSearchAreaButtonRef.current) {
-      const timeoutId = setTimeout(() => {
-        setShowSearchAreaButton(true);
-        showSearchAreaButtonRef.current = true;
-      }, 1000);
-      map.current.once("movestart", () => {
-        clearTimeout(timeoutId);
-      });
-    }
   }
 
   return (
@@ -365,62 +373,21 @@ export default function Map() {
       <div className="map-wrap">
         <div ref={mapContainer} className="map" />
 
-        <div className="flex">
-          <div className="geocoding">
-            <GeocodingControl
-              apiKey={API_KEY}
-              mapController={mapController}
-              proximity={[{ type: "map-center" }]}
-              placeholder="Search Location (City, Address, etc.)"
-              noResultsMessage="Location not found"
-              showFullGeometry={false}
-              markerOnSelected={false}
-              flyTo={false}
-              onPick={(e) => {
-                // check if e is not null, otherwise bug happens where the map glitches when you search location
-                if (e) {
-                  map.current.jumpTo({ center: e?.center, zoom: 14 });
-                  fetchStores(lat, lon);
-                  clickedOnRestaurantPopup.current = false;
-                }
-              }}
-            />
-          </div>
-
-          {showSearchAreaButton && (
-            <button
-              type="button"
-              className="search-area-btn bg-slate-700"
-              onClick={() => {
-                // Use last known position in case user has physically moved to another location,
-                // so it sets lat and lon to actual current position to get accurate distances to restaurants
-                if (geolocate.current._lastKnownPosition) {
-                  const lat =
-                    geolocate.current._lastKnownPosition.coords.latitude;
-                  const lon =
-                    geolocate.current._lastKnownPosition.coords.longitude;
-                  setLat(lat);
-                  setLon(lon);
-                  fetchStores(lat, lon);
-                } else {
-                  // User doesn't want to share location, so use the default lat and lon
-                  fetchStores(lat, lon);
-                }
-                // When you click on the search area button, the restaurant popup closes if it's open
-                clickedOnRestaurantPopup.current = false;
-              }}
-            >
-              Search this area
-            </button>
-          )}
-        </div>
+        <GeocodingControlCustom
+          map={map}
+          mapController={mapController}
+          API_KEY={API_KEY}
+          fetchStores={fetchStores}
+          bottomSheetRef={bottomSheetRef}
+          clickedOnRestaurantPopup={clickedOnRestaurantPopup}
+          isMobile={isMobile}
+        />
       </div>
 
       <Sidebar
         map={map}
         lat={lat}
         lon={lon}
-        zoom={zoom}
         showDistance={showDistance}
         setShowDistance={setShowDistance}
         showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
@@ -430,6 +397,7 @@ export default function Map() {
         setIsActive={setIsActive}
         clickedOnRestaurantPopup={clickedOnRestaurantPopup}
         searchedRestaurantSelected={searchedRestaurantSelected}
+        bottomSheetRef={bottomSheetRef}
         bottomSheetSnapping={bottomSheetSnapping}
       />
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import CustomTypehead from "./CustomTypehead";
+import RestaurantSearch from "./RestaurantSearch";
 import SearchResultsList from "./SearchResultsList";
 import maplibregl from "maplibre-gl";
 import SearchResultsFilters from "./SearchResultsFilters";
@@ -11,7 +11,6 @@ export default function Sidebar({
   map,
   lat,
   lon,
-  zoom,
   showDistance,
   setShowDistance,
   showDistanceBtnIsDisabled,
@@ -22,17 +21,13 @@ export default function Sidebar({
   clickedOnRestaurantPopup,
   searchedRestaurantSelected,
   bottomSheetSnapping,
-  mapBounds,
-  mobileSidebarBottomSheetIsSnapping,
-  snapPoint,
+  bottomSheetRef,
 }) {
-  // Bottom modal drawer open state. useEffect to open it smoothly on mount
-  const [open, setOpen] = useState(false);
-  const sheetRef = useRef();
+  const [bottomSheetIsOpen, setBottomSheetIsOpen] = useState(false);
   const snapPointsRef = useRef([]);
 
   useEffect(() => {
-    setOpen(true);
+    setBottomSheetIsOpen(true);
   }, []);
 
   function showPopup(restaurant) {
@@ -48,8 +43,6 @@ export default function Sidebar({
     if (popups.length) {
       [...popups].map((popup) => popup.remove());
     }
-
-    map.current.easeTo({ center: coordinates, zoom: zoom });
 
     let popup = new maplibregl.Popup()
       .setLngLat(coordinates)
@@ -83,56 +76,68 @@ export default function Sidebar({
   // Only render the bottom modal sheet on mobile
   if (useMediaQuery("(max-width:767px)")) {
     return (
-      <div className="sidebar">
-        <BottomSheet
-          ref={sheetRef}
-          open={open}
-          blocking={false}
-          snapPoints={({ minHeight, maxHeight, headerHeight }) => {
-            const snapPoints = [minHeight, maxHeight * 0.5, headerHeight];
-            snapPointsRef.current = snapPoints;
-            return snapPoints;
-          }}
-          onSpringStart={() => {
-            bottomSheetSnapping.current = true;
-          }}
-          onSpringEnd={() => {
-            bottomSheetSnapping.current = false;
-          }}
-          defaultSnap={({ snapPoints }) => snapPoints[1]}
-          expandOnContentDrag={true}
-          header={
-            <CustomTypehead
+      <BottomSheet
+        ref={bottomSheetRef}
+        open={bottomSheetIsOpen}
+        blocking={false}
+        //maxHeight is full screen, maxHeight * 0.5 is middle, and headerHeight is bottom of screen (dragged down position)
+        snapPoints={({ maxHeight, headerHeight }) => {
+          const snapPoints = [maxHeight, maxHeight * 0.5, headerHeight];
+          snapPointsRef.current = snapPoints;
+          return snapPoints;
+        }}
+        onSpringStart={() => {
+          bottomSheetSnapping.current = true;
+        }}
+        onSpringEnd={() => {
+          bottomSheetSnapping.current = false;
+        }}
+        defaultSnap={({ snapPoints }) => snapPoints[1]}
+        expandOnContentDrag={true}
+        header={
+          <>
+            <RestaurantSearch
               map={map}
               lat={lat}
               lon={lon}
               showPopup={showPopup}
               setSearchResults={setSearchResults}
               searchedRestaurantSelected={searchedRestaurantSelected}
+              bottomSheetRef={bottomSheetRef}
             />
-          }
-        >
-          <SearchResultsFilters
-            showDistance={showDistance}
-            setShowDistance={setShowDistance}
-            showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
-          />
-          <SearchResultsList
-            map={map}
-            isActive={isActive}
-            showPopup={showPopup}
-            showDistance={showDistance}
-            searchResults={searchResults}
-          />
-        </BottomSheet>
-      </div>
+            {searchResults?.features && searchResults.features.length > 0 && (
+              <div>
+                <span>
+                  <b>
+                    {searchResults.features.length}{" "}
+                    {searchResults.features.length === 1 ? "result" : "results"}
+                  </b>
+                </span>
+              </div>
+            )}
+          </>
+        }
+      >
+        <SearchResultsFilters
+          showDistance={showDistance}
+          setShowDistance={setShowDistance}
+          showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+        />
+        <SearchResultsList
+          map={map}
+          isActive={isActive}
+          showPopup={showPopup}
+          showDistance={showDistance}
+          searchResults={searchResults}
+        />
+      </BottomSheet>
     );
   }
 
   // Tablet and desktop sidebar
   return (
     <div className="sidebar">
-      <CustomTypehead
+      <RestaurantSearch
         map={map}
         lat={lat}
         lon={lon}
@@ -146,9 +151,7 @@ export default function Sidebar({
         showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
       />
       <SearchResultsList
-        map={map}
         isActive={isActive}
-        showPopup={showPopup}
         showDistance={showDistance}
         searchResults={searchResults}
       />

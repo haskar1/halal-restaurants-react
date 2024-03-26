@@ -1,8 +1,7 @@
 import {
   AsyncTypeahead,
-  Menu,
-  MenuItem,
   ClearButton,
+  Highlighter,
 } from "react-bootstrap-typeahead";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap-typeahead/css/Typeahead.css";
@@ -10,17 +9,19 @@ import "react-bootstrap-typeahead/css/Typeahead.bs5.css";
 import { useState } from "react";
 
 // Searchbar that searches the database for restaurants
-export default function CustomTypehead({
+export default function RestaurantSearch({
   map,
   showPopup,
   setSearchResults,
   searchedRestaurantSelected,
   lat,
   lon,
+  bottomSheetRef,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState([]);
   const [GeoJSON, setGeoJSON] = useState({});
+  const [inputExists, setInputExists] = useState(false);
 
   return (
     <div className="typeahead-container">
@@ -28,13 +29,31 @@ export default function CustomTypehead({
         id="typeahead-result-list"
         placeholder="Search Restaurants"
         isLoading={isLoading}
+        useCache={false}
         labelKey={(option) => `${option.name}`}
+        onInputChange={(text) => {
+          if (text === "") {
+            setInputExists(false);
+            return;
+          }
+
+          if (!inputExists) {
+            setInputExists(true);
+          }
+        }}
+        // onFocus={() => {
+        //   bottomSheetRef.current.snapTo(({ maxHeight }) => maxHeight);
+        // }}
         onSearch={(query) => {
+          const mapCenter = map.current.getCenter();
+
           setIsLoading(true);
           fetch(
             `/api/get-searchbar-restaurants?q=${JSON.stringify(
               query
-            )}&lat=${lat}&lon=${lon}`
+            )}&userLat=${lat}&userLon=${lon}&mapCenterLat=${
+              mapCenter.lat
+            }&mapCenterLon=${mapCenter.lng}`
           )
             .then((res) => res.json())
             .then((data) => {
@@ -101,21 +120,17 @@ export default function CustomTypehead({
             searchedRestaurantSelected.current = true;
           }
         }}
-        renderMenu={(results) => (
-          <Menu id="typeahead-menu" emptyLabel="Restaurant not found">
-            {results.map((result, index) => (
-              <MenuItem key={index} option={result} position={index}>
-                <b>{result.name}</b>
-                {" - "}
-                {result.address}
-              </MenuItem>
-            ))}
-          </Menu>
+        renderMenuItemChildren={(option, props) => (
+          <div key={option.id}>
+            <Highlighter search={props.text}>{option.name}</Highlighter>
+            {" - "}
+            {option.address}
+          </div>
         )}
       >
-        {({ onClear, selected }) => (
+        {({ onClear }) => (
           <div className="rbt-aux">
-            {!!selected.length && <ClearButton onClick={onClear} />}
+            {inputExists && <ClearButton onClick={onClear} />}
           </div>
         )}
       </AsyncTypeahead>
