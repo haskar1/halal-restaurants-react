@@ -8,7 +8,7 @@ export default async function CuisineList() {
   return (
     <>
       <h1 className="text-3xl pb-8">Cuisine List</h1>
-      <ul>
+      <ul className="pl-0">
         {cuisines && cuisines.length > 0 ? (
           cuisines.map((cuisine) => (
             <li key={cuisine.id}>

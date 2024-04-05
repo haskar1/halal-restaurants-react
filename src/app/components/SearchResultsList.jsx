@@ -16,7 +16,7 @@ export default function SearchResultsList({
                 }
               >
                 <a
-                  href={`/dashboard/restaurants/${restaurant.properties.id}`}
+                  href={`/dashboard/restaurants/${restaurant.properties.restaurant_tag}`}
                   target="_blank"
                 >
                   <img

@@ -1,6 +1,8 @@
 import { sql } from "@vercel/postgres";
 
-export default async function getRestaurant(restaurant_tag) {
+export default async function handler(request, response) {
+  const restaurant_tag = request.query.restaurant_tag;
+
   try {
     const result = await sql`
       SELECT
@@ -38,12 +40,12 @@ export default async function getRestaurant(restaurant_tag) {
       restaurant.rating = null;
     }
 
-    return restaurant;
+    return response.status(200).json({ restaurant });
   } catch (error) {
     console.error(
       "Error fetching restaurant:",
       error.response?.data?.message || error.message
     );
-    return;
+    return response.status(500).json({ error });
   }
 }

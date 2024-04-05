@@ -1,57 +1,127 @@
-// import callAPI_GET from "@/utils/callAPI_GET";
-import getRestaurants from "@/utils/get-restaurants";
+"use client";
+
+import { useEffect, useState } from "react";
+import { FixedSizeList as List } from "react-window";
+import InfiniteLoader from "react-window-infinite-loader";
+import AutoSizer from "react-virtualized-auto-sizer";
+import "@/stylesheets/restaurants.css";
 
 export const fetchCache = "force-no-store";
 
-export default async function RestaurantList() {
-  const restaurants = await getRestaurants();
+export default function RestaurantList() {
+  const [restaurants, setRestaurants] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreItems, setHasMoreItems] = useState(true);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [loadingMsg, setLoadingMsg] = useState("Loading...");
+
+  useEffect(() => {
+    setIsLoadingMore(true);
+    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+    fetchRestaurants();
+  }, []);
+
+  function fetchRestaurants() {
+    fetch(`/api/get-restaurants?pageNumber=${pageNumber}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        if (json.error) {
+          setLoadingMsg("No restaurants found");
+          setHasMoreItems(false);
+          return;
+        }
+        if (!json.restaurants) {
+          setHasMoreItems(false);
+          return;
+        }
+        setRestaurants((prevRestaurants) => {
+          if (!prevRestaurants) {
+            return [...json.restaurants];
+          } else {
+            return [...prevRestaurants, ...json.restaurants];
+          }
+        });
+        setIsLoadingMore(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching restaurants: ", error);
+      });
+  }
+
+  function isItemLoaded(index) {
+    return !!restaurants[index];
+  }
+
+  function loadMoreItems(startIndex, stopIndex) {
+    if (!isLoadingMore && hasMoreItems) {
+      console.log("loadMoreItems");
+      setIsLoadingMore(true);
+      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      fetchRestaurants();
+    }
+  }
 
   return (
-    <>
-      <h1 className="text-3xl pb-8">Restaurant List</h1>
-      <ul className="flex flex-wrap gap-8">
-        {restaurants && restaurants.length > 0 ? (
-          restaurants.map((restaurant) => (
-            <li
-              key={restaurant.restaurant_id}
-              className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
-            >
-              <a
-                href={`/dashboard/restaurants/${encodeURIComponent(
-                  restaurant.restaurant_id.toString()
-                )}`}
+    <div className="restaurants-container">
+      {restaurants ? (
+        <div className="h-full">
+          {/* <h1 className="text-3xl pb-8">Restaurant List</h1> */}
+          <AutoSizer>
+            {({ height, width }) => (
+              <InfiniteLoader
+                isItemLoaded={isItemLoaded}
+                itemCount={restaurants.length + (hasMoreItems ? 1 : 0)}
+                loadMoreItems={loadMoreItems}
               >
-                <h2 className="text-2xl pb-6">{restaurant.restaurant_name}</h2>
+                {({ onItemsRendered, ref }) => (
+                  <List
+                    onItemsRendered={onItemsRendered}
+                    ref={ref}
+                    itemCount={restaurants.length + (hasMoreItems ? 1 : 0)}
+                    itemSize={80}
+                    height={height}
+                    width={width}
+                  >
+                    {({ index, style }) => {
+                      if (!isItemLoaded(index)) {
+                        return <div style={style}>Loading...</div>;
+                      }
 
-                {restaurant.cuisines.length > 1 ? (
-                  <p>
-                    Cuisines:{" "}
-                    {restaurant.cuisines.map((cuisine, index) => (
-                      <span key={cuisine.id}>
-                        {cuisine.name}
-                        {index < restaurant.cuisines.length - 1 && ", "}
-                      </span>
-                    ))}
-                  </p>
-                ) : restaurant.cuisines.length === 1 ? (
-                  <p>
-                    Cuisine:{" "}
-                    {restaurant.cuisines.map((cuisine) => (
-                      <span key={cuisine.id}>{cuisine.name}</span>
-                    ))}
-                  </p>
-                ) : null}
+                      const restaurant = restaurants[index];
 
-                {restaurant.restaurant_address && (
-                  <p>{restaurant.restaurant_address}</p>
+                      return (
+                        <div style={style}>
+                          <a
+                            href={`/dashboard/restaurants/${encodeURIComponent(
+                              restaurant.restaurant_tag.toString()
+                            )}`}
+                          >
+                            <div className="p-0 m-0">
+                              <p className="p-0 m-0 truncate">
+                                <b>{restaurant.restaurant_name}</b>
+                              </p>
+
+                              {restaurant.restaurant_address && (
+                                <p className="p-0 m-0 truncate">
+                                  {restaurant.restaurant_address}
+                                </p>
+                              )}
+                            </div>
+                          </a>
+                        </div>
+                      );
+                    }}
+                  </List>
                 )}
-              </a>
-            </li>
-          ))
-        ) : (
-          <li>No restaurants found.</li>
-        )}
-      </ul>
-    </>
+              </InfiniteLoader>
+            )}
+          </AutoSizer>
+        </div>
+      ) : (
+        <p>{loadingMsg}</p>
+      )}
+    </div>
   );
 }

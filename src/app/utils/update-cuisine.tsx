@@ -5,11 +5,12 @@ import { z } from "zod";
 import { sql } from "@vercel/postgres";
 import { redirect } from "next/navigation";
 
-export default async function createCuisine(
+export default async function updateCuisine(
   prevState: any,
   formData: FormData
 ) {
   const schema = z.object({
+    id: z.string().trim().min(1, { message: "Cuisine id missing or invalid." }),
     name: z
       .string()
       .trim()
@@ -17,6 +18,7 @@ export default async function createCuisine(
   });
 
   const parse = schema.safeParse({
+    id: formData.get("id"),
     name: formData.get("name"),
   });
 
@@ -29,32 +31,19 @@ export default async function createCuisine(
   }
 
   const data = parse.data;
+  const id = data.id;
   let redirectPath;
 
   try {
-    revalidatePath("/");
-    const cuisineExists = await sql`
-      SELECT * FROM cuisines WHERE name ILIKE ${data.name};
-    `;
-
-    if (cuisineExists.rows[0]) {
-      return {
-        id: cuisineExists.rows[0].id,
-      };
-    } else {
-      const newCuisine = await sql`
-        INSERT INTO cuisines (name)
-        VALUES (${data.name})
-        RETURNING id;
+    const updatedCuisine = await sql`
+        UPDATE cuisines
+        SET name = ${data.name}
+        WHERE id = ${id};
       `;
-
-      const newCuisineId = newCuisine.rows[0].id;
-
-      revalidatePath("/");
-      redirectPath = `/dashboard/cuisines/${newCuisineId}`;
-    }
+    revalidatePath("/");
+    redirectPath = `/dashboard/cuisines/${id}`;
   } catch (e) {
-    return { message: `Failed to create cuisine. ${e}` };
+    return { message: `Failed to update cuisine. ${e}` };
   } finally {
     if (redirectPath) redirect(redirectPath);
   }

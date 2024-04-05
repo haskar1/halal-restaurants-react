@@ -1,21 +1,3 @@
-when location is searched:
-  if there are no restaurants within 50 mile radius, 
-  zoom out to 50 mile radius (searched location's coordinates in the middle) 
-  and display message saying no restaurants found
-
-  if there is one restaurant within 50 mile radius,
-  zoom out only enough to show the one restaurant with padding around
-  keep center as searched location's coordinates 
-
-  if there are two or more restaurants within 50 mile radius,
-  zoom out and use the outer most restaurant as the edge for map bounds
-  only zoom out to show enough padding 
-  (i.e. if the outer most restaurant is only 20 miles from center then zoom to that and add padding)
-  keep center as searched location's coordinates 
-
-  display distance to restaurants from searched center 
-
-
-
-allow zooming while mouse hovered over popup
-
+Optimizations:
+- implement getStaticProps for create restaurant page so that cuisines is loaded with the rest of the page
+- client side validation for create restaurant page to prevent clicking submit button unless at least one cuisine is selected

@@ -17,6 +17,9 @@ const config: Config = {
     },
   },
   plugins: [require("tw-elements/dist/plugin.cjs")],
+  corePlugins: {
+    preflight: false,
+  },
   darkMode: "class",
 };
 export default config;

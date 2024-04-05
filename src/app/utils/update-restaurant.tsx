@@ -6,11 +6,15 @@ import { z } from "zod";
 import { sql } from "@vercel/postgres";
 import { redirect } from "next/navigation";
 
-export default async function createRestaurant(
+export default async function updateRestaurant(
   prevState: any,
   formData: FormData
 ) {
   const schema = z.object({
+    id: z
+      .string()
+      .trim()
+      .min(1, { message: "Restaurant id missing or invalid." }),
     name: z
       .string()
       .trim()
@@ -49,6 +53,7 @@ export default async function createRestaurant(
   });
 
   const parse = schema.safeParse({
+    id: formData.get("id"),
     name: formData.get("name"),
     restaurant_tag: formData.get("restaurant_tag"),
     address: formData.get("address"),
@@ -73,13 +78,15 @@ export default async function createRestaurant(
   }
 
   const data = parse.data;
+  const id = data.id;
   const lat = data.latitude;
   const lon = data.longitude;
   let redirectPath;
 
   try {
     const result = await sql`
-      INSERT INTO restaurants (
+      UPDATE restaurants 
+      SET (
         name, 
         restaurant_tag, 
         address, 
@@ -92,8 +99,7 @@ export default async function createRestaurant(
         rating,
         price,
         cover_photo_url
-      )
-      VALUES (
+      ) = (
         ${data.name}, 
         ${data.restaurant_tag}, 
         ${data.address}, 
@@ -107,28 +113,37 @@ export default async function createRestaurant(
         ${data.price},
         ${data.cover_photo_url}
       )
+      WHERE id = ${id}
       RETURNING *;
     `;
 
-    const newRestaurantId = result.rows[0].id;
-    const newRestaurantTag = result.rows[0].restaurant_tag;
+    const updatedRestaurantTag = result.rows[0].restaurant_tag;
 
+    revalidatePath("/");
+
+    // Delete existing records from restaurant_cuisines for the given restaurant ID
+    await sql`
+      DELETE FROM restaurant_cuisines
+      WHERE restaurant_id = ${id};
+    `;
+
+    //Insert new records into restaurant_cuisines for the selected cuisines
     data.cuisine.map(async (cuisineId) => {
       await sql`
-          INSERT INTO restaurant_cuisines (restaurant_id, cuisine_id)
-          VALUES (${newRestaurantId}, ${cuisineId})
-        `;
+        INSERT INTO restaurant_cuisines (restaurant_id, cuisine_id)
+        VALUES (${id}, ${cuisineId});
+      `;
     });
 
     revalidatePath("/");
-    redirectPath = `/dashboard/restaurants/${newRestaurantTag}`;
+    redirectPath = `/dashboard/restaurants/${updatedRestaurantTag}`;
 
     return {
-      id: newRestaurantId,
-      restaurant_tag: newRestaurantTag,
+      id: id,
+      restaurant_tag: updatedRestaurantTag,
     };
-  } catch (error) {
-    return { message: `Failed to create restaurant: ${error.message}` };
+  } catch (e) {
+    return { message: `Failed to update cuisine. ${e}` };
   } finally {
     if (redirectPath) redirect(redirectPath);
   }

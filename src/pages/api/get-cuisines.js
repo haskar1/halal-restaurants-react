@@ -1,6 +1,6 @@
 import { sql } from "@vercel/postgres";
 
-export default async function getCuisines() {
+export default async function handler(request, response) {
   try {
     const result = await sql`SELECT * FROM cuisines ORDER BY name;`;
 
@@ -8,12 +8,8 @@ export default async function getCuisines() {
       throw new Error("No cuisines found");
     }
     const cuisines = result.rows;
-    return cuisines;
+    return response.status(200).json({ cuisines });
   } catch (error) {
-    console.error(
-      "Error fetching cuisines:",
-      error.response?.data?.message || error.message
-    );
-    return;
+    return response.status(500).json({ error });
   }
 }

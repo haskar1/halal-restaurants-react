@@ -1,56 +1,167 @@
-import getCuisine from "@/utils/get-cuisine";
+"use client";
+
+import DeleteButton from "@/components/DeleteButton";
+import UpdateButton from "@/components/UpdateButton";
+import deleteCuisine from "@/utils/delete-cuisine";
+import { useEffect, useState } from "react";
+import { FixedSizeList as List } from "react-window";
+import InfiniteLoader from "react-window-infinite-loader";
+import AutoSizer from "react-virtualized-auto-sizer";
+import "@/stylesheets/restaurants.css";
 
 export const dynamicParams = true;
 export const fetchCache = "force-no-store";
 
-// export async function generateStaticParams() {
-//   const cuisines = await getCuisines();
+export default function CuisineList({ params }) {
+  const id = params.id;
+  const [cuisine, setCuisine] = useState(null);
+  const [cuisineRestaurants, setCuisineRestaurants] = useState(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreItems, setHasMoreItems] = useState(true);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [loadingMsg, setLoadingMsg] = useState("Loading...");
 
-//   if (cuisines && cuisines.length > 0) {
-//     return cuisines.map((cuisine) => ({
-//       id: cuisine.id.toString(),
-//     }));
-//   }
-// }
+  useEffect(() => {
+    fetch(`/api/get-cuisine?id=${id}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        if (json.error) {
+          setLoadingMsg("Cuisine not found");
+          return;
+        }
+        setCuisine(json.cuisine);
+      })
+      .catch((error) => {
+        console.error("Error fetching cuisine: ", error);
+      });
+  }, []);
 
-export default async function CuisineList({ params }) {
-  const cuisine = await getCuisine(params.id);
+  useEffect(() => {
+    setIsLoadingMore(true);
+    setPageNumber((prevPageNumber) => prevPageNumber + 1);
+    fetchCuisineRestaurants();
+  }, []);
+
+  function fetchCuisineRestaurants() {
+    fetch(`/api/get-cuisine-restaurants?id=${id}&pageNumber=${pageNumber}`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        if (!json.cuisine_restaurants) {
+          setHasMoreItems(false);
+          return;
+        }
+        setCuisineRestaurants((prevCuisineRestaurants) => {
+          if (!prevCuisineRestaurants) {
+            return [...json.cuisine_restaurants];
+          } else {
+            return [...prevCuisineRestaurants, ...json.cuisine_restaurants];
+          }
+        });
+        setIsLoadingMore(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching cuisine's restaurants: ", error);
+      });
+  }
+
+  function isItemLoaded(index) {
+    return !!cuisineRestaurants[index];
+  }
+
+  function loadMoreItems(startIndex, stopIndex) {
+    if (!isLoadingMore && hasMoreItems) {
+      setIsLoadingMore(true);
+      setPageNumber((prevPageNumber) => prevPageNumber + 1);
+      fetchCuisineRestaurants();
+    }
+  }
 
   return (
     <>
       {cuisine ? (
-        <div>
-          <h1 className="text-3xl pb-8">{cuisine.cuisine_name} Restaurants</h1>
-
-          {/* Cuisine's restaurants */}
-          {cuisine.restaurants.length > 0 ? (
-            <ul className="flex flex-wrap gap-8">
-              {cuisine.restaurants.map((restaurant) => (
-                <li
-                  key={restaurant.restaurant_id}
-                  className="w-[90%] max-w-[20rem] border-[3px] border-solid border-[#b9ae8c] rounded-lg p-8"
-                >
-                  <a
-                    href={`/dashboard/restaurants/${encodeURIComponent(
-                      restaurant.restaurant_id.toString()
-                    )}`}
+        <div className="cuisine-restaurants-container">
+          <h1 className="text-3xl pb-8">{cuisine.name} Restaurants</h1>
+          {cuisineRestaurants ? (
+            <div className="h-full">
+              <AutoSizer>
+                {({ height, width }) => (
+                  <InfiniteLoader
+                    isItemLoaded={isItemLoaded}
+                    itemCount={
+                      cuisineRestaurants.length + (hasMoreItems ? 1 : 0)
+                    }
+                    loadMoreItems={loadMoreItems}
                   >
-                    <p className="text-2xl pb-6">
-                      {restaurant.restaurant_name}
-                    </p>
-                    {restaurant.restaurant_address && (
-                      <p>Address: {restaurant.restaurant_address}</p>
+                    {({ onItemsRendered, ref }) => (
+                      <List
+                        onItemsRendered={onItemsRendered}
+                        ref={ref}
+                        itemCount={
+                          cuisineRestaurants.length + (hasMoreItems ? 1 : 0)
+                        }
+                        itemSize={80}
+                        height={height}
+                        width={width}
+                      >
+                        {({ index, style }) => {
+                          if (!isItemLoaded(index)) {
+                            return <div style={style}>Loading...</div>;
+                          }
+
+                          const restaurant = cuisineRestaurants[index];
+
+                          return (
+                            <div style={style}>
+                              <a
+                                href={`/dashboard/restaurants/${encodeURIComponent(
+                                  restaurant.restaurant_tag.toString()
+                                )}`}
+                              >
+                                <div className="p-0 m-0">
+                                  <p className="p-0 m-0 truncate">
+                                    <b>{restaurant.restaurant_name}</b>
+                                  </p>
+
+                                  {restaurant.restaurant_address && (
+                                    <p className="p-0 m-0 truncate">
+                                      {restaurant.restaurant_address}
+                                    </p>
+                                  )}
+                                </div>
+                              </a>
+                            </div>
+                          );
+                        }}
+                      </List>
                     )}
-                  </a>
-                </li>
-              ))}
-            </ul>
+                  </InfiniteLoader>
+                )}
+              </AutoSizer>
+            </div>
           ) : (
             <p>There are no restaurants with this cuisine yet.</p>
           )}
+
+          <div className="flex flex-wrap gap-[1rem] pt-8 absolute top-[80vh]">
+            <UpdateButton
+              href={`/dashboard/cuisines/${id}/update`}
+              text="Update Cuisine"
+            />
+
+            <DeleteButton
+              onClick={deleteCuisine}
+              args={cuisine.id}
+              category="Cuisine"
+              cuisineRestaurants={cuisineRestaurants}
+            />
+          </div>
         </div>
       ) : (
-        <h1>Cuisine Not Found</h1>
+        <p>{loadingMsg}</p>
       )}
     </>
   );

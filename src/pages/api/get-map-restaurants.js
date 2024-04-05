@@ -9,13 +9,13 @@ export default async function handler(request, response) {
 
   try {
     const result = await sql`
-            SELECT id, name, address, address_url, latitude, longitude, cover_photo_url
-              ,ROUND((ST_DistanceSphere(ST_MakePoint(${userLon}, ${userLat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
-              ,ROUND((ST_DistanceSphere(ST_MakePoint(${mapCenterLon}, ${mapCenterLat}), location) * 0.000621371192)::NUMERIC, 1) AS nearestToMapCenter
-            FROM restaurants
-            WHERE ST_Within(location, ST_MakeEnvelope(${bounds._sw.lng}, ${bounds._sw.lat}, ${bounds._ne.lng}, ${bounds._ne.lat}, 4326))
-            ORDER BY nearestToMapCenter
-        `;
+      SELECT id, name, restaurant_tag, address, address_url, latitude, longitude, cover_photo_url
+        ,ROUND((ST_DistanceSphere(ST_MakePoint(${userLon}, ${userLat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
+        ,ROUND((ST_DistanceSphere(ST_MakePoint(${mapCenterLon}, ${mapCenterLat}), location) * 0.000621371192)::NUMERIC, 1) AS nearestToMapCenter
+      FROM restaurants
+      WHERE ST_Within(location, ST_MakeEnvelope(${bounds._sw.lng}, ${bounds._sw.lat}, ${bounds._ne.lng}, ${bounds._ne.lat}, 4326))
+      ORDER BY nearestToMapCenter
+    `;
 
     const rows = result.rows;
 
@@ -31,6 +31,7 @@ export default async function handler(request, response) {
         properties: {
           id: row.id,
           name: row.name,
+          restaurant_tag: row.restaurant_tag,
           address: row.address,
           address_url: row.address_url,
           latitude: row.latitude,
