@@ -2,8 +2,11 @@
 
 import Image from "next/image";
 import { useEffect } from "react";
+import { useUser } from "@auth0/nextjs-auth0/client";
 
 export default function DashboardNav() {
+  const { user } = useUser();
+
   // Initialize Tailwind Element for Navigation
   useEffect(() => {
     const init = async () => {
@@ -449,7 +452,7 @@ export default function DashboardNav() {
                 <li>
                   <a
                     className="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-gray-700 hover:bg-gray-100 active:text-zinc-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-gray-400 dark:text-gray-200 dark:hover:bg-white/30"
-                    href="#"
+                    href="/dashboard/profile"
                     data-te-dropdown-item-ref
                   >
                     My profile
@@ -464,15 +467,27 @@ export default function DashboardNav() {
                     Settings
                   </a>
                 </li>
-                <li>
-                  <a
-                    className="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-gray-700 hover:bg-gray-100 active:text-zinc-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-gray-400 dark:text-gray-200 dark:hover:bg-white/30"
-                    href="#"
-                    data-te-dropdown-item-ref
-                  >
-                    Logout
-                  </a>
-                </li>
+                {!user ? (
+                  <li>
+                    <a
+                      className="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-gray-700 hover:bg-gray-100 active:text-zinc-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-gray-400 dark:text-gray-200 dark:hover:bg-white/30"
+                      href="/api/auth/login"
+                      data-te-dropdown-item-ref
+                    >
+                      Login
+                    </a>
+                  </li>
+                ) : (
+                  <li>
+                    <a
+                      className="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-gray-700 hover:bg-gray-100 active:text-zinc-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-gray-400 dark:text-gray-200 dark:hover:bg-white/30"
+                      href="/api/auth/logout"
+                      data-te-dropdown-item-ref
+                    >
+                      Logout
+                    </a>
+                  </li>
+                )}
               </ul>
             </li>
           </ul>
