@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 
 const style = {
@@ -31,7 +30,7 @@ export default function Modal({ props }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>{props}</Box>
+        <Box sx={style}>{children}</Box>
       </Modal>
     </div>
   );

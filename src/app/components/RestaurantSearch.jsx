@@ -23,6 +23,13 @@ export default function RestaurantSearch({
   const [GeoJSON, setGeoJSON] = useState({});
   const [inputExists, setInputExists] = useState(false);
 
+  function flyToRestaurant(restaurant) {
+    map.current.easeTo({
+      center: [restaurant.longitude, restaurant.latitude],
+      zoom: 15,
+    });
+  }
+
   return (
     <div className="typeahead-container">
       <AsyncTypeahead
@@ -116,6 +123,7 @@ export default function RestaurantSearch({
 
             map.current.getSource("restaurants").setData(updatedGeoJSON);
             setSearchResults(updatedGeoJSON);
+            flyToRestaurant(selected[0]);
             showPopup(selected[0]);
             searchedRestaurantSelected.current = true;
           }

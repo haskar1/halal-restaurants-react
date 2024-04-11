@@ -346,6 +346,7 @@ export default function Map() {
     }
 
     const bounds = map.current.getBounds();
+    console.log("bounds: ", bounds);
     const mapCenter = map.current.getCenter();
 
     // Fetch restaurants dynamically based on the current viewport

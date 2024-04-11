@@ -75,6 +75,8 @@ export default function Sidebar({
 
   // Only render the bottom modal sheet on mobile
   if (useMediaQuery("(max-width:767px)")) {
+    // Make the bottom of the map bounds end at the top of headerHeight (snapPointsRef[2]),
+    // so that restaurants will only be fetched in the visible map area.
     return (
       <BottomSheet
         ref={bottomSheetRef}
@@ -132,29 +134,29 @@ export default function Sidebar({
         />
       </BottomSheet>
     );
+  } else {
+    // Tablet and desktop sidebar
+    return (
+      <div className="sidebar">
+        <RestaurantSearch
+          map={map}
+          lat={lat}
+          lon={lon}
+          showPopup={showPopup}
+          setSearchResults={setSearchResults}
+          searchedRestaurantSelected={searchedRestaurantSelected}
+        />
+        <SearchResultsFilters
+          showDistance={showDistance}
+          setShowDistance={setShowDistance}
+          showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+        />
+        <SearchResultsList
+          isActive={isActive}
+          showDistance={showDistance}
+          searchResults={searchResults}
+        />
+      </div>
+    );
   }
-
-  // Tablet and desktop sidebar
-  return (
-    <div className="sidebar">
-      <RestaurantSearch
-        map={map}
-        lat={lat}
-        lon={lon}
-        showPopup={showPopup}
-        setSearchResults={setSearchResults}
-        searchedRestaurantSelected={searchedRestaurantSelected}
-      />
-      <SearchResultsFilters
-        showDistance={showDistance}
-        setShowDistance={setShowDistance}
-        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
-      />
-      <SearchResultsList
-        isActive={isActive}
-        showDistance={showDistance}
-        searchResults={searchResults}
-      />
-    </div>
-  );
 }
