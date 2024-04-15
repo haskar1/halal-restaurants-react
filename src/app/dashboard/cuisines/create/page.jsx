@@ -31,7 +31,7 @@ export default function CreateCuisineForm() {
           type="text"
           id="cuisine"
           name="name"
-          placeholder="Arab, American, Indian, etc."
+          placeholder="Mediterranean, American, Italian, etc."
           className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
           min="1"
           max="100"

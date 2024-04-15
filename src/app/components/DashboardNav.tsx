@@ -436,7 +436,10 @@ export default function DashboardNav() {
                 aria-expanded="false"
               >
                 <Image
-                  src="https://tecdn.b-cdn.net/img/Photos/Avatars/img(31).webp"
+                  src={
+                    user?.picture ||
+                    "https://tecdn.b-cdn.net/img/Photos/Avatars/img(31).webp"
+                  }
                   className="rounded-full"
                   height={22}
                   width={22}

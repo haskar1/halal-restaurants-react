@@ -44,12 +44,12 @@ export default function DeleteButton(props) {
           <Box sx={style}>
             <Alert variant="outlined" severity="error">
               Cuisine cannot be deleted because it has associated restaurant(s).
-              Please delete the above restaurant(s) before deleting the cuisine.
+              Please delete the restaurant(s) before deleting the cuisine.
             </Alert>
             <Button
               onClick={handleClose}
               variant="contained"
-              className="relative left-[50%] mt-[2rem] translate-x-[50%]"
+              className="relative left-[50%] !mt-[2rem] translate-x-[-50%]"
             >
               Ok
             </Button>

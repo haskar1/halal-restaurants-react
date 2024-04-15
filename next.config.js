@@ -29,6 +29,12 @@ const nextConfig = {
         port: "",
         pathname: "/img/Photos/Avatars/**",
       },
+      {
+        protocol: "https",
+        hostname: "s.gravatar.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
   reactStrictMode: false,

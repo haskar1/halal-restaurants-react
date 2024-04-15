@@ -33,14 +33,14 @@ export default async function createCuisine(
 
   try {
     revalidatePath("/");
+
     const cuisineExists = await sql`
       SELECT * FROM cuisines WHERE name ILIKE ${data.name};
     `;
 
     if (cuisineExists.rows[0]) {
-      return {
-        id: cuisineExists.rows[0].id,
-      };
+      const existingCuisineId = cuisineExists.rows[0].id;
+      redirectPath = `/dashboard/cuisines/${existingCuisineId}`;
     } else {
       const newCuisine = await sql`
         INSERT INTO cuisines (name)
@@ -50,12 +50,14 @@ export default async function createCuisine(
 
       const newCuisineId = newCuisine.rows[0].id;
 
-      revalidatePath("/");
       redirectPath = `/dashboard/cuisines/${newCuisineId}`;
     }
   } catch (e) {
     return { message: `Failed to create cuisine. ${e}` };
   } finally {
-    if (redirectPath) redirect(redirectPath);
+    if (redirectPath) {
+      revalidatePath("/");
+      redirect(redirectPath);
+    }
   }
 }
