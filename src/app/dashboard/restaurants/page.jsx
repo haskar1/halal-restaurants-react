@@ -5,6 +5,7 @@ import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import AutoSizer from "react-virtualized-auto-sizer";
 import "@/stylesheets/restaurants.css";
+import Link from "next/link";
 
 export const fetchCache = "force-no-store";
 
@@ -19,6 +20,11 @@ export default function RestaurantList() {
     setIsLoadingMore(true);
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
     fetchRestaurants();
+
+    document.body.classList.add("no-overflow");
+    return () => {
+      document.body.classList.remove("no-overflow");
+    };
   }, []);
 
   function fetchRestaurants() {
@@ -93,10 +99,8 @@ export default function RestaurantList() {
 
                       return (
                         <div style={style}>
-                          <a
-                            href={`/dashboard/restaurants/${encodeURIComponent(
-                              restaurant.restaurant_tag.toString()
-                            )}`}
+                          <Link
+                            href={`/dashboard/restaurants/${restaurant.slug}`}
                           >
                             <div className="p-0 m-0">
                               <p className="p-0 m-0 truncate">
@@ -109,7 +113,7 @@ export default function RestaurantList() {
                                 </p>
                               )}
                             </div>
-                          </a>
+                          </Link>
                         </div>
                       );
                     }}

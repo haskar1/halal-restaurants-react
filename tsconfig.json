@@ -20,11 +20,11 @@
       }
     ],
     "paths": {
-      "@/api/*": ["src/app/pages/api/*"],
-      "@/components/*": ["./src/app/components/*"],
-      "@/lib/*": ["./src/app/lib/*"],
-      "@/utils/*": ["./src/app/utils/*"],
-      "@/stylesheets/*": ["./src/app/stylesheets/*"],
+      "@/api/*": ["src/pages/api/*"],
+      "@/components/*": ["src/components/*"],
+      "@/lib/*": ["src/lib/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/stylesheets/*": ["src/stylesheets/*"],
       "@react-leaflet/core": ["./node_modules/@react-leaflet/core"]
     }
   },
@@ -33,9 +33,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/dashboard/restaurants/[restaurant_tag]",
+    "src/app/dashboard/restaurants/[slug]",
     "src/app/search/page.jsx",
-    "src/app/components/DashboardNav.jsx",
+    "src/components/DashboardNav.jsx",
     "src/app/dashboard/page.jsx",
     "src/app/dashboard/layout.jsx",
     "src/app/dashboard/restaurants/page.jsx",
@@ -43,14 +43,14 @@
     "src/app/dashboard/cuisines/page.jsx",
     "src/app/dashboard/cuisines/create/page.jsx",
     "src/app/dashboard/cuisines/[id]/page.jsx",
-    "src/app/components/Sidebar.tsx",
-    "src/app/components/SearchResultsList.jsx",
-    "src/app/components/SearchResultsFilters.jsx",
-    "src/app/components/Map-maplibre.jsx",
-    "src/app/components/RestaurantSearch.jsx",
-    "src/app/pages/api/get-cuisines/route.js",
-    "src/app/pages/api/get-cuisine/route.js",
-    "src/app/components/BottomModalSheet.jsx"
+    "src/components/Sidebar.tsx",
+    "src/components/SearchResultsList.jsx",
+    "src/components/SearchResultsFilters.jsx",
+    "src/components/Map-maplibre.jsx",
+    "src/components/RestaurantSearch.jsx",
+    "src/pages/api/get-cuisines/route.js",
+    "src/pages/api/get-cuisine/route.js",
+    "src/components/BottomModalSheet.jsx"
   ],
   "exclude": ["node_modules"]
 }

@@ -70,11 +70,11 @@ export default function CreateRestaurantForm() {
           min="1"
           required
         />
-        <label htmlFor="restaurant_tag">Restaurant Tag:</label>
+        <label htmlFor="slug">Restaurant Slug:</label>
         <input
           type="text"
-          id="restaurant_tag"
-          name="restaurant_tag"
+          id="slug"
+          name="slug"
           className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
           min="1"
           required

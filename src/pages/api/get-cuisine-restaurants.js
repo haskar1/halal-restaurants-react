@@ -11,7 +11,7 @@ export default async function handler(request, response) {
         SELECT
           r.id AS restaurant_id,
           r.name AS restaurant_name,
-          r.restaurant_tag AS restaurant_tag,
+          r.slug AS slug,
           r.address AS restaurant_address
         FROM
           restaurants r

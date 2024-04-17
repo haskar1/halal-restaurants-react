@@ -1,8 +1,6 @@
 import { sql } from "@vercel/postgres";
 
-export default async function handler(request, response) {
-  const slug = decodeURIComponent(request.query.slug);
-
+export default async function getRestaurant(slug) {
   try {
     const result = await sql`
       SELECT
@@ -15,7 +13,7 @@ export default async function handler(request, response) {
       LEFT JOIN
         cuisines c ON rc.cuisine_id = c.id
       WHERE
-        r.slug = ${slug}
+        r.slug = ${decodeURIComponent(slug)}
       GROUP BY
         r.id
     `;
@@ -40,12 +38,12 @@ export default async function handler(request, response) {
       restaurant.rating = null;
     }
 
-    return response.status(200).json({ restaurant });
+    return restaurant;
   } catch (error) {
     console.error(
       "Error fetching restaurant:",
       error.response?.data?.message || error.message
     );
-    return response.status(500).json({ error });
+    return;
   }
 }

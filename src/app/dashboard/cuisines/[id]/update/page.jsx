@@ -8,7 +8,7 @@ import SubmitButton from "@/components/SubmitButton";
 export const fetchCache = "force-no-store";
 
 export default function UpdateCuisineForm({ params }) {
-  const { id } = params;
+  const id = params.id;
   const [state, formAction] = useFormState(updateCuisine, null);
   const [cuisine, setCuisine] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

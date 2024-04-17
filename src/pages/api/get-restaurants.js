@@ -10,7 +10,7 @@ export default async function handler(request, response) {
       SELECT
         r.id AS restaurant_id,
         r.name AS restaurant_name,
-        r.restaurant_tag AS restaurant_tag,
+        r.slug AS slug,
         r.address AS restaurant_address,
         STRING_AGG(c.id || ':' || c.name, ', ') AS cuisines
       FROM
@@ -44,7 +44,7 @@ export default async function handler(request, response) {
       // Return the restaurant object with cuisines as an array of objects
       return {
         restaurant_id: row.restaurant_id,
-        restaurant_tag: row.restaurant_tag,
+        slug: row.slug,
         restaurant_name: row.restaurant_name,
         restaurant_address: row.restaurant_address,
         cuisines: cuisinesArray,

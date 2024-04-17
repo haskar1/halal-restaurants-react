@@ -1,4 +1,5 @@
 import getCuisines from "@/utils/get-cuisines";
+import Link from "next/link";
 
 export const fetchCache = "force-no-store";
 
@@ -12,15 +13,11 @@ export default async function CuisineList() {
         {cuisines && cuisines.length > 0 ? (
           cuisines.map((cuisine) => (
             <li key={cuisine.id}>
-              <a
-                href={`/dashboard/cuisines/${encodeURIComponent(
-                  cuisine.id.toString()
-                )}`}
-              >
+              <Link href={`/dashboard/cuisines/${cuisine.id}`}>
                 <p>
                   <span>{cuisine.name}</span>
                 </p>
-              </a>
+              </Link>
             </li>
           ))
         ) : (
