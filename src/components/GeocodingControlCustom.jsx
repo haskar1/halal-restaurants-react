@@ -15,11 +15,12 @@ export default function GeocodingControlCustom({
         apiKey={process.env.NEXT_PUBLIC_MAPTILER_API_KEY}
         mapController={mapController}
         proximity={[{ type: "map-center" }]}
-        placeholder="Search Location (City, Address, etc.)"
+        placeholder="Search Location"
         noResultsMessage="Location not found"
         flyTo={false}
         markerOnSelected={false}
-        types={["country"]}
+        limit={5}
+        types={["poi", "address", "municipal_district", "joint_municipality"]}
         excludeTypes={true}
         onPick={(e) => {
           // check if e is not null, otherwise bug happens where the map glitches when you search location
@@ -41,12 +42,16 @@ export default function GeocodingControlCustom({
         onResponse={(e) => {
           if (e.featureCollection.features?.length) {
             e.featureCollection.features.forEach((feature) => {
-              if (
-                feature.properties.place_type_name.includes("municipality") ||
-                feature.properties.place_type_name.includes("agglomerate")
-              ) {
-                feature.properties.place_type_name[0] = "city";
-              }
+              console.log(feature);
+              feature.place_type.forEach((type) => {
+                if (
+                  type === "municipality" ||
+                  type === "agglomerate" ||
+                  type === "region"
+                ) {
+                  feature.properties.place_type_name[0] = "city";
+                }
+              });
             });
           }
         }}

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import AutoSizer from "react-virtualized-auto-sizer";
-import "@/stylesheets/restaurants.css";
+import "@/stylesheets/restaurants-list-async.css";
 import Link from "next/link";
 
 export const dynamicParams = true;

@@ -139,6 +139,11 @@ textarea {
   border-bottom: none;
 } */
 
+.listings .item img {
+  width: 100%;
+  height: auto;
+}
+
 .listings .item a,
 .listings .item a span {
   display: block;

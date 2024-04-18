@@ -1,5 +1,6 @@
-import Link from "next/link";
 import RestaurantCardLoading from "@/components/RestaurantCardLoading";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function SearchResultsList({
   isActive,
@@ -19,14 +20,21 @@ export default function SearchResultsList({
                 }
               >
                 <Link
-                  href={`/dashboard/restaurants/${restaurant.properties.slug}`}
+                  href={`/restaurants/${restaurant.properties.slug}`}
                   target="_blank"
                 >
-                  <img
+                  {/* <img
                     src={restaurant.properties.cover_photo_url}
                     className="item__cover-photo"
                     width="100%"
                     height="auto"
+                  /> */}
+                  <Image
+                    src={restaurant.properties.cover_photo_url}
+                    alt={restaurant.properties.name}
+                    className="item__cover-photo"
+                    width="250"
+                    height="250"
                   />
                   <div className="item__text-container">
                     <span className="text-[#003089]">
