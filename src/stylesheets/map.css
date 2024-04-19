@@ -71,7 +71,7 @@ textarea {
 
 .map-wrap {
   position: fixed;
-  height: 100vh;
+  height: calc(100vh - 106px);
   width: 100%;
   background-image: url("https://img.whoishalal.com/map-loading-background.png");
   background-size: cover;
@@ -80,8 +80,7 @@ textarea {
 }
 
 .map {
-  /* position: fixed; */
-  height: 100vh;
+  height: calc(100vh - 106px);
 }
 
 .sidebar {
@@ -112,7 +111,11 @@ textarea {
     position: relative;
     order: 1;
     width: auto;
-    height: auto;
+    height: 100vh;
+  }
+
+  .map {
+    height: 100vh;
   }
 
   .sidebar {
@@ -193,7 +196,31 @@ textarea {
 
 /*** LOCATION SEARCH BAR ***/
 
-.geocoding {
+.mapboxgl-ctrl-geocoder {
+  margin: 1rem auto !important;
+  width: 90% !important;
+  z-index: 9 !important;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+  height: auto !important;
+}
+
+.mapboxgl-ctrl-geocoder--icon-search {
+  top: 7px !important;
+}
+
+/* Close button */
+.mapboxgl-ctrl-geocoder--button {
+  top: 0 !important;
+}
+
+/* Loading circle */
+.mapboxgl-ctrl-geocoder--icon-loading {
+  top: 0 !important;
+}
+
+/* .geocoding {
   position: absolute;
   top: 20px;
   left: 50%;
@@ -219,7 +246,7 @@ textarea {
 
 .geocoding input {
   font-size: 16px !important;
-}
+} */
 
 /*** MARKER POPUP ***/
 

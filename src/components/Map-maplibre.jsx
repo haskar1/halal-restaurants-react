@@ -2,17 +2,16 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
-import GeocodingControlCustom from "@/components/GeocodingControlCustom";
-import { createMapLibreGlMapController } from "@maptiler/geocoding-control/maplibregl-controller";
 import Sidebar from "@/components/Sidebar";
 import { Skeleton, useMediaQuery } from "@mui/material";
+import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@/stylesheets/map.css";
 
 export default function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [mapController, setMapController] = useState();
   const [lon, setLon] = useState(-78.81729);
   const [lat, setLat] = useState(35.813);
   const zoom = 14;
@@ -27,7 +26,6 @@ export default function Map() {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const bottomSheetRef = useRef();
   const bottomSheetSnapping = useRef(false);
-
   const isMobile = useMediaQuery("(max-width:767px)", { noSsr: true });
 
   useEffect(() => {
@@ -293,9 +291,56 @@ export default function Map() {
       }
     });
 
-    setMapController(
-      createMapLibreGlMapController(map.current, maplibregl, false)
+    const geocoder = new MapboxGeocoder({
+      accessToken:
+        "pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg",
+      types: "country,region,postcode,district,place,locality,neighborhood",
+      placeholder: "Search Location",
+    });
+    geocoder.addTo(".map");
+
+    geocoder.on("result", (e) => {
+      const bbox = e.result.bbox;
+      const center = e.result.center;
+      const lat = e.result.center[1];
+      const lon = e.result.center[0];
+
+      if (bbox) {
+        map.current.fitBounds(bbox, { animate: false });
+        map.current.jumpTo({ center: center });
+      } else {
+        map.current.jumpTo({ center: center, zoom: 14 });
+      }
+      fetchStores(lat, lon);
+      clickedOnRestaurantPopup.current = false;
+    });
+
+    geocoder.on("loading", (e) => {
+      if (isMobile) {
+        bottomSheetRef.current?.snapTo(({ headerHeight }) => headerHeight);
+      }
+    });
+
+    const geocoderInput = document.querySelector(
+      ".mapboxgl-ctrl-geocoder--input"
     );
+    const geocoderCloseBtn = document.querySelector(
+      ".mapboxgl-ctrl-geocoder--button"
+    );
+    geocoderInput?.addEventListener("change", () => {
+      if (geocoderInput.value !== "") {
+        geocoderCloseBtn.style.display = "block";
+      } else {
+        geocoderCloseBtn.style.display = "none";
+      }
+    });
+    geocoderInput?.addEventListener("blur", () => {
+      if (geocoderInput.value !== "") {
+        geocoderCloseBtn.style.display = "block";
+      } else {
+        geocoderCloseBtn.style.display = "none";
+      }
+    });
 
     setIsMapLoaded(true);
   }, []);
@@ -327,7 +372,7 @@ export default function Map() {
       }
       // When you click on the search area button, the restaurant popup closes if it's open
       clickedOnRestaurantPopup.current = false;
-    }, 1000);
+    }, 100); // adjust delay time as needed
     map.current.once("movestart", () => {
       clearTimeout(timeoutId);
     });
@@ -371,21 +416,12 @@ export default function Map() {
     <div className="map-and-sidebar-container">
       <div className="map-wrap">
         <div ref={mapContainer} className="map" />
-        {isMapLoaded ? (
-          <GeocodingControlCustom
-            map={map}
-            mapController={mapController}
-            fetchStores={fetchStores}
-            bottomSheetRef={bottomSheetRef}
-            clickedOnRestaurantPopup={clickedOnRestaurantPopup}
-            isMobile={isMobile}
-          />
-        ) : (
+        {!isMapLoaded && (
           <Skeleton
             sx={{
               height: "100vh",
               width: "100%",
-              bgcolor: "grey.400",
+              bgcolor: "rgba(246,241,228,0.65)",
               marginTop: "-100vh",
             }}
             variant="rectangular"
