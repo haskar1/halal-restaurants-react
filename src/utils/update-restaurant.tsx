@@ -31,6 +31,7 @@ export default async function updateRestaurant(
       .string()
       .trim()
       .min(1, { message: "Restaurant address_url cannot be empty." }),
+    google_maps_embedded_url: z.string().trim(),
     latitude: z
       .string()
       .trim()
@@ -40,13 +41,19 @@ export default async function updateRestaurant(
       .trim()
       .min(1, { message: "Restaurant longitude cannot be empty." }),
     restaurant_summary: z.string().trim(),
+    halal_status: z.enum(["", "Fully Halal", "Partially Halal", "Not Halal"]),
     halal_description: z.string().trim(),
+    alcohol_served: z.enum(["", "Yes", "No"]),
+    pork_served: z.enum(["", "Yes", "No"]),
+    slaughter_method: z.enum(["", "Hand Slaughtered", "Machine Cut"]),
     rating: z
       .union([z.number().positive().min(1).max(5).multipleOf(0.1), z.nan()])
       .optional(),
-    price: z.string().trim(),
+    price: z.enum(["", "$", "$$", "$$$", "$$$$"]),
+    phone: z.string().trim(),
+    website: z.string().trim(),
     cover_photo_url: z.string().trim(),
-    // other_photos_url: z.string().trim(),
+    other_photos_url: z.array(z.string().trim()),
     cuisine: z
       .array(z.string())
       .min(1, { message: "Please select at least one cuisine." }),
@@ -58,14 +65,21 @@ export default async function updateRestaurant(
     slug: formData.get("slug"),
     address: formData.get("address"),
     address_url: formData.get("address_url"),
+    google_maps_embedded_url: formData.get("google_maps_embedded_url"),
     latitude: formData.get("latitude"),
     longitude: formData.get("longitude"),
     restaurant_summary: formData.get("restaurant_summary"),
+    halal_status: formData.get("halal_status"),
     halal_description: formData.get("halal_description"),
+    alcohol_served: formData.get("alcohol_served"),
+    pork_served: formData.get("pork_served"),
+    slaughter_method: formData.get("slaughter_method"),
     rating: parseFloat(formData.get("rating")),
     price: formData.get("price"),
+    phone: formData.get("phone"),
+    website: formData.get("website"),
     cover_photo_url: formData.get("cover_photo_url"),
-    // other_photos_url: formData.get("other_photos_url"),
+    other_photos_url: formData.getAll("other_photos_url"),
     cuisine: formData.getAll("cuisine"),
   });
 
@@ -84,6 +98,14 @@ export default async function updateRestaurant(
 
   let redirectPath = "";
 
+  if (data.other_photos_url.includes("")) {
+    data.other_photos_url = data.other_photos_url.filter((e) => e !== "");
+  }
+
+  if (data.rating) {
+    data.rating = data.rating.toFixed(1);
+  }
+
   try {
     revalidatePath("/");
 
@@ -94,27 +116,43 @@ export default async function updateRestaurant(
         slug, 
         address, 
         address_url, 
+        google_maps_embedded_url,
         latitude, 
         longitude, 
         location, 
         restaurant_summary, 
+        halal_status,
         halal_description,
+        alcohol_served,
+        pork_served,
+        slaughter_method,
         rating,
         price,
-        cover_photo_url
+        phone,
+        website,
+        cover_photo_url,
+        other_photos_url
       ) = (
         ${data.name}, 
         ${data.slug}, 
         ${data.address}, 
         ${data.address_url}, 
+        ${data.google_maps_embedded_url}, 
         ${data.latitude}, 
         ${data.longitude}, 
         ST_GeomFromText('POINT(' || ${lon} || ' ' || ${lat} || ')',4326),
         ${data.restaurant_summary},
+        ${data.halal_status},
         ${data.halal_description},
+        ${data.alcohol_served},
+        ${data.pork_served},
+        ${data.slaughter_method},
         ${data.rating},
         ${data.price},
-        ${data.cover_photo_url}
+        ${data.phone},
+        ${data.website},
+        ${data.cover_photo_url},
+        ${data.other_photos_url}
       )
       WHERE id = ${id}
       RETURNING *;

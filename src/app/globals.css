@@ -42,6 +42,8 @@ blockquote,
 dl,
 dd {
   margin: 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
@@ -119,20 +121,18 @@ textarea:not([rows]) {
   }
 }
 
-p + p {
+/* p + p {
   padding-top: 0.75rem;
-}
+} */
 
 h1 {
   font-size: 3rem;
-  word-break: break-word;
-  overflow-wrap: break-word;
 }
 
 /*** END CSS RESET ***/
 
 .container {
-  width: 80%;
+  width: 90%;
   max-width: 1100px;
   margin: 0 auto;
 }

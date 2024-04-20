@@ -70,7 +70,7 @@ export default function UpdateRestaurantForm({ params }) {
     <>
       {restaurant ? (
         <>
-          <h1 className="mb-[3rem]">Update Restaurant</h1>
+          <h1 className="mb-[3rem]">Update {restaurant.name}</h1>
           <form
             action={formAction}
             onSubmit={() => setIsSubmitting(true)}
@@ -88,6 +88,7 @@ export default function UpdateRestaurantForm({ params }) {
               min="1"
               required
             />
+
             <label htmlFor="slug">Restaurant Slug:</label>
             <input
               type="text"
@@ -98,6 +99,7 @@ export default function UpdateRestaurantForm({ params }) {
               min="1"
               required
             />
+
             <label htmlFor="address">Address:</label>
             <input
               type="text"
@@ -108,6 +110,7 @@ export default function UpdateRestaurantForm({ params }) {
               min="1"
               required
             />
+
             <label htmlFor="address_url">Address URL:</label>
             <input
               type="text"
@@ -118,6 +121,18 @@ export default function UpdateRestaurantForm({ params }) {
               min="1"
               required
             />
+
+            <label htmlFor="google_maps_embedded_url">
+              Google Maps Embedded URL:
+            </label>
+            <input
+              type="text"
+              id="google_maps_embedded_url"
+              name="google_maps_embedded_url"
+              defaultValue={restaurant.google_maps_embedded_url}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            />
+
             <label htmlFor="latitude">Latitude:</label>
             <input
               type="text"
@@ -127,6 +142,7 @@ export default function UpdateRestaurantForm({ params }) {
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
               required
             />
+
             <label htmlFor="longitude">Longitude:</label>
             <input
               type="text"
@@ -136,22 +152,74 @@ export default function UpdateRestaurantForm({ params }) {
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
               required
             />
-            <label htmlFor="restaurant_summary">Restaurant_summary:</label>
-            <input
-              type="text"
+
+            <label htmlFor="restaurant_summary">Restaurant Summary:</label>
+            <textarea
               id="restaurant_summary"
               name="restaurant_summary"
+              rows="4"
               defaultValue={restaurant.restaurant_summary}
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
             />
-            <label htmlFor="halal_description">Halal_description:</label>
-            <input
-              type="text"
+
+            <label htmlFor="halal_status">Halal Status:</label>
+            <select
+              id="halal_status"
+              name="halal_status"
+              defaultValue={restaurant.halal_status}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            >
+              <option value=""></option>
+              <option value="Fully Halal">Fully Halal</option>
+              <option value="Partially Halal">Partially Halal</option>
+              <option value="Not Halal">Not Halal</option>
+            </select>
+
+            <label htmlFor="halal_description">Halal Description:</label>
+            <textarea
               id="halal_description"
               name="halal_description"
+              rows="4"
               defaultValue={restaurant.halal_description}
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
             />
+
+            <label htmlFor="alcohol_served">Alcohol Served?</label>
+            <select
+              id="alcohol_served"
+              name="alcohol_served"
+              defaultValue={restaurant.alcohol_served}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            >
+              <option value=""></option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+
+            <label htmlFor="pork_served">Pork Served?</label>
+            <select
+              id="pork_served"
+              name="pork_served"
+              defaultValue={restaurant.pork_served}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            >
+              <option value=""></option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+
+            <label htmlFor="slaughter_method">Slaughter Method:</label>
+            <select
+              id="slaughter_method"
+              name="slaughter_method"
+              defaultValue={restaurant.slaughter_method}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            >
+              <option value=""></option>
+              <option value="Hand Slaughtered">Hand Slaughtered</option>
+              <option value="Machine Cut">Machine Cut</option>
+            </select>
+
             <label htmlFor="rating">Rating:</label>
             <input
               type="number"
@@ -163,14 +231,39 @@ export default function UpdateRestaurantForm({ params }) {
               max="5"
               step="0.1"
             />
+
             <label htmlFor="price">Price:</label>
-            <input
-              type="text"
+            <select
               id="price"
               name="price"
               defaultValue={restaurant.price}
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            >
+              <option value=""></option>
+              <option value="$">$</option>
+              <option value="$$">$$</option>
+              <option value="$$$">$$$</option>
+              <option value="$$$$">$$$$</option>
+            </select>
+
+            <label htmlFor="phone">Phone:</label>
+            <input
+              type="text"
+              id="phone"
+              name="phone"
+              defaultValue={restaurant.phone}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
             />
+
+            <label htmlFor="website">Website:</label>
+            <input
+              type="text"
+              id="website"
+              name="website"
+              defaultValue={restaurant.website}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            />
+
             <label htmlFor="cover_photo_url">Cover_photo_url:</label>
             <input
               type="text"
@@ -179,14 +272,27 @@ export default function UpdateRestaurantForm({ params }) {
               defaultValue={restaurant.cover_photo_url}
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
             />
-            {/* <label htmlFor="other_photos_url">Other_photos_url:</label>
+
+            <label htmlFor="other_photos_1_url">Other_photos_url:</label>
             <input
               type="text"
-              id="other_photos_url"
+              id="other_photos_1_url"
               name="other_photos_url"
-              defaultValue={restaurant.other_photos_url}
+              defaultValue={
+                restaurant.other_photos_url && restaurant.other_photos_url[0]
+              }
               className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
-            /> */}
+            />
+            <input
+              type="text"
+              id="other_photos_2_url"
+              name="other_photos_url"
+              defaultValue={
+                restaurant.other_photos_url && restaurant.other_photos_url[1]
+              }
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+            />
+
             {cuisines && cuisines.length > 0 && (
               <div className="cuisines mb-[1.5rem]">
                 <label>Cuisine(s):</label>
@@ -214,6 +320,7 @@ export default function UpdateRestaurantForm({ params }) {
               isSubmitting={isSubmitting}
               isError={customErrorMsg}
             />
+
             {state?.message && (
               <p ref={stateMessageRef} className="text-red-600">
                 {state.message}

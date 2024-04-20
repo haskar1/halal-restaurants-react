@@ -15,11 +15,13 @@ export default async function updateCuisine(
       .string()
       .trim()
       .min(1, { message: "Cuisine name cannot be empty." }),
+    tag_color: z.string().trim(),
   });
 
   const parse = schema.safeParse({
     id: formData.get("id"),
     name: formData.get("name"),
+    tag_color: formData.get("tag_color"),
   });
 
   if (!parse.success) {
@@ -38,7 +40,7 @@ export default async function updateCuisine(
     revalidatePath("/");
     const updatedCuisine = await sql`
         UPDATE cuisines
-        SET name = ${data.name}
+        SET name = ${data.name}, tag_color = ${data.tag_color}
         WHERE id = ${id};
       `;
     redirectPath = `/dashboard/cuisines/${id}`;

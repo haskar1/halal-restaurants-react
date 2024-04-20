@@ -1,0 +1,28 @@
+.carousel-status {
+  top: unset !important;
+  bottom: 1rem !important;
+  right: 1rem !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  border-radius: 5px !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.carousel.carousel-slider:hover .control-arrow,
+.carousel.carousel-slider:focus .control-arrow {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.restaurant__summary {
+  border-top: 1px solid rgb(222, 222, 222);
+}
+
+.restaurant__location-info {
+  border: 1px solid rgb(222, 222, 222);
+}
+
+@media screen and (min-width: 768px) {
+  .restaurant__title {
+    order: -1;
+  }
+}

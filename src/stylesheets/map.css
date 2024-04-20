@@ -10,8 +10,8 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  color: #404040;
-  background-color: #faf9f6;
+  color: #404040 !important;
+  background-color: #faf9f6 !important;
   font:
     400 15px/22px "Source Sans Pro",
     "Helvetica Neue",
@@ -28,12 +28,12 @@ h1 {
 }
 
 a {
-  color: #404040;
-  text-decoration: none;
+  color: #404040 !important;
+  text-decoration: none !important;
 }
 
 a:hover {
-  color: #101010;
+  color: #101010 !important;
 }
 
 button {
@@ -160,8 +160,8 @@ textarea {
 .listings .item.active a,
 .listings .item a:hover {
   /* opacity: 0.7; */
-  font-weight: 900;
-  text-decoration: underline;
+  font-weight: 900 !important;
+  text-decoration: underline !important;
 }
 
 .listings .item.active {

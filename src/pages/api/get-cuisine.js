@@ -6,7 +6,6 @@ export default async function handler(request, response) {
   try {
     const result = await sql`SELECT * FROM cuisines WHERE id = ${id};`;
 
-    console.log("result: ", result);
     if (!result.rows[0]) {
       throw new Error("Cuisine not found");
     }

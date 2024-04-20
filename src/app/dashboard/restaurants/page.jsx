@@ -62,7 +62,6 @@ export default function RestaurantList() {
 
   function loadMoreItems(startIndex, stopIndex) {
     if (!isLoadingMore && hasMoreItems) {
-      console.log("loadMoreItems");
       setIsLoadingMore(true);
       setPageNumber((prevPageNumber) => prevPageNumber + 1);
       fetchRestaurants();

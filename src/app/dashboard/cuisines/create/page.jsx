@@ -33,10 +33,17 @@ export default function CreateCuisineForm() {
           name="name"
           placeholder="Mediterranean, American, Italian, etc."
           className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
-          min="1"
-          max="100"
           required
         />
+
+        <label htmlFor="tag_color">Cuisine tag color:</label>
+        <input
+          type="text"
+          id="tag_color"
+          name="tag_color"
+          className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+        />
+
         <SubmitButton isSubmitting={isSubmitting} />
         {state?.message && <p className="text-red-600">{state.message}</p>}
       </form>

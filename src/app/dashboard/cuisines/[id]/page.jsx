@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import AutoSizer from "react-virtualized-auto-sizer";
-import "@/stylesheets/restaurants-list-async.css";
 import Link from "next/link";
+import "@/stylesheets/restaurants-list-async.css";
 
 export const dynamicParams = true;
 export const fetchCache = "force-no-store";
@@ -86,6 +86,9 @@ export default function CuisineList({ params }) {
       {cuisine ? (
         <div className="cuisine-restaurants-container">
           <h1 className="text-3xl pb-8">{cuisine.name} Restaurants</h1>
+          {cuisine.tag_color && (
+            <p className="pb-4">Cuisine tag color: {cuisine.tag_color}</p>
+          )}
           {cuisineRestaurants ? (
             <div className="h-full">
               <AutoSizer>

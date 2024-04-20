@@ -7,7 +7,7 @@ export default async function handler(request, response) {
     const result = await sql`
       SELECT
         r.*,
-        STRING_AGG(c.id || ':' || c.name, ', ') AS cuisines
+        STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
       FROM
         restaurants r
       LEFT JOIN
@@ -30,8 +30,8 @@ export default async function handler(request, response) {
     if (restaurant.cuisines) {
       // Split the concatenated string of cuisines into an array of objects
       cuisinesArray = restaurant.cuisines.split(", ").map((cuisine) => {
-        const [id, name] = cuisine.split(":");
-        return { id: id, name: name };
+        const [id, name, tag_color] = cuisine.split(":");
+        return { id: id, name: name, tag_color: tag_color };
       });
     }
     restaurant.cuisines = cuisinesArray;

@@ -14,10 +14,12 @@ export default async function createCuisine(
       .string()
       .trim()
       .min(1, { message: "Cuisine name cannot be empty." }),
+    tag_color: z.string().trim(),
   });
 
   const parse = schema.safeParse({
     name: formData.get("name"),
+    tag_color: formData.get("tag_color"),
   });
 
   if (!parse.success) {
@@ -43,8 +45,8 @@ export default async function createCuisine(
       redirectPath = `/dashboard/cuisines/${existingCuisineId}`;
     } else {
       const newCuisine = await sql`
-        INSERT INTO cuisines (name)
-        VALUES (${data.name})
+        INSERT INTO cuisines (name, tag_color)
+        VALUES (${data.name}, ${data.tag_color})
         RETURNING id;
       `;
 
