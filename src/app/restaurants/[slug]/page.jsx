@@ -187,9 +187,9 @@ export default async function RestaurantPage({ params }) {
                     width="400"
                     height="300"
                     style={{ border: 0, width: "100%" }}
-                    allowfullscreen=""
+                    allowFullScreen=""
                     loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
+                    referrerPolicy="no-referrer-when-downgrade"
                   ></iframe>
                 </div>
               </div>

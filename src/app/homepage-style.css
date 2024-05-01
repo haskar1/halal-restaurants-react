@@ -1,0 +1,27 @@
+#geocoder {
+  min-height: 50px;
+}
+
+#geocoder .mapboxgl-ctrl-geocoder {
+  margin: 0 !important;
+}
+
+#geocoder .mapboxgl-ctrl-geocoder--input {
+  font-size: 1.25rem !important;
+  min-height: 50px;
+}
+
+#geocoder .mapboxgl-ctrl-geocoder--icon-search {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media screen and (min-width: 768px) {
+  #geocoder {
+    min-height: 36px;
+  }
+
+  #geocoder .mapboxgl-ctrl-geocoder--input {
+    min-height: 36px;
+  }
+}

@@ -32,9 +32,9 @@ a {
   text-decoration: none !important;
 }
 
-a:hover {
+/* a:hover {
   color: #101010 !important;
-}
+} */
 
 button {
   background-color: rgb(51 65 85);
@@ -157,9 +157,9 @@ textarea {
   font-weight: 400;
 }
 
-.listings .item.active a,
-.listings .item a:hover {
+.listings .item.active a {
   /* opacity: 0.7; */
+  color: #101010 !important;
   font-weight: 900 !important;
   text-decoration: underline !important;
 }
@@ -196,57 +196,29 @@ textarea {
 
 /*** LOCATION SEARCH BAR ***/
 
-.mapboxgl-ctrl-geocoder {
-  margin: 1rem auto !important;
-  width: 90% !important;
-  z-index: 9 !important;
+.map .mapboxgl-ctrl-geocoder {
+  margin: 1rem auto;
+  width: 90%;
+  z-index: 9;
 }
 
-.mapboxgl-ctrl-geocoder--input {
-  height: auto !important;
+.map .mapboxgl-ctrl-geocoder--input {
+  height: auto;
 }
 
-.mapboxgl-ctrl-geocoder--icon-search {
-  top: 7px !important;
+.map .mapboxgl-ctrl-geocoder--icon-search {
+  top: 7px;
 }
 
 /* Close button */
-.mapboxgl-ctrl-geocoder--button {
-  top: 0 !important;
+.map .mapboxgl-ctrl-geocoder--icon-close {
+  margin-top: 0;
 }
 
 /* Loading circle */
-.mapboxgl-ctrl-geocoder--icon-loading {
-  top: 0 !important;
+.map .mapboxgl-ctrl-geocoder--icon-loading {
+  top: 0;
 }
-
-/* .geocoding {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1;
-  width: 22rem;
-  max-width: 90%;
-}
-
-.geocoding form {
-  width: auto !important;
-  max-width: none !important;
-}
-
-.geocoding form li {
-  animation: none !important;
-  padding-left: 1rem !important;
-}
-
-.geocoding form li img {
-  display: none;
-}
-
-.geocoding input {
-  font-size: 16px !important;
-} */
 
 /*** MARKER POPUP ***/
 
@@ -303,5 +275,5 @@ textarea {
 /* ZOOM AND GEOLOCATE BUTTONS */
 
 .maplibregl-ctrl-top-right {
-  top: 15%;
+  top: 15% !important;
 }

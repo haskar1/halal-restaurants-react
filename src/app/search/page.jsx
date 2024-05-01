@@ -9,7 +9,7 @@ export default function Map() {
   const Map = useMemo(
     () =>
       dynamic(() => import("@/components/Map-maplibre"), {
-        loading: () => <p>Loading Map...</p>,
+        loading: () => <p className="p-8">Loading Map...</p>,
         ssr: true,
       }),
     []

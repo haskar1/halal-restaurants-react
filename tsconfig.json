@@ -50,7 +50,8 @@
     "src/components/RestaurantSearch.jsx",
     "src/pages/api/get-cuisines/route.js",
     "src/pages/api/get-cuisine/route.js",
-    "src/components/BottomModalSheet.jsx"
+    "src/components/BottomModalSheet.jsx",
+    "src/app/page.jsx"
   ],
   "exclude": ["node_modules"]
 }

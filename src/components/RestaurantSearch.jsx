@@ -121,7 +121,6 @@ export default function RestaurantSearch({
               features: updatedFeatures,
             };
 
-            map.current.getSource("restaurants").setData(updatedGeoJSON);
             setSearchResults(updatedGeoJSON);
             flyToRestaurant(selected[0]);
             showPopup(selected[0]);
