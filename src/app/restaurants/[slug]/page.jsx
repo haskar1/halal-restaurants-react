@@ -31,7 +31,9 @@ export default async function RestaurantPage({ params }) {
               restaurantSlug={restaurant.slug}
             />
             <div className="restaurant__title container pt-8">
-              <h1 className="text-[1.625rem] pb-4">{restaurant.name}</h1>
+              <h1 className="text-[1.625rem] pb-4">
+                {restaurant.name} - Halal Restaurant
+              </h1>
               <div className="flex flex-wrap gap-4">
                 <StarRating rating={restaurant.rating} />
                 <CuisineTags cuisines={restaurant.cuisines} />
@@ -141,7 +143,7 @@ export default async function RestaurantPage({ params }) {
 
               {/* Location Info */}
               <div className="grid gap-12">
-                <div className="restaurant__location-info grid gap-4 py-6 px-4 rounded-xl shadow-lg h-fit">
+                <div className="restaurant__location-info grid gap-4 py-6 px-4 rounded-xl shadow-lg h-fit max-w-[389px]">
                   <h3 className="font-medium pb-3 underline underline-offset-[6px]">
                     Location Info
                   </h3>

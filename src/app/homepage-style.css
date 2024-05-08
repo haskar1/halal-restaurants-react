@@ -1,27 +1,107 @@
 #geocoder {
-  min-height: 50px;
+  min-height: 3.125rem;
 }
 
 #geocoder .mapboxgl-ctrl-geocoder {
   margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 #geocoder .mapboxgl-ctrl-geocoder--input {
   font-size: 1.25rem !important;
-  min-height: 50px;
+  min-height: 3.125rem !important;
+  padding: 0.5rem 3rem;
 }
 
 #geocoder .mapboxgl-ctrl-geocoder--icon-search {
+  left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 @media screen and (min-width: 768px) {
   #geocoder {
-    min-height: 36px;
+    min-height: 2.25rem;
   }
 
   #geocoder .mapboxgl-ctrl-geocoder--input {
-    min-height: 36px;
+    min-height: 2.25rem !important;
   }
+}
+
+/* RESTAURANT LIST */
+
+.homepage__search-list {
+  padding: 2rem 1rem;
+}
+
+.homepage__search-list .listings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+@media screen and (min-width: 560px) {
+  .homepage__search-list .listings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .homepage__search-list {
+    padding: 4rem 6rem 0;
+  }
+
+  .homepage__search-list .listings {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .homepage__search-list .listings {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.homepage__search-list .listings .item {
+  padding: 10px;
+  text-decoration: none;
+}
+
+.homepage__search-list .listings .item img {
+  width: 100%;
+  height: auto;
+}
+
+.homepage__search-list .listings .item a,
+.homepage__search-list .listings .item a span {
+  display: block;
+  font-weight: 600;
+}
+
+.homepage__search-list .listings .item a small {
+  font-weight: 400;
+}
+
+.homepage__search-list .listings .item__cover-photo {
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.homepage__search-list .listings .item__rating {
+  position: absolute;
+  padding: 0.1rem 0.75rem;
+  background-color: darkblue;
+  color: white;
+  border-radius: 16px 5px 5px;
+  font-size: 1.2rem;
+  /* font-weight: 500; */
+}
+
+.homepage__search-list .listings .item__text-container {
+  padding: 0.5rem;
 }

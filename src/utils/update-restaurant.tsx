@@ -27,6 +27,10 @@ export default async function updateRestaurant(
       .string()
       .trim()
       .min(1, { message: "Restaurant address cannot be empty." }),
+    city: z
+      .string()
+      .trim()
+      .min(1, { message: "Restaurant city cannot be empty." }),
     address_url: z
       .string()
       .trim()
@@ -64,6 +68,7 @@ export default async function updateRestaurant(
     name: formData.get("name"),
     slug: formData.get("slug"),
     address: formData.get("address"),
+    city: formData.get("city"),
     address_url: formData.get("address_url"),
     google_maps_embedded_url: formData.get("google_maps_embedded_url"),
     latitude: formData.get("latitude"),
@@ -115,6 +120,7 @@ export default async function updateRestaurant(
         name, 
         slug, 
         address, 
+        city,
         address_url, 
         google_maps_embedded_url,
         latitude, 
@@ -136,6 +142,7 @@ export default async function updateRestaurant(
         ${data.name}, 
         ${data.slug}, 
         ${data.address}, 
+        ${data.city}, 
         ${data.address_url}, 
         ${data.google_maps_embedded_url}, 
         ${data.latitude}, 

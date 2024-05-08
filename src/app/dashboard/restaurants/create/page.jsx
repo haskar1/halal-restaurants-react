@@ -92,6 +92,16 @@ export default function CreateRestaurantForm() {
           required
         />
 
+        <label htmlFor="city">City/Town/Neighborhood/etc:</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+          min="1"
+          required
+        />
+
         <label htmlFor="address_url">Address URL:</label>
         <input
           type="text"

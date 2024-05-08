@@ -52,6 +52,7 @@ export default async function RestaurantList({ params }) {
             )}
 
             <p>Address: {restaurant.address}</p>
+            <p>City/Town/Neighborhood/etc: {restaurant.city}</p>
             <p>
               Address URL:{" "}
               <a

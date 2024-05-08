@@ -2,10 +2,11 @@
 
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function GeocoderNoMap() {
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -16,16 +17,27 @@ export default function GeocoderNoMap() {
       placeholder: "Search a location",
     });
 
-    document.querySelector("#geocoder").textContent = "";
+    // document.querySelector("#geocoder").textContent = "";
     geocoder.addTo("#geocoder");
 
     geocoder.on("result", (e) => {
+      const placeName = e.result?.place_name;
       const bbox = e.result?.bbox;
       const center = e.result?.center;
 
-      router.push(`/search?bbox=${bbox}&center=${center}`);
+      router.push(`/search?name=${placeName}&bbox=${bbox}&center=${center}`);
     });
+
+    setIsLoading(false);
   }, []);
 
-  return <div id="geocoder">Loading...</div>;
+  return (
+    <>
+      <input
+        placeholder="Loading..."
+        className={!isLoading ? "hidden" : "w-[19.375rem] rounded text-center"}
+      ></input>
+      <div id="geocoder" className={isLoading && "hidden"}></div>
+    </>
+  );
 }

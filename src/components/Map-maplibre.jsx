@@ -35,7 +35,8 @@ export default function Map() {
   useEffect(() => {
     if (map?.current) return; // stops map from initializing more than once
 
-    let mapCenter;
+    const placeName = searchParams.get("name");
+    let mapCenter = searchParams.get("center");
     let mapCenterLat;
     let mapCenterLon;
     let bbox = searchParams.get("bbox");
@@ -44,8 +45,8 @@ export default function Map() {
       bbox = bbox.split(",");
     }
 
-    if (searchParams.size > 0) {
-      mapCenter = searchParams.get("center").split(",");
+    if (mapCenter) {
+      mapCenter = mapCenter.split(",");
       mapCenterLat = mapCenter[1];
       mapCenterLon = mapCenter[0];
     } else {
@@ -343,6 +344,7 @@ export default function Map() {
       types: "country,region,postcode,district,place,locality,neighborhood",
       placeholder: "Search Location",
     });
+
     geocoder.addTo(".map");
 
     geocoder.on("result", (e) => {
@@ -373,6 +375,13 @@ export default function Map() {
     const geocoderCloseBtn = document.querySelector(
       ".mapboxgl-ctrl-geocoder--button"
     );
+    geocoderInput?.addEventListener("focus", () => {
+      if (geocoderInput.value !== "") {
+        geocoderCloseBtn.style.display = "block";
+      } else {
+        geocoderCloseBtn.style.display = "none";
+      }
+    });
     geocoderInput?.addEventListener("change", () => {
       if (geocoderInput.value !== "") {
         geocoderCloseBtn.style.display = "block";
@@ -387,6 +396,10 @@ export default function Map() {
         geocoderCloseBtn.style.display = "none";
       }
     });
+
+    if (placeName) {
+      geocoder.setInput(placeName);
+    }
 
     setIsMapLoaded(true);
   }, []);
@@ -496,7 +509,6 @@ export default function Map() {
   function showPopup(restaurant) {
     const id = restaurant.id;
     const name = restaurant.name;
-    const slug = restaurant.slug;
     const coordinates = [restaurant.longitude, restaurant.latitude];
     const address = restaurant.address;
     const address_url = restaurant.address_url;
@@ -510,11 +522,13 @@ export default function Map() {
       .setLngLat(coordinates)
       .setHTML(
         `<b>${name}</b><br>
-         <a href="${address_url}" target="_blank">Address: ${address}</a><br><br>
-         <a href="/restaurants/${slug}" target="_blank" style="color:blue !important;">View more info</a>
+         <a href="${address_url}" target="_blank">Address: ${address}</a>
         `
       )
       .addTo(map.current);
+
+    // Prevents 'address_url' link inside popup from focusing and having a blue outline on initial load
+    popup._content.children[2].blur();
 
     setIsActive(id);
 
