@@ -23,7 +23,7 @@ export default async function RestaurantPage({ params }) {
       {restaurant ? (
         <div>
           {/* Title and images */}
-          <div className="grid pb-16">
+          <div className="grid pb-20">
             <ImageGallery
               coverPhotoUrl={restaurant.cover_photo_url}
               otherPhotosUrls={restaurant.other_photos_url}
@@ -31,12 +31,32 @@ export default async function RestaurantPage({ params }) {
               restaurantSlug={restaurant.slug}
             />
             <div className="restaurant__title container pt-8">
-              <h1 className="text-[1.625rem] pb-4">
-                {restaurant.name} - Halal Restaurant
+              <h1 className="font-bold text-stone-700 text-3xl pb-4">
+                {restaurant.name} - Halal Restaurant in {restaurant.city}
               </h1>
-              <div className="flex flex-wrap gap-4">
-                <StarRating rating={restaurant.rating} />
-                <CuisineTags cuisines={restaurant.cuisines} />
+              <div>
+                <div className="flex flex-wrap gap-4 items-center pb-4">
+                  <StarRating rating={restaurant.rating} />
+                  <CuisineTags cuisines={restaurant.cuisines} />
+                </div>
+                {restaurant.halal_status && (
+                  <Alert
+                    severity={
+                      restaurant.halal_status === "Fully Halal"
+                        ? "success"
+                        : restaurant.halal_status === "Partially Halal"
+                          ? "warning"
+                          : "error"
+                    }
+                    className="py-1 px-3 w-fit"
+                  >
+                    {restaurant.halal_status === "Fully Halal"
+                      ? "Full Halal Menu"
+                      : restaurant.halal_status === "Partially Halal"
+                        ? "Partial Halal Menu"
+                        : "Not Halal"}
+                  </Alert>
+                )}
               </div>
             </div>
           </div>
@@ -44,107 +64,79 @@ export default async function RestaurantPage({ params }) {
           {/* About this restaurant */}
           <div className="container">
             <div className="flex flex-wrap justify-between gap-8 pb-8">
-              {(restaurant.halal_status ||
-                restaurant.halal_description ||
-                restaurant.alcohol_served ||
-                restaurant.pork_served ||
-                restaurant.slaughter_method ||
-                restaurant.restaurant_summary) && (
-                <div>
-                  <div className="flex flex-wrap gap-6 items-center">
-                    <h2 className="font-medium">About this restaurant</h2>
-                    {restaurant.halal_status && (
-                      <Alert
-                        severity={
-                          restaurant.halal_status === "Fully Halal"
-                            ? "success"
-                            : restaurant.halal_status === "Partially Halal"
-                              ? "warning"
-                              : "error"
-                        }
-                        className="py-1 px-3 w-fit"
-                      >
-                        {restaurant.halal_status === "Fully Halal"
-                          ? "Full Halal Menu"
+              <div>
+                <h2 className="text-[1.7rem] text-stone-700 pb-12">
+                  About this restaurant
+                </h2>
+
+                <div className="grid pb-12">
+                  <div className="max-w-xl">
+                    <p className="font-bold text-lg pb-4">
+                      Is {restaurant.name} in {restaurant.city} halal?
+                    </p>
+                    <p className="pb-12">
+                      {restaurant.halal_status
+                        ? restaurant.halal_status === "Fully Halal"
+                          ? `Yes, ${restaurant.name} is fully halal.`
                           : restaurant.halal_status === "Partially Halal"
-                            ? "Partial Halal Menu"
-                            : "Not Halal"}
-                      </Alert>
-                    )}
+                            ? `${restaurant.name} is partially halal.`
+                            : `${restaurant.name} is not halal.`
+                        : `It is unknown if ${restaurant.name} is halal.`}{" "}
+                      {restaurant.halal_description}
+                    </p>
                   </div>
 
-                  {(restaurant.halal_description ||
-                    restaurant.alcohol_served ||
+                  {(restaurant.alcohol_served ||
                     restaurant.pork_served ||
                     restaurant.slaughter_method) && (
-                    <div className="grid gap-4 pt-10 pb-10">
-                      {restaurant.halal_description && (
-                        <div>
-                          <p className="max-w-xl">
-                            <span className="font-semibold">
-                              Halal information:
-                            </span>{" "}
-                            {restaurant.halal_description}
-                          </p>
-                        </div>
-                      )}
+                    <div className="flex flex-wrap gap-4">
+                      {restaurant.alcohol_served === "Yes" ? (
+                        <p className="border border-solid border-blue text-blue-600 rounded py-1 px-3 w-fit">
+                          Serves Alcohol
+                        </p>
+                      ) : restaurant.alcohol_served === "No" ? (
+                        <p className="border border-solid border-green text-green-700 rounded py-1 px-3 w-fit">
+                          No Alcohol
+                        </p>
+                      ) : null}
 
-                      {(restaurant.alcohol_served ||
-                        restaurant.pork_served ||
-                        restaurant.slaughter_method) && (
-                        <div className="flex flex-wrap gap-4">
-                          {restaurant.alcohol_served === "Yes" ? (
-                            <p className="border border-solid border-blue text-blue-600 rounded py-1 px-3 w-fit">
-                              Serves Alcohol
-                            </p>
-                          ) : restaurant.alcohol_served === "No" ? (
-                            <p className="border border-solid border-green text-green-700 rounded py-1 px-3 w-fit">
-                              No Alcohol
-                            </p>
-                          ) : null}
+                      {restaurant.pork_served === "Yes" ? (
+                        <p className="border border-solid border-blue text-blue-600 rounded py-1 px-3 w-fit">
+                          Serves Pork
+                        </p>
+                      ) : restaurant.pork_served === "No" ? (
+                        <p className="border border-solid border-green text-green-700 rounded py-1 px-3 w-fit">
+                          No Pork
+                        </p>
+                      ) : null}
 
-                          {restaurant.pork_served === "Yes" ? (
-                            <p className="border border-solid border-blue text-blue-600 rounded py-1 px-3 w-fit">
-                              Serves Pork
-                            </p>
-                          ) : restaurant.pork_served === "No" ? (
-                            <p className="border border-solid border-green text-green-700 rounded py-1 px-3 w-fit">
-                              No Pork
-                            </p>
-                          ) : null}
-
-                          {restaurant.slaughter_method === "Machine Cut" ? (
-                            <p className="border border-solid border-blue text-purple-600 rounded py-1 px-3 w-fit">
-                              Machine Cut Meat
-                            </p>
-                          ) : restaurant.slaughter_method ===
-                            "Hand Slaughtered" ? (
-                            <p className="border border-solid border-green text-green-700 rounded py-1 px-3 w-fit">
-                              Hand Slaughtered Meat
-                            </p>
-                          ) : null}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {restaurant.restaurant_summary && (
-                    <div className="restaurant__summary pt-10 pb-5">
-                      <p className="pb-4 font-semibold">
-                        What kind of food does {restaurant.name} have?
-                      </p>
-                      <p className="max-w-xl">
-                        {restaurant.restaurant_summary}
-                      </p>
+                      {restaurant.slaughter_method === "Machine Cut" ? (
+                        <p className="border border-solid border-blue text-purple-600 rounded py-1 px-3 w-fit">
+                          Machine Cut Meat
+                        </p>
+                      ) : restaurant.slaughter_method === "Hand Slaughtered" ? (
+                        <p className="border border-solid border-green text-green-700 rounded py-1 px-3 w-fit">
+                          Hand Slaughtered Meat
+                        </p>
+                      ) : null}
                     </div>
                   )}
                 </div>
-              )}
+
+                {restaurant.restaurant_summary && (
+                  <div className="restaurant__summary pt-10 pb-5 max-w-xl">
+                    <p className="font-bold text-lg pb-4">
+                      What kind of food does {restaurant.name} have?
+                    </p>
+                    <p>{restaurant.restaurant_summary}</p>
+                  </div>
+                )}
+              </div>
 
               {/* Location Info */}
               <div className="grid gap-12">
                 <div className="restaurant__location-info grid gap-4 py-6 px-4 rounded-xl shadow-lg h-fit max-w-[389px]">
-                  <h3 className="font-medium pb-3 underline underline-offset-[6px]">
+                  <h3 className="text-stone-600 font-medium pb-3 underline underline-offset-[6px]">
                     Location Info
                   </h3>
                   {restaurant.price && (
