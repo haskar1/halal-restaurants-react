@@ -9,6 +9,8 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@/stylesheets/map.css";
 import { useSearchParams } from "next/navigation";
+import { bbox as turfbbox } from "@turf/bbox";
+import { useRouter } from "next/navigation";
 
 export default function Map() {
   const mapContainer = useRef(null);
@@ -31,73 +33,106 @@ export default function Map() {
   const bottomSheetSnapping = useRef(false);
   const isMobile = useMediaQuery("(max-width:767px)", { noSsr: true });
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
     if (map?.current) return; // stops map from initializing more than once
 
-    const placeName = searchParams.get("name");
-    let mapCenter = searchParams.get("center");
-    let mapCenterLat;
-    let mapCenterLon;
-    let bbox = searchParams.get("bbox");
+    const placeName = searchParams.get("location");
+    // let mapCenter = searchParams.get("center");
+    // let mapCenterLat;
+    // let mapCenterLon;
+    // let bbox = searchParams.get("bbox");
 
-    if (bbox) {
-      bbox = bbox.split(",");
-    }
+    fetch(
+      `https://api.mapbox.com/search/geocode/v6/forward?q=${placeName}&proximity=ip&access_token=pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg`
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        let location = json.features?.filter((feature) => {
+          // API call returns 5 results when you search the placeName. This code returns the correct result.
+          return (
+            placeName ===
+            feature.properties.full_address
+              .toLowerCase()
+              .replace(/,?\s+/g, "-")
+              .replace(/,/g, "-")
+          );
+        });
 
-    if (mapCenter) {
-      mapCenter = mapCenter.split(",");
-      mapCenterLat = mapCenter[1];
-      mapCenterLon = mapCenter[0];
-    } else {
-      mapCenterLat = lat;
-      mapCenterLon = lon;
-    }
+        let bbox = location[0].properties?.bbox;
+        let mapCenterLat;
+        let mapCenterLon;
 
-    map.current = new maplibregl.Map({
-      container: mapContainer.current,
-      style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`,
-      bounds: bbox,
-      center: [mapCenterLon, mapCenterLat],
-      zoom: zoom,
-      maxZoom: 17,
-      minZoom: 5,
-      // attributionControl: false,
-    });
+        if (location[0].properties?.coordinates) {
+          mapCenterLat = location[0].properties?.coordinates.latitude;
+          mapCenterLon = location[0].properties?.coordinates.longitude;
+        } else {
+          mapCenterLat = lat;
+          mapCenterLon = lon;
+        }
 
-    if (map?.current && bbox) {
-      map.current.jumpTo({ center: mapCenter });
-    }
+        // if (bbox) {
+        //   bbox = bbox.split(",");
+        // }
 
-    map.current.on("load", () => {
-      // Add an image to use as a custom marker
-      map.current.loadImage(
-        "https://maplibre.org/maplibre-gl-js/docs/assets/custom_marker.png",
+        // if (mapCenter) {
+        //   mapCenter = mapCenter.split(",");
+        //   mapCenterLat = mapCenter[1];
+        //   mapCenterLon = mapCenter[0];
+        // } else {
+        //   mapCenterLat = lat;
+        //   mapCenterLon = lon;
+        // }
 
-        (error, image) => {
-          if (error) throw error;
+        map.current = new maplibregl.Map({
+          container: mapContainer.current,
+          style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`,
+          bounds: bbox,
+          center: [mapCenterLon, mapCenterLat],
+          zoom: zoom,
+          maxZoom: 17,
+          minZoom: 5,
+          // attributionControl: false,
+        });
 
-          if (!map.current.getImage("custom-marker")) {
-            map.current.addImage("custom-marker", image);
-          }
+        if (map?.current && bbox) {
+          map.current.jumpTo({ center: [mapCenterLon, mapCenterLat] });
+        }
 
-          let initialBounds;
+        map.current.on("load", () => {
+          // Add an image to use as a custom marker
+          map.current.loadImage(
+            "https://maplibre.org/maplibre-gl-js/docs/assets/custom_marker.png",
 
-          if (bbox) {
-            initialBounds = {
-              _sw: {
-                lng: parseFloat(bbox[0]),
-                lat: parseFloat(bbox[1]),
-              },
-              _ne: {
-                lng: parseFloat(bbox[2]),
-                lat: parseFloat(bbox[3]),
-              },
-            };
-          } else {
-            initialBounds = map.current.getBounds();
-          }
+            (error, image) => {
+              if (error) throw error;
 
+              if (!map.current.getImage("custom-marker")) {
+                map.current.addImage("custom-marker", image);
+              }
+
+              // let initialBounds;
+
+              // if (bbox) {
+              //   initialBounds = {
+              //     _sw: {
+              //       lng: parseFloat(bbox[0]),
+              //       lat: parseFloat(bbox[1]),
+              //     },
+              //     _ne: {
+              //       lng: parseFloat(bbox[2]),
+              //       lat: parseFloat(bbox[3]),
+              //     },
+              //   };
+              // } else {
+              //   initialBounds = map.current.getBounds();
+              // }
+
+              /*
+          // Old way. Gets the searched location's bounds and center and sets the map to those bounds, then searches all restaurants in those bounds
           fetch(
             `/api/get-map-restaurants?bounds=${JSON.stringify(
               initialBounds
@@ -305,105 +340,343 @@ export default function Map() {
             .catch((error) => {
               console.error("Error fetching restaurant data:", error);
             });
+          */
+
+              // New way. Searches most popular restaurants within 50 miles of searched location. See api/get-popular-restaurants for more info.
+              fetch(
+                `/api/get-popular-restaurants?latitude=${mapCenterLat}&longitude=${mapCenterLon}`
+              )
+                .then((res) => {
+                  return res.json();
+                })
+                .then((json) => {
+                  if (json.geoJsonData.features.length) {
+                    let bbox2 = turfbbox(json.geoJsonData);
+                    map.current.fitBounds(bbox2, { padding: 100 });
+                    console.log(bbox2);
+                  }
+
+                  if (!map.current.getSource("restaurants")) {
+                    map.current.addSource("restaurants", {
+                      type: "geojson",
+                      data: json.geoJsonData,
+                      cluster: true,
+                      clusterMaxZoom: 10, // Max zoom to cluster points on
+                      clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
+                    });
+                  }
+
+                  let layerAlreadyExists = false;
+
+                  map.current.getStyle().layers.map((layer) => {
+                    if (
+                      layer.id === "restaurants" ||
+                      layer.id === "cluster-count"
+                    ) {
+                      layerAlreadyExists = true;
+                      return;
+                    }
+                  });
+
+                  if (!layerAlreadyExists) {
+                    map.current.addLayer({
+                      id: "clusters",
+                      type: "circle",
+                      source: "restaurants",
+                      filter: ["has", "point_count"],
+                      paint: {
+                        // Use step expressions (https://docs.mapbox.com/style-spec/reference/expressions/#step)
+                        // with three steps to implement three types of circles:
+                        //   * Blue, 20px circles when point count is less than 100
+                        //   * Yellow, 30px circles when point count is between 100 and 750
+                        //   * Pink, 40px circles when point count is greater than or equal to 750
+                        "circle-color": [
+                          "step",
+                          ["get", "point_count"],
+                          "#51bbd6",
+                          100,
+                          "#f1f075",
+                          750,
+                          "#f28cb1",
+                        ],
+                        "circle-radius": [
+                          "step",
+                          ["get", "point_count"],
+                          20,
+                          100,
+                          30,
+                          750,
+                          40,
+                        ],
+                      },
+                    });
+
+                    map.current.addLayer({
+                      id: "cluster-count",
+                      type: "symbol",
+                      source: "restaurants",
+                      filter: ["has", "point_count"],
+                      layout: {
+                        "text-field": ["get", "point_count_abbreviated"],
+                        "text-font": [
+                          "DIN Offc Pro Medium",
+                          "Arial Unicode MS Bold",
+                        ],
+                        "text-size": 12,
+                      },
+                    });
+
+                    // Add a symbol layer
+                    map.current.addLayer({
+                      id: "restaurants",
+                      type: "symbol",
+                      source: "restaurants",
+                      filter: ["!", ["has", "point_count"]],
+                      layout: {
+                        "icon-image": "custom-marker",
+                        "icon-allow-overlap": true,
+                      },
+                    });
+                  }
+
+                  map.current.on("mouseenter", "clusters", () => {
+                    map.current.getCanvas().style.cursor = "pointer";
+                  });
+                  map.current.on("mouseleave", "clusters", () => {
+                    map.current.getCanvas().style.cursor = "";
+                  });
+
+                  map.current.on("mouseenter", "restaurants", (e) => {
+                    map.current.getCanvas().style.cursor = "pointer";
+                  });
+
+                  map.current.on("mouseleave", "restaurants", () => {
+                    map.current.getCanvas().style.cursor = "";
+                  });
+
+                  // Zoom into a cluster on click
+                  map.current.on("click", "clusters", (e) => {
+                    const features = map.current.queryRenderedFeatures(
+                      e.point,
+                      {
+                        layers: ["clusters"],
+                      }
+                    );
+                    const clusterId = features[0].properties.cluster_id;
+                    map.current
+                      .getSource("restaurants")
+                      .getClusterExpansionZoom(clusterId, (err, zoom) => {
+                        if (err) return;
+
+                        map.current.easeTo({
+                          center: features[0].geometry.coordinates,
+                          zoom: zoom,
+                        });
+                      });
+                  });
+
+                  // When a restaurant is clicked open a popup with info about it,
+                  // and highlight it in the sidebar list
+                  map.current.on("click", (e) => {
+                    const features = map.current.queryRenderedFeatures(
+                      e.point,
+                      {
+                        layers: ["restaurants"],
+                      }
+                    );
+
+                    // If you click on a restaurant marker
+                    if (features && features.length) {
+                      clickedOnRestaurantPopup.current = true;
+                    } else {
+                      clickedOnRestaurantPopup.current = false;
+                      return; // Return, otherwise the below consts will throw an error
+                    }
+
+                    const id = features[0].properties.id;
+                    const name = features[0].properties.name;
+                    const slug = features[0].properties.slug;
+                    const coordinates =
+                      features[0].geometry.coordinates.slice();
+                    const address = features[0].properties.address;
+                    const address_url = features[0].properties.address_url;
+                    const popups =
+                      document.getElementsByClassName("maplibregl-popup");
+
+                    if (popups.length) {
+                      [...popups].map((popup) => popup.remove());
+                    }
+
+                    // map.current.easeTo({ center: coordinates });
+
+                    let popup = new maplibregl.Popup()
+                      .setLngLat(coordinates)
+                      .setHTML(
+                        `<b>${name}</b><br>
+                     <a href="${address_url}" target="_blank">Address: ${address}</a><br><br>
+                     <a href="/restaurants/${slug}" target="_blank" style="color:blue !important;">View more info</a>
+                    `
+                      )
+                      .addTo(map.current);
+
+                    setIsActive(id);
+
+                    // clickedOnRestaurantPopup.current check is needed because setIsActive runs first and then popup.on('close') fires,
+                    // so if you click on a restaurant marker while another marker was already open, then it runs setIsActive for the new marker,
+                    // but then immediately fires the close event for the previous marker and runs setIsActive("").
+                    popup.on("close", () => {
+                      if (clickedOnRestaurantPopup.current) return;
+                      setIsActive("");
+                    });
+
+                    // Separate closeButton event because clickedOnRestaurantPopup.current returns 'true' when
+                    // you click on the close button because you're not actually clicking on the map.
+                    popup._closeButton.onclick = () => {
+                      clickedOnRestaurantPopup.current = false;
+                      setIsActive("");
+                    };
+
+                    popup._container.onwheel = (e) => {
+                      map.current.scrollZoom.wheel(e);
+                    };
+                  });
+
+                  map.current.on("moveend", () => {
+                    if (searchedRestaurantSelected.current) {
+                      searchedRestaurantSelected.current = false;
+                      return;
+                    }
+
+                    if (clickedOnRestaurantPopup.current) {
+                      return;
+                    }
+                  });
+
+                  geoJsonData.current = json.geoJsonData;
+                  setSearchResults(json.geoJsonData);
+                  searchResultsRef.current = json.geoJsonData;
+                  // geolocate.current.trigger();
+                })
+                .catch((error) => {
+                  console.error("Error fetching restaurant data:", error);
+                });
+            }
+          );
+        });
+
+        map.current.addControl(new maplibregl.NavigationControl(), "top-right");
+
+        geolocate.current = new maplibregl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+          fitBoundsOptions: { maxZoom: 14, animate: false },
+          showAccuracyCircle: false,
+          showUserLocation: false,
+        });
+
+        map.current.addControl(geolocate.current);
+
+        // Only once because geolocate event randomly fires even if nothing is happening.
+        // Only fires on map load
+        geolocate.current.once("geolocate", (e) => {
+          const lat = e.coords.latitude;
+          const lon = e.coords.longitude;
+          setLat(lat);
+          setLon(lon);
+          fetchStores(lat, lon);
+
+          if (!showDistance) {
+            setShowDistance(true);
+            setShowDistanceBtnIsDisabled(false);
+          }
+        });
+
+        const geocoder = new MapboxGeocoder({
+          accessToken:
+            "pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg",
+          types: "country,region,postcode,district,place,locality,neighborhood",
+          placeholder: "Search Location",
+        });
+
+        geocoder.addTo(".map");
+
+        geocoder.on("result", (e) => {
+          const bbox = e.result.bbox;
+          const center = e.result.center;
+          const lat = e.result.center[1];
+          const lon = e.result.center[0];
+
+          // if (bbox) {
+          //   map.current.fitBounds(bbox, { animate: false });
+          //   map.current.jumpTo({ center: center });
+          // } else {
+          //   map.current.jumpTo({ center: center, zoom: 14 });
+          // }
+          // fetchStores(lat, lon);
+
+          const placeName = e.result?.place_name
+            .toLowerCase()
+            .replace(/,?\s+/g, "-")
+            .replace(/,/g, "-");
+
+          clickedOnRestaurantPopup.current = false;
+
+          router.push(`/search?location=${placeName}`);
+        });
+
+        geocoder.on("loading", (e) => {
+          if (isMobile) {
+            bottomSheetRef.current?.snapTo(({ headerHeight }) => headerHeight);
+          }
+        });
+
+        const geocoderInput = document.querySelector(
+          ".mapboxgl-ctrl-geocoder--input"
+        );
+        const geocoderCloseBtn = document.querySelector(
+          ".mapboxgl-ctrl-geocoder--button"
+        );
+        geocoderInput?.addEventListener("focus", () => {
+          if (geocoderInput.value !== "") {
+            geocoderCloseBtn.style.display = "block";
+          } else {
+            geocoderCloseBtn.style.display = "none";
+          }
+        });
+        geocoderInput?.addEventListener("change", () => {
+          if (geocoderInput.value !== "") {
+            geocoderCloseBtn.style.display = "block";
+          } else {
+            geocoderCloseBtn.style.display = "none";
+          }
+        });
+        geocoderInput?.addEventListener("blur", () => {
+          if (geocoderInput.value !== "") {
+            geocoderCloseBtn.style.display = "block";
+          } else {
+            geocoderCloseBtn.style.display = "none";
+          }
+        });
+
+        // if (placeName) {
+        //   geocoder.setInput(placeName);
+        // }
+
+        if (placeName) {
+          geocoder.setInput(location[0].properties?.full_address);
         }
-      );
-    });
 
-    map.current.addControl(new maplibregl.NavigationControl(), "top-right");
-
-    geolocate.current = new maplibregl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true,
-      },
-      trackUserLocation: true,
-      fitBoundsOptions: { maxZoom: 14, animate: false },
-      showAccuracyCircle: false,
-      showUserLocation: false,
-    });
-
-    map.current.addControl(geolocate.current);
-
-    // Only once because geolocate event randomly fires even if nothing is happening.
-    // Only fires on map load
-    geolocate.current.once("geolocate", (e) => {
-      const lat = e.coords.latitude;
-      const lon = e.coords.longitude;
-      setLat(lat);
-      setLon(lon);
-      fetchStores(lat, lon);
-
-      if (!showDistance) {
-        setShowDistance(true);
-        setShowDistanceBtnIsDisabled(false);
-      }
-    });
-
-    const geocoder = new MapboxGeocoder({
-      accessToken:
-        "pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg",
-      types: "country,region,postcode,district,place,locality,neighborhood",
-      placeholder: "Search Location",
-    });
-
-    geocoder.addTo(".map");
-
-    geocoder.on("result", (e) => {
-      const bbox = e.result.bbox;
-      const center = e.result.center;
-      const lat = e.result.center[1];
-      const lon = e.result.center[0];
-
-      if (bbox) {
-        map.current.fitBounds(bbox, { animate: false });
-        map.current.jumpTo({ center: center });
-      } else {
-        map.current.jumpTo({ center: center, zoom: 14 });
-      }
-      fetchStores(lat, lon);
-      clickedOnRestaurantPopup.current = false;
-    });
-
-    geocoder.on("loading", (e) => {
-      if (isMobile) {
-        bottomSheetRef.current?.snapTo(({ headerHeight }) => headerHeight);
-      }
-    });
-
-    const geocoderInput = document.querySelector(
-      ".mapboxgl-ctrl-geocoder--input"
-    );
-    const geocoderCloseBtn = document.querySelector(
-      ".mapboxgl-ctrl-geocoder--button"
-    );
-    geocoderInput?.addEventListener("focus", () => {
-      if (geocoderInput.value !== "") {
-        geocoderCloseBtn.style.display = "block";
-      } else {
-        geocoderCloseBtn.style.display = "none";
-      }
-    });
-    geocoderInput?.addEventListener("change", () => {
-      if (geocoderInput.value !== "") {
-        geocoderCloseBtn.style.display = "block";
-      } else {
-        geocoderCloseBtn.style.display = "none";
-      }
-    });
-    geocoderInput?.addEventListener("blur", () => {
-      if (geocoderInput.value !== "") {
-        geocoderCloseBtn.style.display = "block";
-      } else {
-        geocoderCloseBtn.style.display = "none";
-      }
-    });
-
-    if (placeName) {
-      geocoder.setInput(placeName);
-    }
-
-    setIsMapLoaded(true);
+        setIsMapLoaded(true);
+      })
+      .catch((error) => {
+        console.error("Error fetching restaurant data:", error);
+      });
   }, []);
 
+  /* 
+  // Update map results on move
   useEffect(() => {
     if (!map?.current || !isMapLoaded) return;
     map.current.off("moveend", delaySearchArea);
@@ -436,6 +709,7 @@ export default function Map() {
       clearTimeout(timeoutId);
     });
   }
+*/
 
   function fetchStores(currentLat, currentLon) {
     if (isActive !== "") {
