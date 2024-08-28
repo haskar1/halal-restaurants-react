@@ -87,6 +87,19 @@ textarea {
   display: none;
 }
 
+.search-results-title {
+  text-align: center;
+  padding-top: 3rem;
+  font-weight: 600;
+  font-size: 2.2rem;
+  line-height: 1.1;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+.search-results-list-message {
+  text-align: center;
+}
+
 .search-list {
   padding: 1rem;
 }
@@ -136,6 +149,7 @@ textarea {
   /* border-bottom: 2px solid #eee; */
   padding: 10px;
   text-decoration: none;
+  position: relative;
 }
 
 /* .listings .item:last-child {
@@ -176,6 +190,16 @@ textarea {
 
 .listings .item__text-container {
   padding: 0.5rem;
+}
+
+.listings .item__rating {
+  position: absolute;
+  padding: 0.1rem 0.75rem;
+  background-color: darkblue;
+  color: white;
+  border-radius: 16px 5px 5px;
+  font-size: 1.2rem;
+  /* font-weight: 500; */
 }
 
 ::-webkit-scrollbar {

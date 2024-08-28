@@ -9,6 +9,7 @@ import CuisineTags from "@/components/CuisineTags";
 export default function HomePageRestaurantList({
   userLatitude,
   userLongitude,
+  limit,
 }) {
   const [popularRestaurants, setPopularRestaurants] = useState(null);
   const [nearbyRestaurants, setNearbyRestaurants] = useState(null);
@@ -19,7 +20,7 @@ export default function HomePageRestaurantList({
 
   function fetchPopularRestaurants() {
     fetch(
-      `/api/get-popular-restaurants?userLatitude=${userLatitude}&userLongitude=${userLongitude}`
+      `/api/get-popular-restaurants?userLatitude=${userLatitude}&userLongitude=${userLongitude}&limit=${limit}`
     )
       .then((res) => {
         return res.json();
@@ -38,7 +39,7 @@ export default function HomePageRestaurantList({
 
   function fetchNearbyRestaurants() {
     fetch(
-      `/api/get-nearby-restaurants?userLatitude=${userLatitude}&userLongitude=${userLongitude}`
+      `/api/get-nearby-restaurants?userLatitude=${userLatitude}&userLongitude=${userLongitude}&limit=${limit}`
     )
       .then((res) => {
         return res.json();

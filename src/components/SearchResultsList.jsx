@@ -4,6 +4,7 @@ import RestaurantCardLoading from "@/components/RestaurantCardLoading";
 import Link from "next/link";
 import Image from "next/image";
 import { useMediaQuery } from "@mui/material";
+import CuisineTags from "@/components/CuisineTags";
 
 export default function SearchResultsList({
   isActive,
@@ -32,6 +33,12 @@ export default function SearchResultsList({
                         : "item"
                     }
                   >
+                    {restaurant.properties.rating &&
+                      restaurant.properties.rating !== "NaN" && (
+                        <div className="item__rating">
+                          {restaurant.properties.rating}
+                        </div>
+                      )}
                     <Image
                       src={restaurant.properties.cover_photo_url}
                       alt={restaurant.properties.name}
@@ -43,7 +50,17 @@ export default function SearchResultsList({
                       <div className="text-[#003089] text-lg font-medium pb-2 leading-[1.3]">
                         {restaurant.properties.name}
                       </div>
+
+                      {restaurant.properties.cuisines && (
+                        <div className="pb-2">
+                          <CuisineTags
+                            cuisines={restaurant.properties.cuisines}
+                          />{" "}
+                        </div>
+                      )}
+
                       <div>{restaurant.properties.address}</div>
+
                       {showDistance && (
                         <div>
                           <b>{restaurant.properties.distance} miles</b>
@@ -80,6 +97,13 @@ export default function SearchResultsList({
                       showPopup(restaurant.properties);
                     }}
                   >
+                    {restaurant.properties.rating &&
+                      restaurant.properties.rating !== "NaN" && (
+                        <div className="item__rating">
+                          {restaurant.properties.rating}
+                        </div>
+                      )}
+
                     <Image
                       src={restaurant.properties.cover_photo_url}
                       alt={restaurant.properties.name}
@@ -91,7 +115,17 @@ export default function SearchResultsList({
                       <div className="text-[#003089] text-lg font-medium pb-2 leading-[1.3]">
                         {restaurant.properties.name}
                       </div>
+
+                      {restaurant.properties.cuisines && (
+                        <div className="pb-2">
+                          <CuisineTags
+                            cuisines={restaurant.properties.cuisines}
+                          />{" "}
+                        </div>
+                      )}
+
                       <div>{restaurant.properties.address}</div>
+
                       {showDistance && (
                         <div>
                           <b>{restaurant.properties.distance} miles</b>
@@ -102,7 +136,9 @@ export default function SearchResultsList({
                 ))}
           </div>
         ) : (
-          <p className="text-black">No restaurants found in this area</p>
+          <p className="search-results-list-message text-black">
+            No restaurants found in this area
+          </p>
         )
       ) : (
         <div className="listings">

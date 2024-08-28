@@ -10,7 +10,6 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "@/stylesheets/map.css";
 import { useSearchParams } from "next/navigation";
 import { bbox as turfbbox } from "@turf/bbox";
-import { useRouter } from "next/navigation";
 
 export default function Map() {
   const mapContainer = useRef(null);
@@ -33,16 +32,12 @@ export default function Map() {
   const bottomSheetSnapping = useRef(false);
   const isMobile = useMediaQuery("(max-width:767px)", { noSsr: true });
   const searchParams = useSearchParams();
-  const router = useRouter();
+  const [searchedLocation, setSearchedLocation] = useState(null);
 
   useEffect(() => {
     if (map?.current) return; // stops map from initializing more than once
 
     const placeName = searchParams.get("location");
-    // let mapCenter = searchParams.get("center");
-    // let mapCenterLat;
-    // let mapCenterLon;
-    // let bbox = searchParams.get("bbox");
 
     fetch(
       `https://api.mapbox.com/search/geocode/v6/forward?q=${placeName}&proximity=ip&access_token=pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg`
@@ -51,41 +46,17 @@ export default function Map() {
         return res.json();
       })
       .then((json) => {
-        let location = json.features?.filter((feature) => {
-          // API call returns 5 results when you search the placeName. This code returns the correct result.
-          return (
-            placeName ===
-            feature.properties.full_address
-              .toLowerCase()
-              .replace(/,?\s+/g, "-")
-              .replace(/,/g, "-")
-          );
-        });
-
-        let bbox = location[0].properties?.bbox;
+        let bbox = json.features[0].properties?.bbox;
         let mapCenterLat;
         let mapCenterLon;
 
-        if (location[0].properties?.coordinates) {
-          mapCenterLat = location[0].properties?.coordinates.latitude;
-          mapCenterLon = location[0].properties?.coordinates.longitude;
+        if (json.features[0].properties?.coordinates) {
+          mapCenterLat = json.features[0].properties?.coordinates.latitude;
+          mapCenterLon = json.features[0].properties?.coordinates.longitude;
         } else {
           mapCenterLat = lat;
           mapCenterLon = lon;
         }
-
-        // if (bbox) {
-        //   bbox = bbox.split(",");
-        // }
-
-        // if (mapCenter) {
-        //   mapCenter = mapCenter.split(",");
-        //   mapCenterLat = mapCenter[1];
-        //   mapCenterLon = mapCenter[0];
-        // } else {
-        //   mapCenterLat = lat;
-        //   mapCenterLon = lon;
-        // }
 
         map.current = new maplibregl.Map({
           container: mapContainer.current,
@@ -114,237 +85,9 @@ export default function Map() {
                 map.current.addImage("custom-marker", image);
               }
 
-              // let initialBounds;
-
-              // if (bbox) {
-              //   initialBounds = {
-              //     _sw: {
-              //       lng: parseFloat(bbox[0]),
-              //       lat: parseFloat(bbox[1]),
-              //     },
-              //     _ne: {
-              //       lng: parseFloat(bbox[2]),
-              //       lat: parseFloat(bbox[3]),
-              //     },
-              //   };
-              // } else {
-              //   initialBounds = map.current.getBounds();
-              // }
-
-              /*
-          // Old way. Gets the searched location's bounds and center and sets the map to those bounds, then searches all restaurants in those bounds
-          fetch(
-            `/api/get-map-restaurants?bounds=${JSON.stringify(
-              initialBounds
-            )}&userLat=${lat}&userLon=${lon}&mapCenterLat=${mapCenterLat}&mapCenterLon=${mapCenterLon}
-              `
-          )
-            .then((res) => {
-              return res.json();
-            })
-            .then((json) => {
-              if (!map.current.getSource("restaurants")) {
-                map.current.addSource("restaurants", {
-                  type: "geojson",
-                  data: json.geoJsonData,
-                  cluster: true,
-                  clusterMaxZoom: 10, // Max zoom to cluster points on
-                  clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
-                });
-              }
-
-              let layerAlreadyExists = false;
-
-              map.current.getStyle().layers.map((layer) => {
-                if (
-                  layer.id === "restaurants" ||
-                  layer.id === "cluster-count"
-                ) {
-                  layerAlreadyExists = true;
-                  return;
-                }
-              });
-
-              if (!layerAlreadyExists) {
-                map.current.addLayer({
-                  id: "clusters",
-                  type: "circle",
-                  source: "restaurants",
-                  filter: ["has", "point_count"],
-                  paint: {
-                    // Use step expressions (https://docs.mapbox.com/style-spec/reference/expressions/#step)
-                    // with three steps to implement three types of circles:
-                    //   * Blue, 20px circles when point count is less than 100
-                    //   * Yellow, 30px circles when point count is between 100 and 750
-                    //   * Pink, 40px circles when point count is greater than or equal to 750
-                    "circle-color": [
-                      "step",
-                      ["get", "point_count"],
-                      "#51bbd6",
-                      100,
-                      "#f1f075",
-                      750,
-                      "#f28cb1",
-                    ],
-                    "circle-radius": [
-                      "step",
-                      ["get", "point_count"],
-                      20,
-                      100,
-                      30,
-                      750,
-                      40,
-                    ],
-                  },
-                });
-
-                map.current.addLayer({
-                  id: "cluster-count",
-                  type: "symbol",
-                  source: "restaurants",
-                  filter: ["has", "point_count"],
-                  layout: {
-                    "text-field": ["get", "point_count_abbreviated"],
-                    "text-font": [
-                      "DIN Offc Pro Medium",
-                      "Arial Unicode MS Bold",
-                    ],
-                    "text-size": 12,
-                  },
-                });
-
-                // Add a symbol layer
-                map.current.addLayer({
-                  id: "restaurants",
-                  type: "symbol",
-                  source: "restaurants",
-                  filter: ["!", ["has", "point_count"]],
-                  layout: {
-                    "icon-image": "custom-marker",
-                    "icon-allow-overlap": true,
-                  },
-                });
-              }
-
-              map.current.on("mouseenter", "clusters", () => {
-                map.current.getCanvas().style.cursor = "pointer";
-              });
-              map.current.on("mouseleave", "clusters", () => {
-                map.current.getCanvas().style.cursor = "";
-              });
-
-              map.current.on("mouseenter", "restaurants", (e) => {
-                map.current.getCanvas().style.cursor = "pointer";
-              });
-
-              map.current.on("mouseleave", "restaurants", () => {
-                map.current.getCanvas().style.cursor = "";
-              });
-
-              // Zoom into a cluster on click
-              map.current.on("click", "clusters", (e) => {
-                const features = map.current.queryRenderedFeatures(e.point, {
-                  layers: ["clusters"],
-                });
-                const clusterId = features[0].properties.cluster_id;
-                map.current
-                  .getSource("restaurants")
-                  .getClusterExpansionZoom(clusterId, (err, zoom) => {
-                    if (err) return;
-
-                    map.current.easeTo({
-                      center: features[0].geometry.coordinates,
-                      zoom: zoom,
-                    });
-                  });
-              });
-
-              // When a restaurant is clicked open a popup with info about it,
-              // and highlight it in the sidebar list
-              map.current.on("click", (e) => {
-                const features = map.current.queryRenderedFeatures(e.point, {
-                  layers: ["restaurants"],
-                });
-
-                // If you click on a restaurant marker
-                if (features && features.length) {
-                  clickedOnRestaurantPopup.current = true;
-                } else {
-                  clickedOnRestaurantPopup.current = false;
-                  return; // Return, otherwise the below consts will throw an error
-                }
-
-                const id = features[0].properties.id;
-                const name = features[0].properties.name;
-                const slug = features[0].properties.slug;
-                const coordinates = features[0].geometry.coordinates.slice();
-                const address = features[0].properties.address;
-                const address_url = features[0].properties.address_url;
-                const popups =
-                  document.getElementsByClassName("maplibregl-popup");
-
-                if (popups.length) {
-                  [...popups].map((popup) => popup.remove());
-                }
-
-                // map.current.easeTo({ center: coordinates });
-
-                let popup = new maplibregl.Popup()
-                  .setLngLat(coordinates)
-                  .setHTML(
-                    `<b>${name}</b><br>
-                     <a href="${address_url}" target="_blank">Address: ${address}</a><br><br>
-                     <a href="/restaurants/${slug}" target="_blank" style="color:blue !important;">View more info</a>
-                    `
-                  )
-                  .addTo(map.current);
-
-                setIsActive(id);
-
-                // clickedOnRestaurantPopup.current check is needed because setIsActive runs first and then popup.on('close') fires,
-                // so if you click on a restaurant marker while another marker was already open, then it runs setIsActive for the new marker,
-                // but then immediately fires the close event for the previous marker and runs setIsActive("").
-                popup.on("close", () => {
-                  if (clickedOnRestaurantPopup.current) return;
-                  setIsActive("");
-                });
-
-                // Separate closeButton event because clickedOnRestaurantPopup.current returns 'true' when
-                // you click on the close button because you're not actually clicking on the map.
-                popup._closeButton.onclick = () => {
-                  clickedOnRestaurantPopup.current = false;
-                  setIsActive("");
-                };
-
-                popup._container.onwheel = (e) => {
-                  map.current.scrollZoom.wheel(e);
-                };
-              });
-
-              map.current.on("moveend", () => {
-                if (searchedRestaurantSelected.current) {
-                  searchedRestaurantSelected.current = false;
-                  return;
-                }
-
-                if (clickedOnRestaurantPopup.current) {
-                  return;
-                }
-              });
-
-              geoJsonData.current = json.geoJsonData;
-              setSearchResults(json.geoJsonData);
-              searchResultsRef.current = json.geoJsonData;
-              // geolocate.current.trigger();
-            })
-            .catch((error) => {
-              console.error("Error fetching restaurant data:", error);
-            });
-          */
-
               // New way. Searches most popular restaurants within 50 miles of searched location. See api/get-popular-restaurants for more info.
               fetch(
-                `/api/get-popular-restaurants?latitude=${mapCenterLat}&longitude=${mapCenterLon}`
+                `/api/get-map-restaurants?latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=${100}`
               )
                 .then((res) => {
                   return res.json();
@@ -353,7 +96,6 @@ export default function Map() {
                   if (json.geoJsonData.features.length) {
                     let bbox2 = turfbbox(json.geoJsonData);
                     map.current.fitBounds(bbox2, { padding: 100 });
-                    console.log(bbox2);
                   }
 
                   if (!map.current.getSource("restaurants")) {
@@ -578,6 +320,9 @@ export default function Map() {
 
         map.current.addControl(geolocate.current);
 
+        /**** Not sure if this is needed in the new method. 
+              The map currently works without it..
+
         // Only once because geolocate event randomly fires even if nothing is happening.
         // Only fires on map load
         geolocate.current.once("geolocate", (e) => {
@@ -592,14 +337,16 @@ export default function Map() {
             setShowDistanceBtnIsDisabled(false);
           }
         });
+        ****/
 
+        /**** Location search bar.
         const geocoder = new MapboxGeocoder({
           accessToken:
-            "pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg",
+          "pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg",
           types: "country,region,postcode,district,place,locality,neighborhood",
           placeholder: "Search Location",
         });
-
+          
         geocoder.addTo(".map");
 
         geocoder.on("result", (e) => {
@@ -608,22 +355,14 @@ export default function Map() {
           const lat = e.result.center[1];
           const lon = e.result.center[0];
 
-          // if (bbox) {
-          //   map.current.fitBounds(bbox, { animate: false });
-          //   map.current.jumpTo({ center: center });
-          // } else {
-          //   map.current.jumpTo({ center: center, zoom: 14 });
-          // }
-          // fetchStores(lat, lon);
-
-          const placeName = e.result?.place_name
-            .toLowerCase()
-            .replace(/,?\s+/g, "-")
-            .replace(/,/g, "-");
-
+          if (bbox) {
+            map.current.fitBounds(bbox, { animate: false });
+            map.current.jumpTo({ center: center });
+          } else {
+            map.current.jumpTo({ center: center, zoom: 14 });
+          }
+          fetchStores(lat, lon);
           clickedOnRestaurantPopup.current = false;
-
-          router.push(`/search?location=${placeName}`);
         });
 
         geocoder.on("loading", (e) => {
@@ -659,15 +398,14 @@ export default function Map() {
             geocoderCloseBtn.style.display = "none";
           }
         });
-
-        // if (placeName) {
-        //   geocoder.setInput(placeName);
-        // }
-
+        
+        // Populate the location search bar with the searched location's name.
         if (placeName) {
-          geocoder.setInput(location[0].properties?.full_address);
+          geocoder.setInput(json.features[0].properties?.full_address);
         }
+        ******/
 
+        setSearchedLocation(json.features[0]);
         setIsMapLoaded(true);
       })
       .catch((error) => {
@@ -675,7 +413,7 @@ export default function Map() {
       });
   }, []);
 
-  /* 
+  /******
   // Update map results on move
   useEffect(() => {
     if (!map?.current || !isMapLoaded) return;
@@ -709,7 +447,7 @@ export default function Map() {
       clearTimeout(timeoutId);
     });
   }
-*/
+  ******/
 
   function fetchStores(currentLat, currentLon) {
     if (isActive !== "") {
@@ -731,7 +469,7 @@ export default function Map() {
         bounds
       )}&userLat=${currentLat}&userLon=${currentLon}&mapCenterLat=${
         mapCenter.lat
-      }&mapCenterLon=${mapCenter.lng}`
+      }&mapCenterLon=${mapCenter.lng}&limit=${100}`
     )
       .then((res) => {
         return res.json();
@@ -859,6 +597,7 @@ export default function Map() {
         searchedRestaurantSelected={searchedRestaurantSelected}
         bottomSheetRef={bottomSheetRef}
         bottomSheetSnapping={bottomSheetSnapping}
+        searchedLocation={searchedLocation}
       />
     </div>
   );

@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/dashboard/restaurants/[slug]",
-    "src/app/search/page.jsx",
+    "src/app/best-halal-restaurants/page.jsx",
     "src/components/DashboardNav.jsx",
     "src/app/dashboard/page.jsx",
     "src/app/dashboard/layout.jsx",

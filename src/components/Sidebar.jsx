@@ -22,6 +22,7 @@ export default function Sidebar({
   searchedRestaurantSelected,
   bottomSheetSnapping,
   bottomSheetRef,
+  searchedLocation,
 }) {
   const [bottomSheetIsOpen, setBottomSheetIsOpen] = useState(false);
   const snapPointsRef = useRef([]);
@@ -55,7 +56,7 @@ export default function Sidebar({
         expandOnContentDrag={true}
         header={
           <>
-            <RestaurantSearch
+            {/* <RestaurantSearch
               map={map}
               lat={lat}
               lon={lon}
@@ -63,7 +64,7 @@ export default function Sidebar({
               setSearchResults={setSearchResults}
               searchedRestaurantSelected={searchedRestaurantSelected}
               bottomSheetRef={bottomSheetRef}
-            />
+            /> */}
             {searchResults?.features && searchResults.features.length > 0 && (
               <div>
                 <span>
@@ -82,6 +83,11 @@ export default function Sidebar({
           setShowDistance={setShowDistance}
           showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
         />
+        {searchedLocation && (
+          <h1 className="search-results-title">
+            Best Halal Restaurants in {searchedLocation.properties?.name}
+          </h1>
+        )}
         <SearchResultsList
           map={map}
           isActive={isActive}
@@ -95,19 +101,24 @@ export default function Sidebar({
     // Tablet and desktop sidebar
     return (
       <div className="sidebar">
-        <RestaurantSearch
+        {/* <RestaurantSearch
           map={map}
           lat={lat}
           lon={lon}
           showPopup={showPopup}
           setSearchResults={setSearchResults}
           searchedRestaurantSelected={searchedRestaurantSelected}
-        />
+        /> */}
         <SearchResultsFilters
           showDistance={showDistance}
           setShowDistance={setShowDistance}
           showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
         />
+        {searchedLocation && (
+          <h1 className="search-results-title">
+            Best Halal Restaurants in {searchedLocation.properties?.name}
+          </h1>
+        )}
         <SearchResultsList
           isActive={isActive}
           setIsActive={setIsActive}

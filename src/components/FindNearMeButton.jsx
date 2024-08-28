@@ -19,7 +19,7 @@ export default function FindNearMeButton() {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
     const center = `${lon},${lat}`;
-    router.push(`/search?center=${center}`);
+    router.push(`/best-halal-restaurants?center=${center}`);
   }
 
   function error(err) {

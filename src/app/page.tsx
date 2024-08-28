@@ -38,9 +38,9 @@ export default async function Home() {
             Find Halal Restaurants
           </h1>
           <div>
-            <div className="flex flex-wrap gap-4 items-center">
-              <FindNearMeButton />
-              <p className="text-[1.2rem] px-4">or</p>
+            <div className="location-searchbar flex flex-wrap gap-4 items-center">
+              {/* <FindNearMeButton />
+              <p className="text-[1.2rem] px-4">or</p> */}
               <GeocoderNoMap />
             </div>
             {/* FindNearMeButton error message displays here if timeout error occurs */}
@@ -51,6 +51,7 @@ export default async function Home() {
         <HomePageRestaurantList
           userLatitude={userLatitude}
           userLongitude={userLongitude}
+          limit={8}
         />
       </main>
     </>

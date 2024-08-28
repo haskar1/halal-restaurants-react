@@ -1,3 +1,21 @@
+.hero {
+  padding: 7rem 0;
+  background-color: #23424a;
+  color: #fff;
+}
+
+.hero .container {
+  max-width: 720px;
+}
+
+.hero h1 {
+  text-align: center;
+}
+
+.hero .location-searchbar {
+  justify-content: center;
+}
+
 #geocoder {
   min-height: 3.125rem;
 }

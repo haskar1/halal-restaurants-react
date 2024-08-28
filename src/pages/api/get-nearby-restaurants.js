@@ -3,6 +3,7 @@ import { sql } from "@vercel/postgres";
 export default async function handler(request, response) {
   const userLatitude = request.query.userLatitude;
   const userLongitude = request.query.userLongitude;
+  const limit = request.query.limit;
 
   try {
     const result = await sql`
@@ -25,7 +26,7 @@ export default async function handler(request, response) {
         r.id, r.name, r.address, r.cover_photo_url, r.rating
       ORDER BY
         distance
-      LIMIT 8;
+      LIMIT ${limit};
     `;
 
     if (!result.rows[0]) {
