@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import RestaurantSearch from "./RestaurantSearch";
+// import RestaurantSearch from "./RestaurantSearch";
 import SearchResultsList from "./SearchResultsList";
 import SearchResultsFilters from "./SearchResultsFilters";
 import { useMediaQuery } from "@mui/material";

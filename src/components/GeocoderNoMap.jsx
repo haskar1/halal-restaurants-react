@@ -36,7 +36,9 @@ export default function GeocoderNoMap() {
     <>
       <input
         placeholder="Loading..."
-        className={!isLoading ? "hidden" : "w-[19.375rem] rounded text-center"}
+        className={
+          !isLoading ? "hidden" : "w-[19.375rem] h-[36px] rounded text-center"
+        }
       ></input>
       <div id="geocoder" className={isLoading && "hidden"}></div>
     </>

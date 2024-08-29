@@ -6,6 +6,7 @@ import "./homepage-style.css";
 import { sql } from "@vercel/postgres";
 import HomePageRestaurantList from "@/components/HomePageRestaurantList";
 import { headers } from "next/headers";
+// import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Halal Food Near Me | Find Halal Restaurants",
@@ -18,18 +19,8 @@ export default async function Home() {
   return (
     <>
       {/* <header>
-        <div className="container">
-          <Link className="logo" href="#">
-            <img src="path/to/image" alt="Who Is Halal Logo" />
-          </Link>
-
-          <nav>
-            <ul>
-              <li>
-                <Link href="/dashboard">Dashboard</Link>
-              </li>
-            </ul>
-          </nav>
+        <div className="navbar-container">
+          <Navbar />
         </div>
       </header> */}
       <section className="hero">

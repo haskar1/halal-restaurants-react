@@ -1,0 +1,127 @@
+:root {
+  --menubar-height: 4rem;
+}
+
+.nav {
+  height: auto;
+  display: grid;
+  grid-template-areas: "logo toggle" "list list";
+  grid-template-columns: 1fr var(--menubar-height);
+  grid-template-rows: var(--menubar-height) auto;
+  overflow: hidden;
+  background-color: #136c72;
+}
+.nav-logo {
+  grid-area: logo;
+  font-size: 1.75rem;
+  height: var(--menubar-height);
+  display: flex;
+  padding: 1rem;
+  max-width: 12.5rem;
+  img {
+    object-fit: contain;
+  }
+}
+button.nav-toggle {
+  all: unset;
+  grid-area: toggle;
+  cursor: pointer;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  width: var(--menubar-height);
+  height: var(--menubar-height);
+  div {
+    width: 1.5rem;
+    height: 2px;
+    background: white;
+    transition: 150ms ease-out;
+  }
+}
+.nav-list {
+  grid-area: list;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 500ms;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  text-align: right;
+  font-size: 1.5rem;
+  color: white;
+  div {
+    overflow: hidden;
+  }
+  li {
+    opacity: 0;
+    transition:
+      transform 400ms ease calc(0.5s - var(--transition-delay)),
+      opacity 400ms ease calc(0.5s - var(--transition-delay));
+    transform: translateX(1em);
+    padding: 0.75rem 2rem;
+  }
+  a {
+    padding: 1rem;
+  }
+  li:last-of-type {
+    padding-bottom: 3rem;
+  }
+}
+
+[data-nav-state="open"] {
+  button.nav-toggle {
+    div:first-child {
+      transform: rotate(-45deg) translate3d(-0.48rem, 0.48rem, 0);
+    }
+    div:nth-child(2) {
+      transform: scale(0);
+    }
+    div:last-child {
+      transform: rotate(45deg) translate3d(-0.48rem, -0.48rem, 0);
+    }
+  }
+  .nav-list {
+    grid-template-rows: 1fr;
+  }
+  .nav-list li {
+    transition:
+      transform 400ms ease var(--transition-delay),
+      opacity 400ms ease var(--transition-delay);
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .nav {
+    max-height: var(--menubar-height);
+    grid-template-areas: "logo list";
+    grid-template-columns: 14rem 1fr;
+    padding: 0 5rem;
+  }
+  button.nav-toggle {
+    display: none;
+  }
+  .nav-list {
+    flex-direction: row;
+    gap: 2rem;
+    justify-content: flex-end;
+    align-self: center;
+    div {
+      display: flex;
+      height: 4rem;
+      align-items: center;
+    }
+    li {
+      opacity: 1;
+      transform: unset;
+      font-size: 1rem;
+      padding: 0;
+    }
+    li:last-of-type {
+      padding-bottom: 0;
+    }
+  }
+}

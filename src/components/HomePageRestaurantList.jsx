@@ -74,7 +74,7 @@ export default function HomePageRestaurantList({
             {popularRestaurants.map((restaurant) => (
               <Link
                 href={`/restaurants/${restaurant.slug}`}
-                target="_blank"
+                // target="_blank"
                 key={restaurant.restaurant_id}
                 className="item"
               >

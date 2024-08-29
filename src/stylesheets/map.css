@@ -5,18 +5,21 @@
 *::after {
   box-sizing: border-box;
 }
-
+html {
+  height: -webkit-fill-available;
+}
 body {
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   margin: 0;
   padding: 0;
-  color: #404040 !important;
+  /* color: #404040 !important; */
   background-color: #faf9f6 !important;
-  font:
+  /* font:
     400 15px/22px "Source Sans Pro",
     "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
+    sans-serif; */
+  /* -webkit-font-smoothing: antialiased; */
 }
 
 h1 {
@@ -28,7 +31,7 @@ h1 {
 }
 
 a {
-  color: #404040 !important;
+  /* color: #404040 !important; */
   text-decoration: none !important;
 }
 
@@ -66,12 +69,12 @@ textarea {
 
 .map-and-sidebar-container {
   display: grid;
-  height: 100vh;
+  /* height: 100vh; */
 }
 
 .map-wrap {
   position: fixed;
-  height: calc(100vh - 106px);
+  /* height: calc(100vh - 106px); */
   width: 100%;
   background-image: url("https://img.whoishalal.com/map-loading-background.png");
   background-size: cover;
@@ -90,6 +93,8 @@ textarea {
 .search-results-title {
   text-align: center;
   padding-top: 3rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   font-weight: 600;
   font-size: 2.2rem;
   line-height: 1.1;
@@ -124,7 +129,7 @@ textarea {
     position: relative;
     order: 1;
     width: auto;
-    height: 100vh;
+    /* height: 100vh; */
   }
 
   .map {

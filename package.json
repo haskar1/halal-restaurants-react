@@ -48,6 +48,7 @@
     "react-virtualized-auto-sizer": "^1.0.24",
     "react-window": "^1.8.10",
     "react-window-infinite-loader": "^1.0.9",
+    "sass": "^1.77.8",
     "slick-carousel": "^1.8.1",
     "tw-elements": "^1.0.0",
     "yarn": "^1.22.22",
