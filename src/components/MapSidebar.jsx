@@ -1,18 +1,17 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 // import RestaurantSearch from "./RestaurantSearch";
-import SearchResultsList from "./SearchResultsList";
+import MapSearchResultsList from "./MapSearchResultsList";
 import SearchResultsFilters from "./SearchResultsFilters";
 import { useMediaQuery } from "@mui/material";
 import { BottomSheet } from "react-spring-bottom-sheet";
 import "react-spring-bottom-sheet/dist/style.css";
 
-export default function Sidebar({
+export default function MapSidebar({
   map,
   lat,
   lon,
-  showDistance,
-  setShowDistance,
-  showDistanceBtnIsDisabled,
   searchResults,
   setSearchResults,
   isActive,
@@ -78,21 +77,16 @@ export default function Sidebar({
           </>
         }
       >
-        <SearchResultsFilters
-          showDistance={showDistance}
-          setShowDistance={setShowDistance}
-          showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
-        />
+        <SearchResultsFilters />
         {searchedLocation && (
           <h1 className="search-results-title">
             Best Halal Restaurants in {searchedLocation.properties?.name}
           </h1>
         )}
-        <SearchResultsList
+        <MapSearchResultsList
           map={map}
           isActive={isActive}
           showPopup={showPopup}
-          showDistance={showDistance}
           searchResults={searchResults}
         />
       </BottomSheet>
@@ -109,20 +103,15 @@ export default function Sidebar({
           setSearchResults={setSearchResults}
           searchedRestaurantSelected={searchedRestaurantSelected}
         /> */}
-        <SearchResultsFilters
-          showDistance={showDistance}
-          setShowDistance={setShowDistance}
-          showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
-        />
+        <SearchResultsFilters />
         {searchedLocation && (
           <h1 className="search-results-title">
             Best Halal Restaurants in {searchedLocation.properties?.name}
           </h1>
         )}
-        <SearchResultsList
+        <MapSearchResultsList
           isActive={isActive}
           setIsActive={setIsActive}
-          showDistance={showDistance}
           searchResults={searchResults}
           showPopup={showPopup}
           clickedOnRestaurantPopup={clickedOnRestaurantPopup}

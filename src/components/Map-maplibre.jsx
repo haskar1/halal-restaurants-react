@@ -2,12 +2,12 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
-import Sidebar from "@/components/Sidebar";
+import MapSidebar from "@/components/MapSidebar";
 import { Skeleton, useMediaQuery } from "@mui/material";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "maplibre-gl/dist/maplibre-gl.css";
-import "@/stylesheets/map.css";
+import "@/stylesheets/map.scss";
 import { useSearchParams } from "next/navigation";
 import { bbox as turfbbox } from "@turf/bbox";
 
@@ -17,9 +17,9 @@ export default function Map() {
   const [lon, setLon] = useState(-73.985542);
   const [lat, setLat] = useState(40.757976);
   const zoom = 14;
-  const [showDistance, setShowDistance] = useState(false);
-  const [showDistanceBtnIsDisabled, setShowDistanceBtnIsDisabled] =
-    useState(true);
+  // const [showDistance, setShowDistance] = useState(false);
+  // const [showDistanceBtnIsDisabled, setShowDistanceBtnIsDisabled] =
+  //   useState(true);
   const geoJsonData = useRef({});
   const [searchResults, setSearchResults] = useState({});
   const searchResultsRef = useRef({});
@@ -37,10 +37,10 @@ export default function Map() {
   useEffect(() => {
     if (map?.current) return; // stops map from initializing more than once
 
-    const placeName = searchParams.get("location");
+    const location = searchParams.get("location");
 
     fetch(
-      `https://api.mapbox.com/search/geocode/v6/forward?q=${placeName}&proximity=ip&access_token=pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg`
+      `https://api.mapbox.com/search/geocode/v6/forward?q=${location}&proximity=ip&access_token=pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbHN1ZHNtbXoxMWV2MnJxbnEyeGNrYW5hIn0.CIAJP91YnRMDk-Fc0jeevg`
     )
       .then((res) => {
         return res.json();
@@ -400,7 +400,7 @@ export default function Map() {
         });
         
         // Populate the location search bar with the searched location's name.
-        if (placeName) {
+        if (location) {
           geocoder.setInput(json.features[0].properties?.full_address);
         }
         ******/
@@ -581,13 +581,13 @@ export default function Map() {
         )}
       </div>
 
-      <Sidebar
+      <MapSidebar
         map={map}
         lat={lat}
         lon={lon}
-        showDistance={showDistance}
-        setShowDistance={setShowDistance}
-        showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
+        // showDistance={showDistance}
+        // setShowDistance={setShowDistance}
+        // showDistanceBtnIsDisabled={showDistanceBtnIsDisabled}
         searchResults={searchResults}
         setSearchResults={setSearchResults}
         isActive={isActive}

@@ -21,12 +21,12 @@ export default function GeocoderNoMap() {
     geocoder.addTo("#geocoder");
 
     geocoder.on("result", (e) => {
-      const placeName = e.result?.place_name
+      const location = e.result?.place_name
         .toLowerCase()
         .replace(/,?\s+/g, "-")
         .replace(/,/g, "-");
 
-      router.push(`/best-halal-restaurants?location=${placeName}`);
+      router.push(`/best-halal-restaurants/${location}`);
     });
 
     setIsLoading(false);

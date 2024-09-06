@@ -24,6 +24,13 @@ export default async function handler(request, response) {
             r.address_url AS restaurant_address_url,
             r.cover_photo_url AS restaurant_cover_photo_url,
             r.rating AS restaurant_rating,
+            r.halal_description AS restaurant_halal_description,
+            r.restaurant_summary AS restaurant_summary,
+            r.price AS restaurant_price,
+            r.halal_status AS restaurant_halal_status,
+            r.alcohol_served AS restaurant_alcohol_served,
+            r.pork_served AS restaurant_pork_served,
+            r.slaughter_method AS restaurant_slaughter_method,
             ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
             STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
           FROM
@@ -53,6 +60,13 @@ export default async function handler(request, response) {
             r.address_url AS restaurant_address_url,
             r.cover_photo_url AS restaurant_cover_photo_url,
             r.rating AS restaurant_rating,
+            r.halal_description AS restaurant_halal_description,
+            r.restaurant_summary AS restaurant_summary,
+            r.price AS restaurant_price,
+            r.halal_status AS restaurant_halal_status,
+            r.alcohol_served AS restaurant_alcohol_served,
+            r.pork_served AS restaurant_pork_served,
+            r.slaughter_method AS restaurant_slaughter_method,
             ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
             STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
           FROM
@@ -105,6 +119,13 @@ export default async function handler(request, response) {
           r.address_url AS restaurant_address_url,
           r.cover_photo_url AS restaurant_cover_photo_url,
           r.rating AS restaurant_rating,
+          r.halal_description AS restaurant_halal_description,
+          r.restaurant_summary AS restaurant_summary,
+          r.price AS restaurant_price,
+          r.halal_status AS restaurant_halal_status,
+          r.alcohol_served AS restaurant_alcohol_served,
+          r.pork_served AS restaurant_pork_served,
+          r.slaughter_method AS restaurant_slaughter_method,
           STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
         FROM
           restaurants r
@@ -136,7 +157,7 @@ export default async function handler(request, response) {
         });
       }
 
-      // Return the restaurant object with cuisines as an array of objects
+      // Return the restaurant object with cuisines as an array of objects. Old way?
       return {
         restaurant_id: row.restaurant_id,
         slug: row.slug,
@@ -181,6 +202,13 @@ export default async function handler(request, response) {
             distance: row.distance,
             nearestToMapCenter: row.nearestToMapCenter,
             cuisines: cuisinesArray,
+            halal_description: row.restaurant_halal_description,
+            summary: row.restaurant_summary,
+            price: row.restaurant_price,
+            halal_status: row.restaurant_halal_status,
+            alcohol_served: row.restaurant_alcohol_served,
+            pork_served: row.restaurant_pork_served,
+            slaughter_method: row.restaurant_slaughter_method,
           },
         };
       }),
