@@ -5,15 +5,25 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMediaQuery } from "@mui/material";
 import CuisineTags from "@/components/CuisineTags";
+import { useEffect } from "react";
 
 export default function MapSearchResultsList({
   isActive,
-  setIsActive,
   searchResults,
   showPopup,
   clickedOnRestaurantPopup,
 }) {
   const isMobile = useMediaQuery("(max-width:767px)", { noSsr: true });
+
+  useEffect(() => {
+    const activePopupRestaurant = document.querySelector(".active");
+    if (activePopupRestaurant) {
+      activePopupRestaurant.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [isActive]);
 
   return (
     <div className="search-list">
@@ -78,19 +88,6 @@ export default function MapSearchResultsList({
                         ? "item active"
                         : "item"
                     }
-                    onMouseEnter={() => {
-                      if (clickedOnRestaurantPopup?.current) return;
-                      showPopup(restaurant.properties);
-                    }}
-                    onMouseLeave={() => {
-                      if (clickedOnRestaurantPopup?.current) return;
-                      const popups =
-                        document.getElementsByClassName("maplibregl-popup");
-                      if (popups.length) {
-                        [...popups].map((popup) => popup.remove());
-                      }
-                      setIsActive("");
-                    }}
                     onClick={() => {
                       clickedOnRestaurantPopup.current = true;
                       showPopup(restaurant.properties);

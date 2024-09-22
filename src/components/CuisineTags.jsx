@@ -25,7 +25,7 @@ export default function CuisineTag({ cuisines }) {
   if (cuisines?.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 h-fit justify-center">
+    <div className="flex flex-wrap gap-2 h-fit">
       {cuisines.map((cuisine) => (
         <p
           key={cuisine.id}

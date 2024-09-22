@@ -12,12 +12,21 @@
   color: black;
 }
 
-.filter_sort_map_container {
+.filters_map_container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
   padding-left: 1rem;
   padding-bottom: 1rem;
 }
 
 .filters_btn {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #1976d2;
+}
+
+.map_btn {
   padding: 0.25rem 0.75rem;
   border: 1px solid #1976d2;
 }
@@ -63,7 +72,6 @@
 
 .listings {
   display: grid;
-  /* justify-content: center; */
   gap: 3rem;
 }
 
@@ -121,6 +129,10 @@
   cursor: pointer;
 }
 
+.cuisine_tags_container > div {
+  justify-content: center;
+}
+
 @media screen and (min-width: 768px) {
   .listings_and_filters_container {
     display: grid;
@@ -130,34 +142,37 @@
     column-gap: 3rem;
     row-gap: 1rem;
     padding: 2rem 0;
-    /* position: relative; */
   }
 
   .restaurant_count {
     grid-column: 2;
+    align-self: end;
     padding-bottom: 0;
-  }
-
-  .filter_sort_map_container {
-    display: none;
   }
 
   .filters {
     display: block;
   }
 
-  .filters_btn {
+  .filters_map_container {
+    padding: 0;
+  }
+
+  .filters_btn_container {
     display: none;
+  }
+
+  .map_btn_container {
+    width: 100%;
+  }
+
+  .map_btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1.1rem;
   }
 
   .item {
     padding: 3rem;
   }
-
-  /* .sidebar {
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-    background-color: #faf9f6;
-    overflow: auto;
-  } */
 }

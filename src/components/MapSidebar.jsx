@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 // import RestaurantSearch from "./RestaurantSearch";
 import MapSearchResultsList from "./MapSearchResultsList";
-import SearchResultsFilters from "./SearchResultsFilters";
 import { useMediaQuery } from "@mui/material";
 import { BottomSheet } from "react-spring-bottom-sheet";
 import "react-spring-bottom-sheet/dist/style.css";
@@ -13,7 +12,6 @@ export default function MapSidebar({
   lat,
   lon,
   searchResults,
-  setSearchResults,
   isActive,
   setIsActive,
   showPopup,
@@ -77,7 +75,6 @@ export default function MapSidebar({
           </>
         }
       >
-        <SearchResultsFilters />
         {searchedLocation && (
           <h1 className="search-results-title">
             Best Halal Restaurants in {searchedLocation.properties?.name}
@@ -103,11 +100,20 @@ export default function MapSidebar({
           setSearchResults={setSearchResults}
           searchedRestaurantSelected={searchedRestaurantSelected}
         /> */}
-        <SearchResultsFilters />
         {searchedLocation && (
           <h1 className="search-results-title">
             Best Halal Restaurants in {searchedLocation.properties?.name}
           </h1>
+        )}
+        {searchResults?.features && searchResults.features.length > 0 && (
+          <div className="text-center">
+            <span>
+              <b>
+                {searchResults.features.length}{" "}
+                {searchResults.features.length === 1 ? "result" : "results"}
+              </b>
+            </span>
+          </div>
         )}
         <MapSearchResultsList
           isActive={isActive}

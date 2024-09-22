@@ -23,7 +23,7 @@ export default function FilterOther({
 
   return (
     <>
-      {others.length > 0 && (
+      {others?.length > 0 && (
         <div className={styles.filter_category}>
           <p className={styles.filter_category_title}>Other</p>
           <FormGroup className="py-2 gap-8 md:gap-3">

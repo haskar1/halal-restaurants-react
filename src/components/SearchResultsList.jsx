@@ -5,6 +5,7 @@ import { useMediaQuery } from "@mui/material";
 import FilterCuisines from "@/components/FilterCuisines";
 import FilterPrice from "@/components/FilterPrice";
 import FilterOther from "@/components/FilterOther";
+import Map from "@/components/Map-maplibre";
 import RestaurantCardLoading from "@/components/RestaurantCardLoading";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,29 +14,33 @@ import SearchResultsFilters from "./SearchResultsFilters";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import TuneIcon from "@mui/icons-material/Tune";
+import PlaceIcon from "@mui/icons-material/Place";
 import styles from "../app/best-halal-restaurants/[location]/styles.module.css";
 
-export default function SearchResultsList({ searchResults }) {
+export default function SearchResultsList({ locationInfo, searchResults }) {
   const allRestaurants = searchResults?.features || []; // Original list
-  const [filteredRestaurants, setFilteredRestaurants] =
-    useState(allRestaurants);
+  const [filteredRestaurants, setFilteredRestaurants] = useState(searchResults);
   const [selectedCuisines, setSelectedCuisines] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [selectedOthers, setSelectedOthers] = useState([]);
 
-  // Filter button on mobile
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  if (useMediaQuery("(min-width:768px)") && open) {
-    handleClose();
+  // Filters button on mobile
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const handleMobileFiltersOpen = () => setMobileFiltersOpen(true);
+  const handleMobileFiltersClose = () => setMobileFiltersOpen(false);
+  if (useMediaQuery("(min-width:768px)") && mobileFiltersOpen) {
+    handleMobileFiltersClose();
   }
+
+  // View Map button on mobile
+  const [mapOpen, setMapOpen] = useState(false);
+  const handleMapOpen = () => setMapOpen(true);
+  const handleMapClose = () => setMapOpen(false);
 
   // Update the filteredRestaurants whenever cuisines or prices or other filters change
   useEffect(() => {
@@ -77,7 +82,10 @@ export default function SearchResultsList({ searchResults }) {
       );
     }
 
-    setFilteredRestaurants(updatedRestaurants);
+    setFilteredRestaurants({
+      features: updatedRestaurants,
+      type: "FeatureCollection",
+    });
   }, [selectedCuisines, selectedPrices, selectedOthers, allRestaurants]);
 
   const filtersAreSelected =
@@ -112,56 +120,57 @@ export default function SearchResultsList({ searchResults }) {
   ].filter((price) => price !== "");
 
   const others = ["No Alcohol Served", "No Pork Served", "Hand Slaughtered"];
-  /*
-  //// Other filters.
-  const others = [];
-
-  const restaurantsNoAlcohol = allRestaurants.filter(
-    (restaurant) => restaurant.properties.alcohol_served === "No"
-  );
-  if (
-    // Only show the filter option if there's at least one restaurant that matches,
-    // but don't show the filter if all the restaurants match because there's no point filtering
-    restaurantsNoAlcohol.length > 0 &&
-    restaurantsNoAlcohol.length < allRestaurants.length
-  ) {
-    others.push("No Alcohol Served");
-  }
-
-  const restaurantsNoPork = allRestaurants.filter(
-    (restaurant) => restaurant.properties.pork_served === "No"
-  );
-  if (
-    restaurantsNoPork.length > 0 &&
-    restaurantsNoPork.length < allRestaurants.length
-  ) {
-    others.push("No Pork Served");
-  }
-
-  const restaurantsHandSlaughtered = allRestaurants.filter(
-    (restaurant) =>
-      restaurant.properties.slaughter_method === "Hand Slaughtered"
-  );
-  if (
-    restaurantsHandSlaughtered.length > 0 &&
-    restaurantsHandSlaughtered.length < allRestaurants.length
-  ) {
-    others.push("Hand Slaughtered");
-  }
-  */
 
   return (
     <>
       {allRestaurants.length > 0 ? (
         <div>
           <div className={styles.listings_and_filters_container}>
-            <div className={styles.filter_sort_map_container}>
+            <div className={styles.filters_map_container}>
+              {/* // Map button */}
+              <div className={styles.map_btn_container}>
+                <Button className={styles.map_btn} onClick={handleMapOpen}>
+                  Map&nbsp;
+                  <PlaceIcon />
+                </Button>
+
+                <Dialog
+                  open={mapOpen}
+                  onClose={handleMapClose}
+                  fullScreen
+                  sx={{ overflow: "hidden" }}
+                  aria-modal
+                >
+                  <IconButton
+                    aria-label="close"
+                    onClick={handleMapClose}
+                    sx={(theme) => ({
+                      position: "absolute",
+                      zIndex: 1,
+                      right: 8,
+                      top: 8,
+                      color: "black",
+                      backgroundColor: "white",
+                    })}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Map
+                    locationInfo={locationInfo}
+                    searchResults={filteredRestaurants}
+                  />
+                </Dialog>
+              </div>
+
+              {/* // Filters button */}
               {(cuisines.length > 0 ||
                 prices.length > 0 ||
                 others.length > 0) && (
-                // Filters button
-                <div>
-                  <Button className={styles.filters_btn} onClick={handleOpen}>
+                <div className={styles.filters_btn_container}>
+                  <Button
+                    className={styles.filters_btn}
+                    onClick={handleMobileFiltersOpen}
+                  >
                     Filters&nbsp;
                     {filtersAreSelected ? (
                       `(${
@@ -175,8 +184,8 @@ export default function SearchResultsList({ searchResults }) {
                   </Button>
 
                   <Dialog
-                    open={open}
-                    onClose={handleClose}
+                    open={mobileFiltersOpen}
+                    onClose={handleMobileFiltersClose}
                     scroll="paper"
                     aria-labelledby="filters-title"
                     aria-describedby="filters-content"
@@ -192,7 +201,7 @@ export default function SearchResultsList({ searchResults }) {
                     </DialogTitle>
                     <IconButton
                       aria-label="close"
-                      onClick={handleClose}
+                      onClick={handleMobileFiltersClose}
                       sx={(theme) => ({
                         position: "absolute",
                         right: 8,
@@ -229,7 +238,7 @@ export default function SearchResultsList({ searchResults }) {
                       >
                         Reset
                       </Button>
-                      <Button onClick={handleClose}>Save</Button>
+                      <Button onClick={handleMobileFiltersClose}>Save</Button>
                     </DialogActions>
                   </Dialog>
                 </div>
@@ -242,19 +251,20 @@ export default function SearchResultsList({ searchResults }) {
               {(selectedCuisines.length ||
                 selectedPrices.length ||
                 selectedOthers.length) &&
-              filteredRestaurants.length > 1 ? (
+              filteredRestaurants.features?.length > 1 ? (
                 <p>
-                  {filteredRestaurants.length} restaurants match your filters
+                  {filteredRestaurants.features?.length} restaurants match your
+                  filters
                 </p>
               ) : (selectedCuisines.length ||
                   selectedPrices.length ||
                   selectedOthers.length) &&
-                filteredRestaurants.length === 1 ? (
+                filteredRestaurants.features?.length === 1 ? (
                 <p>1 restaurant matches your filters</p>
               ) : (selectedCuisines.length ||
                   selectedPrices.length ||
                   selectedOthers.length) &&
-                filteredRestaurants.length === 0 ? (
+                filteredRestaurants.features?.length === 0 ? (
                 <p>No restaurants match your filters</p>
               ) : allRestaurants.length > 1 ? (
                 <p>{allRestaurants.length} restaurants</p>
@@ -263,7 +273,6 @@ export default function SearchResultsList({ searchResults }) {
               ) : null}
             </div>
 
-            {/* {cuisines.length > 0 || prices.length > 0 || others.length > 0 ? ( */}
             <SearchResultsFilters
               clearFilters={clearFilters}
               filtersAreSelected={filtersAreSelected}
@@ -277,12 +286,9 @@ export default function SearchResultsList({ searchResults }) {
               selectedOthers={selectedOthers}
               setSelectedOthers={setSelectedOthers}
             />
-            {/* ) : (
-              <div></div>
-            )} */}
-            {filteredRestaurants.length > 0 && (
+            {filteredRestaurants.features?.length > 0 && (
               <div className={styles.listings}>
-                {filteredRestaurants.map((restaurant) => (
+                {filteredRestaurants.features.map((restaurant) => (
                   <Link
                     href={`/restaurants/${restaurant.properties.slug}`}
                     key={restaurant.properties.id}
@@ -326,7 +332,7 @@ export default function SearchResultsList({ searchResults }) {
                         </div>
 
                         {restaurant.properties.cuisines && (
-                          <div>
+                          <div className={styles.cuisine_tags_container}>
                             <CuisineTags
                               cuisines={restaurant.properties.cuisines}
                             />

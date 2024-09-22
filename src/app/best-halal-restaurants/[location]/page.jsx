@@ -3,7 +3,7 @@
 import getMapboxLocationInfo from "@/utils/get-mapbox-location-info";
 import SearchResultsList from "@/components/SearchResultsList";
 import styles from "./styles.module.css";
-// import "@/stylesheets/map.scss";
+import "@/stylesheets/map.scss";
 
 // export const metadata = {
 // title: "Best Halal Restaurants in [location]",
@@ -33,10 +33,9 @@ export default async function Location({ params }) {
       )}
       <div className="container">
         <SearchResultsList
+          locationInfo={location.locationInfo}
           searchResults={location.locationRestaurantsGeoJSON}
         />
-
-        {/* <Map /> */}
       </div>
     </>
   );

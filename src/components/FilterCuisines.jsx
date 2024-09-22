@@ -22,7 +22,7 @@ export default function FilterCuisines({
 
   return (
     <>
-      {cuisines.length > 0 && (
+      {cuisines?.length > 0 && (
         <div className={styles.filter_category}>
           <p className={styles.filter_category_title}>Cuisines</p>
           <FormGroup className="py-2 gap-8 md:gap-3">

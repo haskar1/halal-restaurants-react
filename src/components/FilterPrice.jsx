@@ -22,7 +22,7 @@ export default function FilterPrice({
 
   return (
     <>
-      {prices.length > 0 && (
+      {prices?.length > 0 && (
         <div className={styles.filter_category}>
           <p className={styles.filter_category_title}>Price</p>
           <FormGroup className="py-2 gap-8 md:gap-3">
