@@ -52,13 +52,13 @@ export default function Navbar() {
               Home
             </Link>
           </li>
-          <li style={{ "--transition-delay": "300ms" }}>
+          {/* <li style={{ "--transition-delay": "300ms" }}>
             <Link href="#" onClick={closeNav}>
               About
             </Link>
-          </li>
-          <li style={{ "--transition-delay": "400ms" }}>
-            <Link href="#" onClick={closeNav}>
+          </li> */}
+          <li style={{ "--transition-delay": "300ms" }}>
+            <Link href="/contact" onClick={closeNav}>
               Contact
             </Link>
           </li>

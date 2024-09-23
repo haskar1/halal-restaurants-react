@@ -1,6 +1,11 @@
-export default function SubmitButton({ isSubmitting, isError }) {
+export default function SubmitButton({
+  isSubmitting,
+  isError = "",
+  btnTextDefault = "Submit",
+  btnTextPending = "Submitting...",
+}) {
   let className =
-    "border-[3px] border-solid border-[#b9ae8c] rounded-lg p-2 cursor-pointer max-w-[10rem] mt-[2rem]";
+    "bg-[#136c72] text-white text-lg border-none rounded-lg py-3 px-10 cursor-pointer";
 
   if (isSubmitting) {
     className += " opacity-70";
@@ -12,7 +17,7 @@ export default function SubmitButton({ isSubmitting, isError }) {
       disabled={isSubmitting || isError}
       className={className}
     >
-      {isSubmitting ? "Submitting..." : "Submit"}
+      {isSubmitting ? btnTextPending : btnTextDefault}
     </button>
   );
 }

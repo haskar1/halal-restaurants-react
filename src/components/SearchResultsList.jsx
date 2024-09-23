@@ -340,12 +340,18 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
                         )}
                       </div>
 
-                      {restaurant.properties.halal_description && (
-                        <div className="pb-6">
-                          <b>Halal information:</b>{" "}
-                          {restaurant.properties.halal_description}
-                        </div>
-                      )}
+                      <div className="pb-6">
+                        <b>Halal information:</b>{" "}
+                        {restaurant.properties.halal_status
+                          ? restaurant.properties.halal_status === "Fully Halal"
+                            ? `${restaurant.properties.name} is fully halal.`
+                            : restaurant.properties.halal_status ===
+                                "Partially Halal"
+                              ? `${restaurant.properties.name} is partially halal.`
+                              : `${restaurant.properties.name} is not halal.`
+                          : `It is unknown if ${restaurant.properties.name} is halal.`}{" "}
+                        {restaurant.properties.halal_description}
+                      </div>
 
                       {restaurant.properties.summary && (
                         <div>
