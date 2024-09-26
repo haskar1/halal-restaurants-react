@@ -1,0 +1,212 @@
+// 31 restaurants and 2 locations, updated 10/1/24
+
+export default function sitemap() {
+  return [
+    {
+      url: "https://www.whoishalal.com/",
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: "https://www.whoishalal.com/contact",
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
+    {
+      url: "https://www.whoishalal.com/best-halal-restaurants/raleigh-north-carolina-united-states",
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: "https://www.whoishalal.com/best-halal-restaurants/new-york-city-new-york-united-states",
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/afghan-kabob-fayetteville-nc",
+      lastModified: "2024-08-06T19:44:47.137Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/meat-and-bite-raleigh-nc",
+      lastModified: "2024-08-06T20:06:28.353Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/al-falah-halal-foods-high-point-nc",
+      lastModified: "2024-07-02T17:09:15.184Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/kolachi-restaurant-seaview-karachi-pakistan",
+      lastModified: "2024-09-25T17:46:30.812Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/al-basha-mediterranean-grill-and-hookah-charlotte-nc",
+      lastModified: "2024-08-06T19:46:02.265Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/hibachi-blue-morrisville-nc",
+      lastModified: "2024-08-06T20:04:48.098Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/al-basha-market-and-grill-raleigh-nc",
+      lastModified: "2024-08-06T19:45:39.947Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/fusion-nine-morrisville-nc",
+      lastModified: "2024-08-06T20:04:35.102Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/tasty-halal-food-truck-morrisville-nc",
+      lastModified: "2024-08-06T20:07:26.411Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/jasmin-and-olivz-mediterranean-weston-morrisville-nc",
+      lastModified: "2024-08-06T20:05:33.464Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/americas-best-wings-greenville-nc",
+      lastModified: "2024-08-06T20:01:20.092Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/afghan-kebab-cary-nc",
+      lastModified: "2024-08-06T19:45:02.490Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/asali-desserts-and-cafe-cary-nc",
+      lastModified: "2024-07-02T17:17:14.902Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/arepa-culture-raleigh-nc",
+      lastModified: "2024-08-06T20:01:34.093Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/baba-ghannouj-durham-nc",
+      lastModified: "2024-08-06T20:02:26.700Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/avent-ferry-pizza-raleigh-nc",
+      lastModified: "2024-08-06T20:01:57.018Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/bateeni-mediterranean-grill-greenville-nc",
+      lastModified: "2024-08-06T20:03:10.685Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/9-spices-indian-cuisine-and-hot-breads-charlotte-nc",
+      lastModified: "2024-08-06T19:43:49.765Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/al-baraka-mediterranean-market-and-grill-raleigh-nc",
+      lastModified: "2024-08-06T19:45:16.340Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/bawarchi-biryanis-greensboro-high-point-nc",
+      lastModified: "2024-08-06T20:03:54.530Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/adda-bistro-and-dining-morrisville-nc",
+      lastModified: "2024-08-06T19:44:26.657Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/azitra-indian-culinary-nirvana-raleigh-nc",
+      lastModified: "2024-08-06T20:02:12.894Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/almadina-biryani-hut-raleigh-nc",
+      lastModified: "2024-08-06T19:46:24.968Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/dames-chicken-and-waffles-durham-nc",
+      lastModified: "2024-08-06T20:04:21.657Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/baba-ghannouj-mediterranean-bistro-cary-nc",
+      lastModified: "2024-08-06T20:02:52.277Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/dames-chicken-and-waffles-cary-nc",
+      lastModified: "2024-08-06T20:04:09.173Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/americas-best-wings-raleigh-nc",
+      lastModified: "2024-08-06T19:47:09.025Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/spices-hut-indian-groceries-morrisville-nc",
+      lastModified: "2024-09-15T04:34:14.214Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/namkeen-brooklyn-new-york",
+      lastModified: "2024-09-24T21:16:08.240Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/adels-famous-halal-food-new-york-city",
+      lastModified: "2024-09-25T17:39:07.316Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: "https://www.whoishalal.com/restaurants/rasa-new-york-city",
+      lastModified: "2024-10-01T18:29:21.715Z",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+  ];
+}
