@@ -16,7 +16,7 @@ export default async function RestaurantList({ params }) {
         <div className="container">
           <h1 className="text-3xl pb-8">{restaurant.name}</h1>
 
-          <div className="grid gap-4 pb-8">
+          <div className="grid gap-4 pb-8 whitespace-pre-line">
             {restaurant.slug && (
               <Link
                 href={`/restaurants/${restaurant.slug}`}
@@ -27,12 +27,16 @@ export default async function RestaurantList({ params }) {
               </Link>
             )}
 
-            <p>ID: {restaurant.id}</p>
-            <p>Slug: {restaurant.slug}</p>
+            <p>
+              <b>ID:</b> {restaurant.id}
+            </p>
+            <p>
+              <b>Slug:</b> {restaurant.slug}
+            </p>
 
             {restaurant.cuisines?.length > 1 ? (
               <p>
-                Cuisines:{" "}
+                <b>Cuisines:</b>{" "}
                 {restaurant.cuisines.map((cuisine, index) => (
                   <span key={cuisine.id}>
                     {cuisine.name}
@@ -42,19 +46,25 @@ export default async function RestaurantList({ params }) {
               </p>
             ) : restaurant.cuisines?.length === 1 ? (
               <p>
-                Cuisine:{" "}
+                <b>Cuisine:</b>{" "}
                 {restaurant.cuisines.map((cuisine) => (
                   <span key={cuisine.id}>{cuisine.name}</span>
                 ))}
               </p>
             ) : (
-              <p>Cuisine(s):</p>
+              <p>
+                <b>Cuisine(s):</b>
+              </p>
             )}
 
-            <p>Address: {restaurant.address}</p>
-            <p>City/Town/Neighborhood/etc: {restaurant.city}</p>
             <p>
-              Address URL:{" "}
+              <b>Address:</b> {restaurant.address}
+            </p>
+            <p>
+              <b>City/Town/Neighborhood/etc:</b> {restaurant.city}
+            </p>
+            <p>
+              <b>Address URL:</b>{" "}
               <a
                 href={restaurant.address_url}
                 target="_blank"
@@ -64,22 +74,47 @@ export default async function RestaurantList({ params }) {
               </a>
             </p>
             <p>
-              Google Maps Embedded URL: {restaurant.google_maps_embedded_url}
+              <b>Google Maps Embedded URL:</b>{" "}
+              {restaurant.google_maps_embedded_url}
             </p>
-            <p>Latitude: {restaurant.latitude}</p>
-            <p>Longitude: {restaurant.longitude}</p>
-            <p>Location: {restaurant.location}</p>
-            <p>Restaurant Summary: {restaurant.restaurant_summary}</p>
-            <p>Halal Status: {restaurant.halal_status}</p>
-            <p>Halal Description: {restaurant.halal_description}</p>
-            <p>Alcohol Served? {restaurant.alcohol_served}</p>
-            <p>Pork Served? {restaurant.pork_served}</p>
-            <p>Slaughter Method: {restaurant.slaughter_method}</p>
-            <p>Rating: {restaurant.rating}</p>
-            <p>Price: {restaurant.price}</p>
-            <p>Phone: {restaurant.phone}</p>
             <p>
-              Website:{" "}
+              <b>Latitude:</b> {restaurant.latitude}
+            </p>
+            <p>
+              <b>Longitude:</b> {restaurant.longitude}
+            </p>
+            <p>
+              <b>Location:</b> {restaurant.location}
+            </p>
+            <p>
+              <b>Restaurant Summary:</b> {restaurant.restaurant_summary}
+            </p>
+            <p>
+              <b>Halal Status:</b> {restaurant.halal_status}
+            </p>
+            <p>
+              <b>Halal Description:</b> {restaurant.halal_description}
+            </p>
+            <p>
+              <b>Alcohol Served?</b> {restaurant.alcohol_served}
+            </p>
+            <p>
+              <b>Pork Served?</b> {restaurant.pork_served}
+            </p>
+            <p>
+              <b>Slaughter Method:</b> {restaurant.slaughter_method}
+            </p>
+            <p>
+              <b>Rating:</b> {restaurant.rating}
+            </p>
+            <p>
+              <b>Price:</b> {restaurant.price}
+            </p>
+            <p>
+              <b>Phone:</b> {restaurant.phone}
+            </p>
+            <p>
+              <b>Website:</b>{" "}
               <a
                 href={restaurant.website}
                 target="_blank"
@@ -89,7 +124,7 @@ export default async function RestaurantList({ params }) {
               </a>
             </p>
             <p>
-              Cover Photo URL:{" "}
+              <b>Cover Photo URL:</b>{" "}
               <a
                 href={restaurant.cover_photo_url}
                 target="_blank"
@@ -101,7 +136,7 @@ export default async function RestaurantList({ params }) {
 
             {restaurant.other_photos_url?.length > 1 ? (
               <p>
-                Other Photos URLs:{" "}
+                <b>Other Photos URLs:</b>{" "}
                 {restaurant.other_photos_url.map((url, index) => (
                   <a
                     key={index}
@@ -118,7 +153,7 @@ export default async function RestaurantList({ params }) {
               </p>
             ) : restaurant.other_photos_url?.length === 1 ? (
               <p>
-                Other Photos URL:{" "}
+                <b>Other Photos URL:</b>{" "}
                 <a
                   href={restaurant.other_photos_url[0]}
                   target="_blank"
@@ -128,11 +163,17 @@ export default async function RestaurantList({ params }) {
                 </a>
               </p>
             ) : (
-              <p>Other Photos URLs:</p>
+              <p>
+                <b>Other Photos URLs:</b>
+              </p>
             )}
 
-            <p>Created At: {restaurant.created_at.toString()}</p>
-            <p>Updated At: {restaurant.updated_at.toString()}</p>
+            <p>
+              <b>Created At:</b> {restaurant.created_at.toString()}
+            </p>
+            <p>
+              <b>Updated At:</b> {restaurant.updated_at.toString()}
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-[1rem]">

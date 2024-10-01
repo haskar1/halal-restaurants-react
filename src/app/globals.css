@@ -45,6 +45,7 @@ dd {
   padding: 0;
   word-break: break-word;
   overflow-wrap: break-word;
+  white-space: pre-line;
 }
 
 /* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
