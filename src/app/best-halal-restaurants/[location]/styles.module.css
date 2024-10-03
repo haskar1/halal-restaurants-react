@@ -164,6 +164,7 @@
 
   .map_btn_container {
     width: 100%;
+    min-height: 56px;
   }
 
   .map_btn {

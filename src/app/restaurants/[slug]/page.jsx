@@ -11,16 +11,28 @@ import "./style.css";
 export const dynamicParams = true;
 export const fetchCache = "force-no-store";
 
-// export const metadata = {
-// title: " [RESTAURANT NAME HERE]| Who Is Halal",
-// };
+export async function generateMetadata({ params }) {
+  const restaurant = await getRestaurant(decodeURIComponent(params.slug));
+
+  // Restaurant found
+  if (restaurant?.name && restaurant?.city) {
+    return {
+      title: `${restaurant.name} - Halal Restaurant in ${restaurant.city}`,
+    };
+  }
+
+  // Restaurant not found
+  return {
+    title: `Restaurant Not Found`,
+  };
+}
 
 export default async function RestaurantPage({ params }) {
   const restaurant = await getRestaurant(decodeURIComponent(params.slug));
 
   return (
     <>
-      {restaurant ? (
+      {restaurant?.name ? (
         <div>
           {/* Title and images */}
           <div className="grid pb-20">
@@ -191,8 +203,8 @@ export default async function RestaurantPage({ params }) {
           </div>
         </div>
       ) : (
-        <div className="container">
-          <h1>Restaurant Not Found</h1>
+        <div className="container flex justify-center items-center h-[calc(100vh-64px)]">
+          <h2>Restaurant Not Found</h2>
         </div>
       )}
     </>

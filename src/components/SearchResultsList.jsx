@@ -42,6 +42,8 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
   const handleMapOpen = () => setMapOpen(true);
   const handleMapClose = () => setMapOpen(false);
 
+  if (!locationInfo) return null;
+
   // Update the filteredRestaurants whenever cuisines or prices or other filters change
   useEffect(() => {
     let updatedRestaurants = allRestaurants;
