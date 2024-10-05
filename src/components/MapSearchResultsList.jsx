@@ -34,7 +34,7 @@ export default function MapSearchResultsList({
               ? searchResults.features.map((restaurant) => (
                   <Link
                     href={`/restaurants/${restaurant.properties.slug}`}
-                    // target="_blank"
+                    target="_blank"
                     key={restaurant.properties.id}
                     className={
                       isActive === restaurant.properties.id
@@ -81,7 +81,7 @@ export default function MapSearchResultsList({
               : searchResults.features.map((restaurant) => (
                   <Link
                     href={`/restaurants/${restaurant.properties.slug}`}
-                    // target="_blank"
+                    target="_blank"
                     key={restaurant.properties.id}
                     className={
                       isActive === restaurant.properties.id

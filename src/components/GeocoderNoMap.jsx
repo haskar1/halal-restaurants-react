@@ -11,7 +11,8 @@ export default function GeocoderNoMap() {
 
   useEffect(() => {
     const geocoder = new MapboxGeocoder({
-      accessToken: process.env.NEXT_PUBLIC_MAPBOX_GEOCODER,
+      accessToken:
+        "pk.eyJ1IjoiaGFza2FyMSIsImEiOiJjbTFpc2Vwdjcwc2swMmlwcWp5dHM2cmE0In0.MsAukE4s3Pej1eq0F9Utjg",
       types: "country,region,postcode,district,place,locality,neighborhood",
       placeholder: "Search a location",
     });

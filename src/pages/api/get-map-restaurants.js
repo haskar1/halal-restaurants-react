@@ -88,7 +88,7 @@ export default async function handler(request, response) {
             ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 75
           ORDER BY
             distance
-          LIMIT 3
+          -- LIMIT 3
         ),
         combined_results AS (
           SELECT *, 'within_radius' AS source

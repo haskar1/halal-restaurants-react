@@ -67,7 +67,9 @@ export default function MapSidebar({
                 <span>
                   <b>
                     {searchResults.features.length}{" "}
-                    {searchResults.features.length === 1 ? "result" : "results"}
+                    {searchResults.features.length === 1
+                      ? "Restaurant"
+                      : "Restaurants"}
                   </b>
                 </span>
               </div>
@@ -101,17 +103,17 @@ export default function MapSidebar({
           searchedRestaurantSelected={searchedRestaurantSelected}
         /> */}
         {searchedLocation && (
-          <h1 className="search-results-title">
+          <h1 className="search-results-title pb-10">
             Best Halal Restaurants in {searchedLocation.properties?.name}
           </h1>
         )}
         {searchResults?.features && searchResults.features.length > 0 && (
-          <div className="text-center">
+          <div className="text-center text-xl font-normal">
             <span>
-              <b>
-                {searchResults.features.length}{" "}
-                {searchResults.features.length === 1 ? "result" : "results"}
-              </b>
+              {searchResults.features.length}{" "}
+              {searchResults.features.length === 1
+                ? "Restaurant"
+                : "Restaurants"}
             </span>
           </div>
         )}

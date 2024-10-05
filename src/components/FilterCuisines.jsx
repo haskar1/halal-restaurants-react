@@ -11,13 +11,17 @@ export default function FilterCuisines({
   setSelectedCuisines,
 }) {
   const handleChange = (e, cuisine) => {
-    let updatedSelectedCuisines;
+    let updatedSelectedCuisines = [];
     if (e.target.checked) {
       updatedSelectedCuisines = [...selectedCuisines, cuisine];
     } else {
       updatedSelectedCuisines = selectedCuisines.filter((c) => c !== cuisine);
     }
     setSelectedCuisines(updatedSelectedCuisines);
+    sessionStorage.setItem(
+      "selectedCuisines",
+      JSON.stringify(updatedSelectedCuisines)
+    );
   };
 
   return (

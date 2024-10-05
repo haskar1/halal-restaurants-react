@@ -85,7 +85,7 @@ textarea {
 
 .map {
   // height: calc(100vh - 106px);
-  height: calc(100vh - 52px);
+  height: calc(100vh - 4rem - 52px);
 }
 
 .sidebar {
@@ -178,6 +178,7 @@ textarea {
 
 @media screen and (min-width: 768px) {
   .map-and-sidebar-container {
+    height: calc(100vh - 4rem);
     grid-template-columns: 60% 40%;
   }
 
@@ -189,7 +190,7 @@ textarea {
   }
 
   .map {
-    height: 100vh;
+    height: calc(100vh - 4rem);
   }
 
   .sidebar {

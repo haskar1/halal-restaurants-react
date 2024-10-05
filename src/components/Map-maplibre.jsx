@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import maplibregl from "maplibre-gl";
 import MapSidebar from "@/components/MapSidebar";
 import { Skeleton } from "@mui/material";
@@ -8,6 +10,8 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "@/stylesheets/map.scss";
 import { bbox as turfbbox } from "@turf/bbox";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function Map({ locationInfo, searchResults }) {
   const mapContainer = useRef(null);
@@ -24,18 +28,23 @@ export default function Map({ locationInfo, searchResults }) {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const bottomSheetRef = useRef();
   const bottomSheetSnapping = useRef(false);
-  const [searchedLocation, setSearchedLocation] = useState(null);
+  const [searchedLocation, setSearchedLocation] = useState(
+    JSON.parse(sessionStorage.getItem("locationInfo")) || null
+  );
+  const router = useRouter();
+  const params = useParams();
 
   useEffect(() => {
+    if (!locationInfo || !searchResults) return; // stops map from initializing more than once
     if (map?.current) return; // stops map from initializing more than once
 
-    let bbox = locationInfo.properties?.bbox;
+    let bbox = locationInfo?.properties?.bbox;
     let mapCenterLat;
     let mapCenterLon;
 
-    if (locationInfo.properties?.coordinates) {
-      mapCenterLat = locationInfo.properties?.coordinates.latitude;
-      mapCenterLon = locationInfo.properties?.coordinates.longitude;
+    if (locationInfo?.properties?.coordinates) {
+      mapCenterLat = locationInfo?.properties?.coordinates.latitude;
+      mapCenterLon = locationInfo?.properties?.coordinates.longitude;
     } else {
       mapCenterLat = lat;
       mapCenterLon = lon;
@@ -68,7 +77,7 @@ export default function Map({ locationInfo, searchResults }) {
             map.current.addImage("custom-marker", image);
           }
 
-          if (searchResults.features.length) {
+          if (searchResults?.features?.length) {
             let bbox2 = turfbbox(searchResults);
             map.current.fitBounds(bbox2, { padding: 100 });
           }
@@ -346,9 +355,11 @@ export default function Map({ locationInfo, searchResults }) {
         }
         ******/
 
-    setSearchedLocation(locationInfo);
+    setSearchedLocation(
+      JSON.parse(sessionStorage.getItem("locationInfo")) || locationInfo
+    );
     setIsMapLoaded(true);
-  }, []);
+  }, [locationInfo, searchResults]);
 
   /******
   // Update map results on move
@@ -516,6 +527,22 @@ export default function Map({ locationInfo, searchResults }) {
             variant="rectangular"
           />
         )}
+        <IconButton
+          aria-label="close"
+          onClick={() =>
+            router.push(`/best-halal-restaurants/${params.location}`)
+          }
+          sx={(theme) => ({
+            position: "absolute",
+            zIndex: 1,
+            right: 8,
+            top: 8,
+            color: "black",
+            backgroundColor: "white",
+          })}
+        >
+          <CloseIcon />
+        </IconButton>
       </div>
 
       <MapSidebar

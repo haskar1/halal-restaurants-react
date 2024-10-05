@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useMediaQuery } from "@mui/material";
 import FilterCuisines from "@/components/FilterCuisines";
 import FilterPrice from "@/components/FilterPrice";
 import FilterOther from "@/components/FilterOther";
-import Map from "@/components/Map-maplibre";
 import RestaurantCardLoading from "@/components/RestaurantCardLoading";
 import Link from "next/link";
 import Image from "next/image";
@@ -23,11 +24,24 @@ import PlaceIcon from "@mui/icons-material/Place";
 import styles from "../app/best-halal-restaurants/[location]/styles.module.css";
 
 export default function SearchResultsList({ locationInfo, searchResults }) {
+  const params = useParams();
+  const router = useRouter();
   const allRestaurants = searchResults?.features || []; // Original list
-  const [filteredRestaurants, setFilteredRestaurants] = useState(searchResults);
-  const [selectedCuisines, setSelectedCuisines] = useState([]);
-  const [selectedPrices, setSelectedPrices] = useState([]);
-  const [selectedOthers, setSelectedOthers] = useState([]);
+  const sessionStoredFilteredRestaurants = JSON.parse(
+    sessionStorage.getItem("filteredRestaurants")
+  );
+  const [filteredRestaurants, setFilteredRestaurants] = useState(
+    sessionStoredFilteredRestaurants || searchResults
+  );
+  const [selectedCuisines, setSelectedCuisines] = useState(
+    JSON.parse(sessionStorage.getItem("selectedCuisines")) || []
+  );
+  const [selectedPrices, setSelectedPrices] = useState(
+    JSON.parse(sessionStorage.getItem("selectedPrices")) || []
+  );
+  const [selectedOthers, setSelectedOthers] = useState(
+    JSON.parse(sessionStorage.getItem("selectedOthers")) || []
+  );
 
   // Filters button on mobile
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -36,13 +50,6 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
   if (useMediaQuery("(min-width:768px)") && mobileFiltersOpen) {
     handleMobileFiltersClose();
   }
-
-  // View Map button on mobile
-  const [mapOpen, setMapOpen] = useState(false);
-  const handleMapOpen = () => setMapOpen(true);
-  const handleMapClose = () => setMapOpen(false);
-
-  if (!locationInfo) return null;
 
   // Update the filteredRestaurants whenever cuisines or prices or other filters change
   useEffect(() => {
@@ -88,7 +95,19 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
       features: updatedRestaurants,
       type: "FeatureCollection",
     });
+
+    sessionStorage.setItem(
+      "filteredRestaurants",
+      JSON.stringify({
+        features: updatedRestaurants,
+        type: "FeatureCollection",
+      })
+    );
   }, [selectedCuisines, selectedPrices, selectedOthers, allRestaurants]);
+
+  useEffect(() => {
+    sessionStorage.setItem("locationInfo", JSON.stringify(locationInfo));
+  }, []);
 
   const filtersAreSelected =
     selectedCuisines.length > 0 ||
@@ -100,6 +119,13 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
     setSelectedPrices([]); // Reset selected prices
     setSelectedOthers([]); // Reset selected other filters
     setFilteredRestaurants(allRestaurants); // Reset the restaurant list to show all restaurants
+    sessionStorage.setItem(
+      "filteredRestaurants",
+      JSON.stringify(allRestaurants)
+    );
+    sessionStorage.setItem("selectedCuisines", JSON.stringify([]));
+    sessionStorage.setItem("selectedPrices", JSON.stringify([]));
+    sessionStorage.setItem("selectedOthers", JSON.stringify([]));
   }
 
   ////// FILTER OPTIONS - DEFINED HERE TO DETERMINE IF FILTERS COMPONENT NEEDS TO BE RENDERED ///////
@@ -131,37 +157,17 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
             <div className={styles.filters_map_container}>
               {/* // Map button */}
               <div className={styles.map_btn_container}>
-                <Button className={styles.map_btn} onClick={handleMapOpen}>
+                <Button
+                  className={styles.map_btn}
+                  onClick={() =>
+                    router.push(
+                      `/best-halal-restaurants/${params.location}/map`
+                    )
+                  }
+                >
                   Map&nbsp;
                   <PlaceIcon />
                 </Button>
-
-                <Dialog
-                  open={mapOpen}
-                  onClose={handleMapClose}
-                  fullScreen
-                  sx={{ overflow: "hidden" }}
-                  aria-modal
-                >
-                  <IconButton
-                    aria-label="close"
-                    onClick={handleMapClose}
-                    sx={(theme) => ({
-                      position: "absolute",
-                      zIndex: 1,
-                      right: 8,
-                      top: 8,
-                      color: "black",
-                      backgroundColor: "white",
-                    })}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Map
-                    locationInfo={locationInfo}
-                    searchResults={filteredRestaurants}
-                  />
-                </Dialog>
               </div>
 
               {/* // Filters button */}
@@ -269,9 +275,9 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
                 filteredRestaurants.features?.length === 0 ? (
                 <p>No restaurants match your filters</p>
               ) : allRestaurants.length > 1 ? (
-                <p>{allRestaurants.length} restaurants</p>
+                <p>{allRestaurants.length} Restaurants</p>
               ) : allRestaurants.length === 1 ? (
-                <p>1 restaurant</p>
+                <p>1 Restaurant</p>
               ) : null}
             </div>
 
