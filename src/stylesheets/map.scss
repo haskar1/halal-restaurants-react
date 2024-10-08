@@ -93,15 +93,14 @@ textarea {
 }
 .search-results-title {
   text-align: center;
-  padding-top: 3rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding: 3rem 1rem 2.5rem;
   font-weight: 600;
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   line-height: 1.1;
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 .search-results-list-message {
+  font-size: 1.2rem;
   text-align: center;
 }
 .search-list {
@@ -198,6 +197,9 @@ textarea {
     grid-template-rows: auto auto 1fr;
     background-color: #faf9f6;
     overflow: auto;
+  }
+  .search-results-title {
+    font-size: 2.2rem;
   }
 }
 

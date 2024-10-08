@@ -19,7 +19,7 @@ export default function MapSidebar({
   searchedRestaurantSelected,
   bottomSheetSnapping,
   bottomSheetRef,
-  searchedLocation,
+  locationInfo,
 }) {
   const [bottomSheetIsOpen, setBottomSheetIsOpen] = useState(false);
   const snapPointsRef = useRef([]);
@@ -77,9 +77,9 @@ export default function MapSidebar({
           </>
         }
       >
-        {searchedLocation && (
+        {locationInfo && (
           <h1 className="search-results-title">
-            Best Halal Restaurants in {searchedLocation.properties?.name}
+            Best Halal Restaurants in {locationInfo.properties?.name}
           </h1>
         )}
         <MapSearchResultsList
@@ -102,9 +102,9 @@ export default function MapSidebar({
           setSearchResults={setSearchResults}
           searchedRestaurantSelected={searchedRestaurantSelected}
         /> */}
-        {searchedLocation && (
-          <h1 className="search-results-title pb-10">
-            Best Halal Restaurants in {searchedLocation.properties?.name}
+        {locationInfo && (
+          <h1 className="search-results-title">
+            Best Halal Restaurants in {locationInfo.properties?.name}
           </h1>
         )}
         {searchResults?.features && searchResults.features.length > 0 && (

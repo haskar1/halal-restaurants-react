@@ -107,7 +107,8 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
 
   useEffect(() => {
     sessionStorage.setItem("locationInfo", JSON.stringify(locationInfo));
-  }, []);
+    clearFilters();
+  }, [locationInfo]);
 
   const filtersAreSelected =
     selectedCuisines.length > 0 ||
@@ -375,7 +376,7 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
           </div>
         </div>
       ) : (
-        <p className={styles.message}>No restaurants found</p>
+        <p className={styles.message}>No restaurants found in this area</p>
       )}
     </>
   );

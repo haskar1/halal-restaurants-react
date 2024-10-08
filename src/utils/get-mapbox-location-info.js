@@ -14,8 +14,9 @@ export default async function getMapboxLocationInfo(location) {
     const locationJson = await locationResponse.json();
     locationInfo = locationJson.features[0];
 
-    const mapCenterLat = locationInfo.properties?.coordinates.latitude;
-    const mapCenterLon = locationInfo.properties?.coordinates.longitude;
+    const bbox = JSON.stringify(locationInfo?.properties?.bbox);
+    const mapCenterLat = locationInfo?.properties?.coordinates.latitude;
+    const mapCenterLon = locationInfo?.properties?.coordinates.longitude;
 
     // Fetch location's restaurants from database
     if (mapCenterLat && mapCenterLon) {
@@ -27,7 +28,7 @@ export default async function getMapboxLocationInfo(location) {
       const protocal =
         process?.env.NODE_ENV === "development" ? "http" : "https";
       let res = await fetch(
-        `${protocal}://${host}/api/get-map-restaurants?latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=100`,
+        `${protocal}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=30`,
         {
           cache: "no-store",
         }

@@ -6,8 +6,6 @@ export default async function handler(request, response) {
       SELECT slug, updated_at FROM restaurants
     `;
 
-    console.log(result);
-
     if (!result.rows[0]) {
       throw new Error("No restaurants found");
     }

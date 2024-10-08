@@ -28,15 +28,17 @@ export default function Map({ locationInfo, searchResults }) {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const bottomSheetRef = useRef();
   const bottomSheetSnapping = useRef(false);
-  const [searchedLocation, setSearchedLocation] = useState(
-    JSON.parse(sessionStorage.getItem("locationInfo")) || null
-  );
+  // const [searchedLocation, setSearchedLocation] = useState(
+  //   JSON.parse(sessionStorage.getItem("locationInfo")) || null
+  // );
   const router = useRouter();
   const params = useParams();
 
   useEffect(() => {
     if (!locationInfo || !searchResults) return; // stops map from initializing more than once
-    if (map?.current) return; // stops map from initializing more than once
+    // if (map?.current) return; // stops map from initializing more than once
+    map.current?.remove();
+    map.current = null;
 
     let bbox = locationInfo?.properties?.bbox;
     let mapCenterLat;
@@ -82,82 +84,86 @@ export default function Map({ locationInfo, searchResults }) {
             map.current.fitBounds(bbox2, { padding: 100 });
           }
 
-          if (!map.current.getSource("restaurants")) {
-            map.current.addSource("restaurants", {
-              type: "geojson",
-              data: searchResults,
-              cluster: true,
-              clusterMaxZoom: 10, // Max zoom to cluster points on
-              clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
+          if (map.current.getSource("restaurants")) {
+            map.current.getStyle().layers.map((layer) => {
+              if (layer.id === "restaurants") {
+                map.current.removeLayer("restaurants");
+              }
+              if (layer.id === "clusters") {
+                map.current.removeLayer("clusters");
+              }
+              if (layer.id === "cluster-count") {
+                map.current.removeLayer("cluster-count");
+              }
             });
+
+            map.current.removeSource("restaurants");
           }
 
-          let layerAlreadyExists = false;
-
-          map.current.getStyle().layers.map((layer) => {
-            if (layer.id === "restaurants" || layer.id === "cluster-count") {
-              layerAlreadyExists = true;
-              return;
-            }
+          map.current.addSource("restaurants", {
+            type: "geojson",
+            data: searchResults,
+            cluster: true,
+            clusterMaxZoom: 10, // Max zoom to cluster points on
+            clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
           });
 
-          if (!layerAlreadyExists) {
-            map.current.addLayer({
-              id: "clusters",
-              type: "circle",
-              source: "restaurants",
-              filter: ["has", "point_count"],
-              paint: {
-                // Use step expressions (https://docs.mapbox.com/style-spec/reference/expressions/#step)
-                // with three steps to implement three types of circles:
-                //   * Blue, 20px circles when point count is less than 100
-                //   * Yellow, 30px circles when point count is between 100 and 750
-                //   * Pink, 40px circles when point count is greater than or equal to 750
-                "circle-color": [
-                  "step",
-                  ["get", "point_count"],
-                  "#51bbd6",
-                  100,
-                  "#f1f075",
-                  750,
-                  "#f28cb1",
-                ],
-                "circle-radius": [
-                  "step",
-                  ["get", "point_count"],
-                  20,
-                  100,
-                  30,
-                  750,
-                  40,
-                ],
-              },
-            });
+          map.current.addLayer({
+            id: "clusters",
+            type: "circle",
+            source: "restaurants",
+            filter: ["has", "point_count"],
+            paint: {
+              // Use step expressions (https://docs.mapbox.com/style-spec/reference/expressions/#step)
+              // with three steps to implement three types of circles:
+              //   * Blue, 20px circles when point count is less than 100
+              //   * Yellow, 30px circles when point count is between 100 and 750
+              //   * Pink, 40px circles when point count is greater than or equal to 750
+              "circle-color": [
+                "step",
+                ["get", "point_count"],
+                "#51bbd6",
+                100,
+                "#f1f075",
+                750,
+                "#f28cb1",
+              ],
+              "circle-radius": [
+                "step",
+                ["get", "point_count"],
+                20,
+                100,
+                30,
+                750,
+                40,
+              ],
+            },
+          });
 
-            map.current.addLayer({
-              id: "cluster-count",
-              type: "symbol",
-              source: "restaurants",
-              filter: ["has", "point_count"],
-              layout: {
-                "text-field": ["get", "point_count_abbreviated"],
-                "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-                "text-size": 12,
-              },
-            });
+          map.current.addLayer({
+            id: "cluster-count",
+            type: "symbol",
+            source: "restaurants",
+            filter: ["has", "point_count"],
+            layout: {
+              "text-field": ["get", "point_count_abbreviated"],
+              "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+              "text-size": 12,
+            },
+          });
 
-            // Add a symbol layer
-            map.current.addLayer({
-              id: "restaurants",
-              type: "symbol",
-              source: "restaurants",
-              filter: ["!", ["has", "point_count"]],
-              layout: {
-                "icon-image": "custom-marker",
-                "icon-allow-overlap": true,
-              },
-            });
-          }
+          // Add a symbol layer
+          map.current.addLayer({
+            id: "restaurants",
+            type: "symbol",
+            source: "restaurants",
+            filter: ["!", ["has", "point_count"]],
+            layout: {
+              "icon-image": "custom-marker",
+              "icon-allow-overlap": true,
+            },
+          });
+          // }
 
           map.current.on("mouseenter", "clusters", () => {
             map.current.getCanvas().style.cursor = "pointer";
@@ -355,10 +361,15 @@ export default function Map({ locationInfo, searchResults }) {
         }
         ******/
 
-    setSearchedLocation(
-      JSON.parse(sessionStorage.getItem("locationInfo")) || locationInfo
-    );
+    // setSearchedLocation(
+    //   JSON.parse(sessionStorage.getItem("locationInfo")) || locationInfo
+    // );
     setIsMapLoaded(true);
+
+    return () => {
+      map.current.remove();
+      map.current = null;
+    };
   }, [locationInfo, searchResults]);
 
   /******
@@ -557,7 +568,7 @@ export default function Map({ locationInfo, searchResults }) {
         searchedRestaurantSelected={searchedRestaurantSelected}
         bottomSheetRef={bottomSheetRef}
         bottomSheetSnapping={bottomSheetSnapping}
-        searchedLocation={searchedLocation}
+        locationInfo={locationInfo}
       />
     </div>
   );

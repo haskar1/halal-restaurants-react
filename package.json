@@ -33,6 +33,7 @@
     "leaflet-geosearch": "^3.11.0",
     "leaflet-search": "^4.0.0",
     "leaflet.locatecontrol": "^0.79.0",
+    "lodash": "^4.17.21",
     "mapbox-gl": "^3.1.2",
     "maplibre-gl": "^3.6.2",
     "next": "^14.2.3",
