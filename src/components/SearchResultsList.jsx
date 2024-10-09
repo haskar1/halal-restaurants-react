@@ -22,6 +22,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import TuneIcon from "@mui/icons-material/Tune";
 import PlaceIcon from "@mui/icons-material/Place";
 import styles from "../app/best-halal-restaurants/[location]/styles.module.css";
+import _ from "lodash";
 
 export default function SearchResultsList({ locationInfo, searchResults }) {
   const params = useParams();
@@ -106,8 +107,17 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
   }, [selectedCuisines, selectedPrices, selectedOthers, allRestaurants]);
 
   useEffect(() => {
-    sessionStorage.setItem("locationInfo", JSON.stringify(locationInfo));
-    clearFilters();
+    // If you go to a different location's page, and sessionStorage already had filters..
+    // from a previous location saved, then clear those filters and set new location in sessionStorage
+    if (
+      !_.isEqual(
+        JSON.parse(sessionStorage.getItem("locationInfo")),
+        locationInfo
+      )
+    ) {
+      clearFilters();
+      sessionStorage.setItem("locationInfo", JSON.stringify(locationInfo));
+    }
   }, [locationInfo]);
 
   const filtersAreSelected =

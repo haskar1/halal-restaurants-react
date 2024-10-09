@@ -28,7 +28,7 @@ export default async function getMapboxLocationInfo(location) {
       const protocal =
         process?.env.NODE_ENV === "development" ? "http" : "https";
       let res = await fetch(
-        `${protocal}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=30`,
+        `${protocal}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=50`,
         {
           cache: "no-store",
         }

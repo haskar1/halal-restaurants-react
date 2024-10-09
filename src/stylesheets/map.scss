@@ -83,6 +83,10 @@ textarea {
   background-color: #f6f1e4;
 }
 
+.map-wrap .map-close-button:hover {
+  background-color: rgb(193, 193, 193);
+}
+
 .map {
   // height: calc(100vh - 106px);
   height: calc(100vh - 4rem - 52px);
@@ -290,8 +294,16 @@ textarea {
   }
 }
 
-/* ZOOM AND GEOLOCATE BUTTONS */
+/* SEARCH THIS AREA BUTTON */
+.search-area-btn {
+  position: absolute;
+  font-size: 0.85rem;
+  top: 1.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
 
+/* ZOOM AND GEOLOCATE BUTTONS */
 .maplibregl-ctrl-top-right {
   top: 15% !important;
 }

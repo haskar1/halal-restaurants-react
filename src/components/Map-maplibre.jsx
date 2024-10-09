@@ -13,13 +13,13 @@ import { bbox as turfbbox } from "@turf/bbox";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 
-export default function Map({ locationInfo, searchResults }) {
+export default function Map({ locationInfo, searchResults, setSearchResults }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const [lon, setLon] = useState(-73.985542);
   const [lat, setLat] = useState(40.757976);
   const zoom = 14;
-  const geoJsonData = useRef({});
+  // const geoJsonData = useRef({});
   const searchResultsRef = useRef({});
   const [isActive, setIsActive] = useState("");
   const geolocate = useRef(null);
@@ -28,6 +28,8 @@ export default function Map({ locationInfo, searchResults }) {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const bottomSheetRef = useRef();
   const bottomSheetSnapping = useRef(false);
+  const [showSearchAreaButton, setShowSearchAreaButton] = useState(false);
+  const showSearchAreaButtonRef = useRef(false);
   // const [searchedLocation, setSearchedLocation] = useState(
   //   JSON.parse(sessionStorage.getItem("locationInfo")) || null
   // );
@@ -35,8 +37,8 @@ export default function Map({ locationInfo, searchResults }) {
   const params = useParams();
 
   useEffect(() => {
-    if (!locationInfo || !searchResults) return; // stops map from initializing more than once
-    // if (map?.current) return; // stops map from initializing more than once
+    if (!locationInfo || !searchResults) return;
+    if (map?.current) return; // stops map from initializing more than once
     map.current?.remove();
     map.current = null;
 
@@ -81,7 +83,19 @@ export default function Map({ locationInfo, searchResults }) {
 
           if (searchResults?.features?.length) {
             let bbox2 = turfbbox(searchResults);
-            map.current.fitBounds(bbox2, { padding: 100 });
+            map.current.fitBounds(
+              bbox2,
+              { padding: 100 },
+              { triggeredByFitBounds: true }
+            );
+            map.current.on("moveend", (event) => {
+              // Check if the event contains the custom 'triggeredByFitBounds' property
+              if (event.triggeredByFitBounds) {
+                setIsMapLoaded(true);
+              }
+            });
+
+            // map.current.fitBounds(bbox2, { padding: 100 });
           }
 
           if (map.current.getSource("restaurants")) {
@@ -270,7 +284,7 @@ export default function Map({ locationInfo, searchResults }) {
             }
           });
 
-          geoJsonData.current = searchResults;
+          // geoJsonData.current = searchResults;
           searchResultsRef.current = searchResults;
           // geolocate.current.trigger();
           // })
@@ -279,6 +293,7 @@ export default function Map({ locationInfo, searchResults }) {
           // });
         }
       );
+      // setIsMapLoaded(true);
     });
 
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -317,7 +332,7 @@ export default function Map({ locationInfo, searchResults }) {
           } else {
             map.current.jumpTo({ center: center, zoom: 14 });
           }
-          fetchStores(lat, lon);
+          fetchMapBoundsRestaurants(lat, lon);
           clickedOnRestaurantPopup.current = false;
         });
 
@@ -364,118 +379,143 @@ export default function Map({ locationInfo, searchResults }) {
     // setSearchedLocation(
     //   JSON.parse(sessionStorage.getItem("locationInfo")) || locationInfo
     // );
-    setIsMapLoaded(true);
 
     return () => {
       map.current.remove();
       map.current = null;
     };
-  }, [locationInfo, searchResults]);
+  }, [locationInfo]);
+  // }, [locationInfo, searchResults]);
 
-  /******
   // Update map results on move
   useEffect(() => {
     if (!map?.current || !isMapLoaded) return;
-    map.current.off("moveend", delaySearchArea);
-    map.current.on("moveend", delaySearchArea);
+    map.current.off("moveend", delayShowSearchAreaButton);
+    map.current.on("moveend", delayShowSearchAreaButton);
     return () => {
-      map.current.off("moveend", delaySearchArea);
+      map?.current?.off("moveend", delayShowSearchAreaButton);
     };
-  }, [isMapLoaded]);
+  }, [isMapLoaded, showSearchAreaButton, showSearchAreaButtonRef.current]);
 
-  function delaySearchArea() {
-    if (bottomSheetSnapping.current) return;
+  // function delaySearchArea() {
+  //   if (bottomSheetSnapping.current) return;
 
-    const timeoutId = setTimeout(() => {
-      // Use last known position in case user has physically moved to another location,
-      // so it sets lat and lon to actual current position to get accurate distances to restaurants
-      if (geolocate.current._lastKnownPosition) {
-        const lat = geolocate.current._lastKnownPosition.coords.latitude;
-        const lon = geolocate.current._lastKnownPosition.coords.longitude;
-        setLat(lat);
-        setLon(lon);
-        fetchStores(lat, lon);
-      } else {
-        // User doesn't want to share location, so use the default lat and lon
-        fetchStores(lat, lon);
-      }
-      // When you click on the search area button, the restaurant popup closes if it's open
-      clickedOnRestaurantPopup.current = false;
-    }, 0); // adjust delay time as needed
-    map.current.once("movestart", () => {
-      clearTimeout(timeoutId);
-    });
-  }
-  ******/
-
-  // function fetchStores(currentLat, currentLon) {
-  //   if (isActive !== "") {
-  //     const popups = document.getElementsByClassName("maplibregl-popup");
-
-  //     if (popups.length) {
-  //       [...popups].map((popup) => popup.remove());
+  //   const timeoutId = setTimeout(() => {
+  //     // Use last known position in case user has physically moved to another location,
+  //     // so it sets lat and lon to actual current position to get accurate distances to restaurants
+  //     if (geolocate.current._lastKnownPosition) {
+  //       const lat = geolocate.current._lastKnownPosition.coords.latitude;
+  //       const lon = geolocate.current._lastKnownPosition.coords.longitude;
+  //       setLat(lat);
+  //       setLon(lon);
+  //       fetchMapBoundsRestaurants(lat, lon);
+  //     } else {
+  //       // User doesn't want to share location, so use the default lat and lon
+  //       fetchMapBoundsRestaurants(lat, lon);
   //     }
-
-  //     setIsActive("");
-  //   }
-
-  //   const bounds = map.current.getBounds();
-  //   const mapCenter = map.current.getCenter();
-
-  //   // Fetch restaurants dynamically based on the current viewport
-  //   fetch(
-  //     `/api/get-map-restaurants?bounds=${JSON.stringify(
-  //       bounds
-  //     )}&userLat=${currentLat}&userLon=${currentLon}&mapCenterLat=${
-  //       mapCenter.lat
-  //     }&mapCenterLon=${mapCenter.lng}&limit=${100}`
-  //   )
-  //     .then((res) => {
-  //       return res.json();
-  //     })
-  //     .then((json) => {
-  //       // Save newly fetched restaurants in geoJsonData ref,
-  //       // so it saves all the markers on the map
-  //       const prevRestaurantIds = geoJsonData.current.features?.map(
-  //         (feature) => feature.properties.id
-  //       );
-  //       const newRestaurants = searchResults.features?.filter(
-  //         (feature) => !prevRestaurantIds?.includes(feature.properties.id)
-  //       );
-
-  //       if (newRestaurants.length > 0) {
-  //         const newGeoJsonData = {
-  //           ...geoJsonData.current,
-  //           features: [...geoJsonData.current?.features, ...newRestaurants],
-  //         };
-  //         geoJsonData.current = newGeoJsonData;
-  //         map.current.getSource("restaurants").setData(newGeoJsonData);
-  //       }
-
-  //       // Only the restaurants in the current map bounds will display in search results.
-  //       // If you move the map and the restaurants haven't changed, don't change the search result list.
-  //       // Otherwise, the search result list will keep jumping around based on which restaurant is in the center.
-  //       const prevSearchResultsRestaurantIds =
-  //         searchResultsRef.current?.features.map(
-  //           (feature) => feature.properties.id
-  //         );
-
-  //       const newSearchResultsRestaurantIds = searchResults?.features.map(
-  //         (feature) => feature.properties.id
-  //       );
-
-  //       if (
-  //         prevSearchResultsRestaurantIds.sort().toString() !==
-  //         newSearchResultsRestaurantIds.sort().toString()
-  //       ) {
-  //         searchResultsRef.current = searchResults;
-  //         // setSearchResults(searchResults);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching restaurant data:", error);
-  //     });
+  //     // When you click on the search area button, the restaurant popup closes if it's open
+  //     clickedOnRestaurantPopup.current = false;
+  //   }, 0); // adjust delay time as needed
+  //   map.current.once("movestart", () => {
+  //     clearTimeout(timeoutId);
+  //   });
   // }
+
+  function fetchMapBoundsRestaurants() {
+    if (isActive !== "") {
+      const popups = document.getElementsByClassName("maplibregl-popup");
+
+      if (popups.length) {
+        [...popups].map((popup) => popup.remove());
+      }
+
+      setIsActive("");
+    }
+
+    const mapCenter = map.current.getCenter();
+    const mapBounds = map.current.getBounds();
+    const mapBBOX = [
+      mapBounds._sw.lng,
+      mapBounds._sw.lat,
+      mapBounds._ne.lng,
+      mapBounds._ne.lat,
+    ];
+
+    // Fetch restaurants dynamically based on the current viewport
+    fetch(
+      `/api/get-map-on-move-restaurants?bbox=${JSON.stringify(
+        mapBBOX
+      )}&latitude=${mapCenter.lat}&longitude=${mapCenter.lng}&limit=30`
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        // // Save newly fetched restaurants in geoJsonData ref,
+        // // so it saves all the markers on the map
+        // const prevRestaurantIds = geoJsonData.current.features?.map(
+        //   (feature) => feature.properties.id
+        // );
+        // const newRestaurants = json.geoJsonData.features?.filter(
+        //   (feature) => !prevRestaurantIds?.includes(feature.properties.id)
+        // );
+
+        // if (newRestaurants.length > 0) {
+        // const newGeoJsonData = {
+        //   ...geoJsonData.current,
+        //   features: [...geoJsonData.current?.features, ...newRestaurants],
+        // };
+        // geoJsonData.current = newGeoJsonData;
+        // map.current.getSource("restaurants").setData(newGeoJsonData);
+        // }
+
+        map.current.getSource("restaurants").setData(json.geoJsonData);
+
+        // Only the restaurants in the current map bounds will display in search results.
+        // If you move the map and the restaurants haven't changed, don't change the search result list.
+        // Otherwise, the search result list will keep jumping around based on which restaurant is in the center.
+        const prevSearchResultsRestaurantIds =
+          searchResultsRef.current?.features.map(
+            (feature) => feature.properties.id
+          );
+
+        const newSearchResultsRestaurantIds = json.geoJsonData?.features.map(
+          (feature) => feature.properties.id
+        );
+
+        if (
+          prevSearchResultsRestaurantIds.sort().toString() !==
+          newSearchResultsRestaurantIds.sort().toString()
+        ) {
+          searchResultsRef.current = json.geoJsonData;
+          setSearchResults(json.geoJsonData);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching restaurant data:", error);
+      });
+
+    if (showSearchAreaButton) {
+      setShowSearchAreaButton(false);
+    }
+  }
+
+  function delayShowSearchAreaButton() {
+    // if (bottomSheetSnapped.current) {
+    //   bottomSheetSnapped.current = false;
+    //   return;
+    // }
+
+    if (!showSearchAreaButton || !showSearchAreaButtonRef.current) {
+      const timeoutId = setTimeout(() => {
+        setShowSearchAreaButton(true);
+        showSearchAreaButtonRef.current = true;
+      }, 250);
+      map.current.once("movestart", () => {
+        clearTimeout(timeoutId);
+      });
+    }
+  }
 
   function showPopup(restaurant) {
     const id = restaurant.id;
@@ -527,7 +567,7 @@ export default function Map({ locationInfo, searchResults }) {
     <div className="map-and-sidebar-container">
       <div className="map-wrap">
         <div ref={mapContainer} className="map" />
-        {!isMapLoaded && (
+        {/* {!isMapLoaded && (
           <Skeleton
             sx={{
               height: "100vh",
@@ -537,7 +577,7 @@ export default function Map({ locationInfo, searchResults }) {
             }}
             variant="rectangular"
           />
-        )}
+        )} */}
         <IconButton
           aria-label="close"
           onClick={() =>
@@ -551,9 +591,24 @@ export default function Map({ locationInfo, searchResults }) {
             color: "black",
             backgroundColor: "white",
           })}
+          className="map-close-button"
         >
           <CloseIcon />
         </IconButton>
+
+        {showSearchAreaButton && (
+          <button
+            type="button"
+            className="search-area-btn bg-slate-700"
+            onClick={() => {
+              fetchMapBoundsRestaurants();
+              // When you click on the search area button, the restaurant popup closes if it's open
+              clickedOnRestaurantPopup.current = false;
+            }}
+          >
+            Search this area
+          </button>
+        )}
       </div>
 
       <MapSidebar

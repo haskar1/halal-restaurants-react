@@ -35,13 +35,21 @@ export default function MapPage() {
         "filteredRestaurants",
         JSON.stringify(fetchedLocationRestaurants)
       );
+
+      sessionStorage.setItem("selectedCuisines", JSON.stringify([]));
+      sessionStorage.setItem("selectedPrices", JSON.stringify([]));
+      sessionStorage.setItem("selectedOthers", JSON.stringify([]));
     }
     fetchData();
   }, [params.location]);
 
   return (
     <>
-      <Map locationInfo={locationInfo} searchResults={filteredRestaurants} />
+      <Map
+        locationInfo={locationInfo}
+        searchResults={filteredRestaurants}
+        setSearchResults={setFilteredRestaurants}
+      />
     </>
   );
 }
