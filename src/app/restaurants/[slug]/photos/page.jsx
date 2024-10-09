@@ -25,7 +25,7 @@ export default async function RestaurantPage({ params }) {
       {restaurant ? (
         <div>
           <div className="container">
-            <div className="grid gap-8 mt-8 mx-auto max-w-2xl">
+            <div className="grid gap-8 my-16 mx-auto max-w-2xl">
               {photosArr.length > 0 &&
                 photosArr.map((photo_url, index) => (
                   <Image

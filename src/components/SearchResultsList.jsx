@@ -150,13 +150,17 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
         restaurant.properties.cuisines.map((cuisine) => cuisine.name)
       )
     ),
-  ].filter((cuisine) => cuisine !== "");
+  ]
+    .filter((cuisine) => cuisine !== "")
+    .sort();
 
   //// Prices. First, take the list of restaurants and make an array of the price choices, only including unique choices (new Set).
   // Then, filter out the empty string options - if there is no price in the database it shows as "".
   const prices = [
     ...new Set(allRestaurants.map((restaurant) => restaurant.properties.price)),
-  ].filter((price) => price !== "");
+  ]
+    .filter((price) => price !== "")
+    .sort();
 
   const others = ["No Alcohol Served", "No Pork Served", "Hand Slaughtered"];
 

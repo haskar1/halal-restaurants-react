@@ -8,84 +8,84 @@ export default async function handler(request, response) {
   try {
     let result;
 
-    if (userLatitude && userLongitude) {
-      // Select all restaurants within 50 mile radius of user and sort results by highest rating to lowest rating. Return 8 highest rated results.
-      // If there are less than 8 restaurants in 50 mile radius, then keep searching nearest restaurants beyond radius until you reach total 8 results.
-      // In that case, the results within 50 mile radius are sorted by rating, and the remaining nearest restaurants are sorted by distance.
-      result = await sql`
-        WITH within_radius AS (
-          SELECT
-            r.id AS restaurant_id,
-            r.name AS restaurant_name,
-            r.slug AS slug,
-            r.address AS restaurant_address,
-            r.cover_photo_url AS restaurant_cover_photo_url,
-            r.rating AS restaurant_rating,
-            ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
-            STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
-          FROM
-            restaurants r
-          LEFT JOIN
-            restaurant_cuisines rc ON r.id = rc.restaurant_id
-          LEFT JOIN
-            cuisines c ON rc.cuisine_id = c.id
-          WHERE
-            -- Only restaurants within 50 mile radius
-            ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 50
-          GROUP BY
-            r.id, r.name, r.address, r.cover_photo_url, r.rating
-          ORDER BY
-            NULLIF(r.rating, 'NaN') DESC
-          NULLS LAST
-          LIMIT ${limit}
-        ),
-        nearest_restaurants AS (
-          SELECT
-            r.id AS restaurant_id,
-            r.name AS restaurant_name,
-            r.slug AS slug,
-            r.address AS restaurant_address,
-            r.cover_photo_url AS restaurant_cover_photo_url,
-            r.rating AS restaurant_rating,
-            ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
-            STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
-          FROM
-            restaurants r
-          LEFT JOIN
-            restaurant_cuisines rc ON r.id = rc.restaurant_id
-          LEFT JOIN
-            cuisines c ON rc.cuisine_id = c.id
-          WHERE
-            NOT EXISTS (
-              SELECT 1
-              FROM within_radius wr
-              WHERE wr.restaurant_id = r.id
-            )
-          GROUP BY
-            r.id, r.name, r.address, r.cover_photo_url, r.rating
-          ORDER BY
-            distance
-          LIMIT ${limit}
-        ),
-        combined_results AS (
-          SELECT *, 'within_radius' AS source
-          FROM within_radius
-          UNION
-          SELECT *, 'nearest_restaurants' AS source
-          FROM nearest_restaurants
-          WHERE (SELECT COUNT(*) FROM within_radius) < ${limit}
-        )
-        SELECT *
-        FROM combined_results
-        ORDER BY
-          source DESC, -- Ensure within_radius results come first
-          CASE WHEN source = 'within_radius' THEN NULLIF(restaurant_rating, 'NaN') END DESC,
-          CASE WHEN source = 'nearest_restaurants' THEN distance END ASC
-        NULLS LAST
-        LIMIT ${limit};
-      `;
-    } else {
-      result = await sql`
+    // if (userLatitude && userLongitude) {
+    //   // Select all restaurants within 50 mile radius of user and sort results by highest rating to lowest rating. Return 8 highest rated results.
+    //   // If there are less than 8 restaurants in 50 mile radius, then keep searching nearest restaurants beyond radius until you reach total 8 results.
+    //   // In that case, the results within 50 mile radius are sorted by rating, and the remaining nearest restaurants are sorted by distance.
+    //   result = await sql`
+    //     WITH within_radius AS (
+    //       SELECT
+    //         r.id AS restaurant_id,
+    //         r.name AS restaurant_name,
+    //         r.slug AS slug,
+    //         r.address AS restaurant_address,
+    //         r.cover_photo_url AS restaurant_cover_photo_url,
+    //         r.rating AS restaurant_rating,
+    //         ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
+    //         STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
+    //       FROM
+    //         restaurants r
+    //       LEFT JOIN
+    //         restaurant_cuisines rc ON r.id = rc.restaurant_id
+    //       LEFT JOIN
+    //         cuisines c ON rc.cuisine_id = c.id
+    //       WHERE
+    //         -- Only restaurants within 50 mile radius
+    //         ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 50
+    //       GROUP BY
+    //         r.id, r.name, r.address, r.cover_photo_url, r.rating
+    //       ORDER BY
+    //         NULLIF(r.rating, 'NaN') DESC
+    //       NULLS LAST
+    //       LIMIT ${limit}
+    //     ),
+    //     nearest_restaurants AS (
+    //       SELECT
+    //         r.id AS restaurant_id,
+    //         r.name AS restaurant_name,
+    //         r.slug AS slug,
+    //         r.address AS restaurant_address,
+    //         r.cover_photo_url AS restaurant_cover_photo_url,
+    //         r.rating AS restaurant_rating,
+    //         ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
+    //         STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
+    //       FROM
+    //         restaurants r
+    //       LEFT JOIN
+    //         restaurant_cuisines rc ON r.id = rc.restaurant_id
+    //       LEFT JOIN
+    //         cuisines c ON rc.cuisine_id = c.id
+    //       WHERE
+    //         NOT EXISTS (
+    //           SELECT 1
+    //           FROM within_radius wr
+    //           WHERE wr.restaurant_id = r.id
+    //         )
+    //       GROUP BY
+    //         r.id, r.name, r.address, r.cover_photo_url, r.rating
+    //       ORDER BY
+    //         distance
+    //       LIMIT ${limit}
+    //     ),
+    //     combined_results AS (
+    //       SELECT *, 'within_radius' AS source
+    //       FROM within_radius
+    //       UNION
+    //       SELECT *, 'nearest_restaurants' AS source
+    //       FROM nearest_restaurants
+    //       WHERE (SELECT COUNT(*) FROM within_radius) < ${limit}
+    //     )
+    //     SELECT *
+    //     FROM combined_results
+    //     ORDER BY
+    //       source DESC, -- Ensure within_radius results come first
+    //       CASE WHEN source = 'within_radius' THEN NULLIF(restaurant_rating, 'NaN') END DESC,
+    //       CASE WHEN source = 'nearest_restaurants' THEN distance END ASC
+    //     NULLS LAST
+    //     LIMIT ${limit};
+    //   `;
+    // } else {
+    result = await sql`
         SELECT
           r.id AS restaurant_id,
           r.name AS restaurant_name,
@@ -107,7 +107,7 @@ export default async function handler(request, response) {
         NULLS LAST
         LIMIT ${limit};
       `;
-    }
+    // }
 
     if (!result.rows[0]) {
       throw new Error("No restaurants found");

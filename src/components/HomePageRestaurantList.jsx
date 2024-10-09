@@ -61,65 +61,13 @@ export default function HomePageRestaurantList({
     if (userLatitude && userLongitude) fetchNearbyRestaurants();
   }, []);
 
+  const restaurantLoadingCards = [];
+  for (let i = 0; i < 12; i++) {
+    restaurantLoadingCards.push(<RestaurantCardLoading key={i} />);
+  }
+
   return (
-    <>
-      <div className="homepage__search-list">
-        <h2 className="p-4 pb-8 text-[2rem] text-[#23424a]">
-          Popular Restaurants
-        </h2>
-        {popularRestaurantsLoadingMsg ? (
-          <div>{popularRestaurantsLoadingMsg}</div>
-        ) : popularRestaurants ? (
-          <div className="listings">
-            {popularRestaurants.map((restaurant) => (
-              <Link
-                href={`/restaurants/${restaurant.slug}`}
-                // target="_blank"
-                key={restaurant.restaurant_id}
-                className="item"
-              >
-                {restaurant.restaurant_rating &&
-                  restaurant.restaurant_rating !== "NaN" && (
-                    <div className="item__rating">
-                      {restaurant.restaurant_rating}
-                    </div>
-                  )}
-                <Image
-                  src={restaurant.restaurant_cover_photo_url}
-                  alt={restaurant.restaurant_name}
-                  className="item__cover-photo"
-                  width="250"
-                  height="250"
-                />
-                <div className="item__text-container">
-                  <div className="text-[#003089] text-lg font-medium pb-2 leading-[1.3]">
-                    {restaurant.restaurant_name}
-                  </div>
-
-                  {restaurant.cuisines && (
-                    <div className="pb-2">
-                      <CuisineTags cuisines={restaurant.cuisines} />{" "}
-                    </div>
-                  )}
-
-                  <div>{restaurant.restaurant_address}</div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="listings">
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-            <RestaurantCardLoading />
-          </div>
-        )}
-      </div>
+    <div className="pb-10 sm:pb-20">
       {userLatitude && userLongitude && (
         <div className="homepage__search-list">
           <h2 className="p-4 pb-8 text-[2rem] text-[#23424a]">
@@ -166,19 +114,58 @@ export default function HomePageRestaurantList({
               ))}
             </div>
           ) : (
-            <div className="listings">
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-              <RestaurantCardLoading />
-            </div>
+            <div className="listings">{restaurantLoadingCards}</div>
           )}
         </div>
       )}
-    </>
+      <div className="homepage__search-list">
+        <h2 className="p-4 pb-10 text-[2rem] text-[#23424a]">
+          Popular Restaurants
+        </h2>
+        {popularRestaurantsLoadingMsg ? (
+          <div>{popularRestaurantsLoadingMsg}</div>
+        ) : popularRestaurants ? (
+          <div className="listings">
+            {popularRestaurants.map((restaurant) => (
+              <Link
+                href={`/restaurants/${restaurant.slug}`}
+                // target="_blank"
+                key={restaurant.restaurant_id}
+                className="item"
+              >
+                {restaurant.restaurant_rating &&
+                  restaurant.restaurant_rating !== "NaN" && (
+                    <div className="item__rating">
+                      {restaurant.restaurant_rating}
+                    </div>
+                  )}
+                <Image
+                  src={restaurant.restaurant_cover_photo_url}
+                  alt={restaurant.restaurant_name}
+                  className="item__cover-photo"
+                  width="250"
+                  height="250"
+                />
+                <div className="item__text-container">
+                  <div className="text-[#003089] text-lg font-medium pb-2 leading-[1.3]">
+                    {restaurant.restaurant_name}
+                  </div>
+
+                  {restaurant.cuisines && (
+                    <div className="pb-2">
+                      <CuisineTags cuisines={restaurant.cuisines} />{" "}
+                    </div>
+                  )}
+
+                  <div>{restaurant.restaurant_address}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="listings">{restaurantLoadingCards}</div>
+        )}
+      </div>
+    </div>
   );
 }

@@ -4,10 +4,12 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function GeocoderNoMap() {
-  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
 
   useEffect(() => {
     const geocoder = new MapboxGeocoder({
@@ -27,9 +29,11 @@ export default function GeocoderNoMap() {
         .replace(/,/g, "-");
 
       router.push(`/best-halal-restaurants/${location}`);
+
+      setIsLocationLoading(true);
     });
 
-    setIsLoading(false);
+    setIsPageLoading(false);
   }, []);
 
   return (
@@ -37,10 +41,20 @@ export default function GeocoderNoMap() {
       <input
         placeholder="Loading..."
         className={
-          !isLoading ? "hidden" : "w-[19.375rem] h-[36px] rounded text-center"
+          !isPageLoading
+            ? "hidden"
+            : "w-[19.375rem] h-[36px] rounded text-center"
         }
       ></input>
-      <div id="geocoder" className={isLoading && "hidden"}></div>
+      <div id="geocoder" className={isPageLoading && "hidden"}>
+        {isLocationLoading && (
+          <CircularProgress
+            size="1.5rem"
+            disableShrink
+            className="absolute z-10 right-3"
+          />
+        )}
+      </div>
     </>
   );
 }

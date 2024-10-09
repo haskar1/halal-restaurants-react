@@ -42,7 +42,7 @@ export default async function RestaurantPage({ params }) {
               restaurantName={restaurant.name}
               restaurantSlug={restaurant.slug}
             />
-            <div className="restaurant__title container pt-8">
+            <div className="restaurant__title container pt-8 md:pt-16">
               <h1 className="font-bold text-stone-700 text-3xl pb-4">
                 {restaurant.name} - Halal Restaurant in {restaurant.city}
               </h1>
@@ -75,7 +75,8 @@ export default async function RestaurantPage({ params }) {
 
           {/* About this restaurant */}
           <div className="container">
-            <div className="flex flex-wrap justify-between gap-8 pb-8">
+            {/* <div className="flex flex-wrap justify-between gap-8 pb-16"> */}
+            <div className="grid gap-8 pb-16 lg:grid-cols-[1fr_auto] lg:gap-16">
               <div>
                 <h2 className="text-[1.7rem] text-stone-700 pb-12">
                   About this restaurant
@@ -146,7 +147,7 @@ export default async function RestaurantPage({ params }) {
               </div>
 
               {/* Location Info */}
-              <div className="grid gap-12">
+              <div className="flex flex-wrap lg:grid gap-12">
                 <div className="restaurant__location-info grid gap-4 py-6 px-4 rounded-xl shadow-lg h-fit max-w-[389px]">
                   <h3 className="text-stone-600 font-medium pb-3 underline underline-offset-[6px]">
                     Location Info
@@ -187,7 +188,7 @@ export default async function RestaurantPage({ params }) {
                   )}
                 </div>
 
-                <div className="restaurant__google-map">
+                <div className="restaurant__google-map flex-[1_0_auto] lg:flex-none">
                   <iframe
                     src={restaurant.google_maps_embedded_url}
                     width="400"

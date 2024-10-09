@@ -18,6 +18,9 @@
 
 #geocoder {
   min-height: 3.125rem;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 #geocoder .mapboxgl-ctrl-geocoder {

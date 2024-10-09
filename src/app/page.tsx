@@ -42,7 +42,7 @@ export default async function Home() {
         <HomePageRestaurantList
           userLatitude={userLatitude}
           userLongitude={userLongitude}
-          limit={8}
+          limit={12}
         />
       </main>
     </>

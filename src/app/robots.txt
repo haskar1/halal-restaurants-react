@@ -2,3 +2,5 @@ User-agent: *
 Disallow: /dashboard/
 Disallow: /restaurants/*/photos
 Disallow: /api/
+Disallow: /privacy-policy
+Disallow: /contact

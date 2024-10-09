@@ -30,6 +30,34 @@ html {
   text-size-adjust: none;
 }
 
+/* Keep footer at bottom of page */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1 0 auto;
+} /* flex: grow / shrink / flex-basis; */
+
+footer {
+  flex-shrink: 0;
+}
+
+/* Hide footer on /map and /dashboard pages */
+body:has(.map) footer {
+  display: none;
+}
+
+body:has(#admin-dashboard) footer {
+  display: none;
+}
+
 /* Remove default margin in favour of better control in authored CSS */
 body,
 h1,
@@ -115,6 +143,10 @@ textarea:not([rows]) {
 /* Anything that has been anchored to should have extra scroll margin */
 :target {
   scroll-margin-block: 5ex;
+}
+
+.footer-copyright > a {
+  padding-left: 0.5rem;
 }
 
 /* Scale full website with the viewport width at very large screen sizes */
