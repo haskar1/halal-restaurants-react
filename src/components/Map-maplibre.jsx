@@ -61,7 +61,7 @@ export default function Map({ locationInfo, searchResults, setSearchResults }) {
       center: [mapCenterLon, mapCenterLat],
       zoom: zoom,
       maxZoom: 17,
-      minZoom: 5,
+      minZoom: 3,
       // attributionControl: false,
     });
 
@@ -118,7 +118,7 @@ export default function Map({ locationInfo, searchResults, setSearchResults }) {
             type: "geojson",
             data: searchResults,
             cluster: true,
-            clusterMaxZoom: 10, // Max zoom to cluster points on
+            clusterMaxZoom: 5, // Max zoom to cluster points on
             clusterRadius: 50, // Radius of each cluster when clustering points (defaults to 50)
           });
 
@@ -445,7 +445,7 @@ export default function Map({ locationInfo, searchResults, setSearchResults }) {
     fetch(
       `/api/get-map-on-move-restaurants?bbox=${JSON.stringify(
         mapBBOX
-      )}&latitude=${mapCenter.lat}&longitude=${mapCenter.lng}&limit=30`
+      )}&latitude=${mapCenter.lat}&longitude=${mapCenter.lng}&limit=50`
     )
       .then((res) => {
         return res.json();

@@ -101,9 +101,9 @@ export default async function handler(request, response) {
           restaurant_cuisines rc ON r.id = rc.restaurant_id
         LEFT JOIN
           cuisines c ON rc.cuisine_id = c.id
+        WHERE hide_restaurant = false
         GROUP BY
           r.id, r.id, r.address
-        WHERE hide_restaurant = false
         ORDER BY
           NULLIF(r.rating, 'NaN') DESC
         NULLS LAST
