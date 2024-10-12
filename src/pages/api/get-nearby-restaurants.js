@@ -11,9 +11,10 @@ export default async function handler(request, response) {
         r.id AS restaurant_id,
         r.name AS restaurant_name,
         r.slug AS slug,
-        r.address AS restaurant_address,
-        r.cover_photo_url AS restaurant_cover_photo_url,
-        r.rating AS restaurant_rating,
+        r.address AS address,
+        r.cover_photo_url AS cover_photo_url,
+        r.rating AS rating,
+        r.hide_restaurant AS hide_restaurant,
         ROUND((ST_DistanceSphere(ST_MakePoint(${userLongitude}, ${userLatitude}), r.location) * 0.000621371192)::NUMERIC, 1) AS distance,
         STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
       FROM
@@ -22,8 +23,9 @@ export default async function handler(request, response) {
         restaurant_cuisines rc ON r.id = rc.restaurant_id
       LEFT JOIN
         cuisines c ON rc.cuisine_id = c.id
+      WHERE hide_restaurant = false
       GROUP BY
-        r.id, r.name, r.address, r.cover_photo_url, r.rating
+        r.id, r.id, r.address
       ORDER BY
         distance
       LIMIT ${limit};
@@ -49,9 +51,9 @@ export default async function handler(request, response) {
         restaurant_id: row.restaurant_id,
         slug: row.slug,
         restaurant_name: row.restaurant_name,
-        restaurant_address: row.restaurant_address,
-        restaurant_cover_photo_url: row.restaurant_cover_photo_url,
-        restaurant_rating: row.restaurant_rating,
+        address: row.address,
+        cover_photo_url: row.cover_photo_url,
+        rating: row.rating,
         cuisines: cuisinesArray,
       };
     });

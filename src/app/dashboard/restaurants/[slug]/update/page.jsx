@@ -327,6 +327,18 @@ export default function UpdateRestaurantForm({ params }) {
               </div>
             )}
 
+            <div className="flex gap-2 mb-[1.5rem]">
+              <label htmlFor="hide_restaurant">
+                Hide restaurant from website
+              </label>
+              <input
+                type="checkbox"
+                id="hide_restaurant"
+                name="hide_restaurant"
+                defaultChecked={restaurant.hide_restaurant}
+              />
+            </div>
+
             <SubmitButton
               isSubmitting={isSubmitting}
               isError={customErrorMsg}

@@ -57,6 +57,10 @@ export default async function createRestaurant(
     cuisine: z
       .array(z.string())
       .min(1, { message: "Please select at least one cuisine." }),
+    hide_restaurant: z.union([
+      z.literal("on").transform(() => true),
+      z.literal(null).transform(() => false),
+    ]),
   });
 
   const parse = schema.safeParse({
@@ -81,6 +85,7 @@ export default async function createRestaurant(
     cover_photo_url: formData.get("cover_photo_url"),
     other_photos_url: formData.getAll("other_photos_url"),
     cuisine: formData.getAll("cuisine"),
+    hide_restaurant: formData.get("hide_restaurant"),
   });
 
   if (!parse.success) {
@@ -128,7 +133,8 @@ export default async function createRestaurant(
         phone,
         website,
         cover_photo_url,
-        other_photos_url
+        other_photos_url,
+        hide_restaurant
       )
       VALUES (
         ${data.name}, 
@@ -151,7 +157,8 @@ export default async function createRestaurant(
         ${data.phone},
         ${data.website},
         ${data.cover_photo_url},
-        ${data.other_photos_url}
+        ${data.other_photos_url},
+        ${data.hide_restaurant}
       )
       RETURNING *;
     `;

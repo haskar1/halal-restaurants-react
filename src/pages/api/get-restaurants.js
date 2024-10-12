@@ -11,7 +11,7 @@ export default async function handler(request, response) {
         r.id AS restaurant_id,
         r.name AS restaurant_name,
         r.slug AS slug,
-        r.address AS restaurant_address,
+        r.address AS address,
         STRING_AGG(c.id || ':' || c.name || ':' || c.tag_color, ', ') AS cuisines
       FROM
         restaurants r
@@ -20,9 +20,9 @@ export default async function handler(request, response) {
       LEFT JOIN
         cuisines c ON rc.cuisine_id = c.id
       GROUP BY
-        r.id, r.name, r.address
+        r.id, r.id, r.address
       ORDER BY
-        r.name
+        restaurant_name
       LIMIT ${itemsPerPage} OFFSET ${offset};
     `;
 
@@ -46,7 +46,7 @@ export default async function handler(request, response) {
         restaurant_id: row.restaurant_id,
         slug: row.slug,
         restaurant_name: row.restaurant_name,
-        restaurant_address: row.restaurant_address,
+        address: row.address,
         cuisines: cuisinesArray,
       };
     });

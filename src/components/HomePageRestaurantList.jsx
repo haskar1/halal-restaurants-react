@@ -84,14 +84,11 @@ export default function HomePageRestaurantList({
                   key={restaurant.restaurant_id}
                   className="item"
                 >
-                  {restaurant.restaurant_rating &&
-                    restaurant.restaurant_rating !== "NaN" && (
-                      <div className="item__rating">
-                        {restaurant.restaurant_rating}
-                      </div>
-                    )}
+                  {restaurant.rating && restaurant.rating !== "NaN" && (
+                    <div className="item__rating">{restaurant.rating}</div>
+                  )}
                   <Image
-                    src={restaurant.restaurant_cover_photo_url}
+                    src={restaurant.cover_photo_url}
                     alt={restaurant.restaurant_name}
                     className="item__cover-photo"
                     width="250"
@@ -108,7 +105,7 @@ export default function HomePageRestaurantList({
                       </div>
                     )}
 
-                    <div>{restaurant.restaurant_address}</div>
+                    <div>{restaurant.address}</div>
                   </div>
                 </Link>
               ))}
@@ -133,14 +130,11 @@ export default function HomePageRestaurantList({
                 key={restaurant.restaurant_id}
                 className="item"
               >
-                {restaurant.restaurant_rating &&
-                  restaurant.restaurant_rating !== "NaN" && (
-                    <div className="item__rating">
-                      {restaurant.restaurant_rating}
-                    </div>
-                  )}
+                {restaurant.rating && restaurant.rating !== "NaN" && (
+                  <div className="item__rating">{restaurant.rating}</div>
+                )}
                 <Image
-                  src={restaurant.restaurant_cover_photo_url}
+                  src={restaurant.cover_photo_url}
                   alt={restaurant.restaurant_name}
                   className="item__cover-photo"
                   width="250"
@@ -157,7 +151,7 @@ export default function HomePageRestaurantList({
                     </div>
                   )}
 
-                  <div>{restaurant.restaurant_address}</div>
+                  <div>{restaurant.address}</div>
                 </div>
               </Link>
             ))}

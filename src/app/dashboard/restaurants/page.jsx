@@ -106,9 +106,9 @@ export default function RestaurantList() {
                                 <b>{restaurant.restaurant_name}</b>
                               </p>
 
-                              {restaurant.restaurant_address && (
+                              {restaurant.address && (
                                 <p className="p-0 m-0 truncate">
-                                  {restaurant.restaurant_address}
+                                  {restaurant.address}
                                 </p>
                               )}
                             </div>

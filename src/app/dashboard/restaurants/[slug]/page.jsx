@@ -174,6 +174,10 @@ export default async function RestaurantList({ params }) {
             <p>
               <b>Updated At:</b> {restaurant.updated_at.toString()}
             </p>
+            <p>
+              <b>Hide Restaurant From Website?</b>{" "}
+              {restaurant.hide_restaurant ? "Yes" : "No"}
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-[1rem]">

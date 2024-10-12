@@ -9,10 +9,11 @@ export default async function handler(request, response) {
 
   try {
     const result = await sql`
-      SELECT id, name, slug, address, address_url, latitude, longitude, cover_photo_url
+      SELECT id, name, slug, address, address_url, latitude, longitude, cover_photo_url, hide_restaurant
         ,ROUND((ST_DistanceSphere(ST_MakePoint(${userLon}, ${userLat}), location) * 0.000621371192)::NUMERIC, 1) AS distance
       FROM restaurants
       WHERE name ILIKE '%' || ${query} || '%'
+        AND hide_restaurant = false
       ORDER BY ROUND(ST_DistanceSphere(ST_MakePoint(${mapCenterLon}, ${mapCenterLat}), location))
       LIMIT 10
     `;
