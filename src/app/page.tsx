@@ -29,7 +29,7 @@ export default async function Home() {
             Find Halal Restaurants
           </h1>
           <div>
-            <div className="location-searchbar flex flex-wrap gap-4 items-center">
+            <div className="location-searchbar flex items-center">
               {/* <FindNearMeButton />
               <p className="text-[1.2rem] px-4">or</p> */}
               <GeocoderNoMap />

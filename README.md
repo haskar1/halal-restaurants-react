@@ -1,2 +1,3 @@
 # halal-restaurants-react
-Website that aims to easily find halal restaurants near you
+
+<a target="_blank" href="https://whoishalal.com">whoishalal.com</a> is a website that lets you search any location worldwide to find halal restaurants in that area.
