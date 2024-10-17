@@ -19,7 +19,7 @@ export default async function RestaurantList({ params }) {
           <div className="grid gap-4 pb-8 whitespace-pre-line">
             {restaurant.slug && (
               <Link
-                href={`/restaurants/${restaurant.slug}`}
+                href={`https://whoishalal.com/restaurants/${restaurant.slug}`}
                 target="_blank"
                 className="text-sky-600"
               >
@@ -133,6 +133,9 @@ export default async function RestaurantList({ params }) {
                 {restaurant.cover_photo_url}
               </a>
             </p>
+            <p>
+              <b>Cover Photo Author:</b> {restaurant.cover_photo_author}
+            </p>
 
             {restaurant.other_photos_url?.length > 1 ? (
               <p>
@@ -169,6 +172,10 @@ export default async function RestaurantList({ params }) {
             )}
 
             <p>
+              <b>Place ID (for Google Place Details API):</b>{" "}
+              {restaurant.place_id}
+            </p>
+            <p>
               <b>Created At:</b> {restaurant.created_at.toString()}
             </p>
             <p>
@@ -190,7 +197,7 @@ export default async function RestaurantList({ params }) {
 
             <DeleteButton
               onClick={deleteRestaurant}
-              args={restaurant.id}
+              args={{ id: restaurant.id, slug: restaurant.slug }}
               category="Restaurant"
             />
           </div>

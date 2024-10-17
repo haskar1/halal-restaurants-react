@@ -57,10 +57,12 @@ export default async function updateRestaurant(
     phone: z.string().trim(),
     website: z.string().trim(),
     cover_photo_url: z.string().trim(),
+    cover_photo_author: z.string().trim(),
     other_photos_url: z.array(z.string().trim()),
     cuisine: z
       .array(z.string())
       .min(1, { message: "Please select at least one cuisine." }),
+    place_id: z.string().trim(),
     hide_restaurant: z.union([
       z.literal("on").transform(() => true),
       z.literal(null).transform(() => false),
@@ -88,8 +90,10 @@ export default async function updateRestaurant(
     phone: formData.get("phone"),
     website: formData.get("website"),
     cover_photo_url: formData.get("cover_photo_url"),
+    cover_photo_author: formData.get("cover_photo_author"),
     other_photos_url: formData.getAll("other_photos_url"),
     cuisine: formData.getAll("cuisine"),
+    place_id: formData.get("place_id"),
     hide_restaurant: formData.get("hide_restaurant"),
   });
 
@@ -114,6 +118,13 @@ export default async function updateRestaurant(
 
   if (data.rating) {
     data.rating = data.rating.toFixed(1);
+  }
+
+  if (data.google_maps_embedded_url?.includes("&#39;")) {
+    data.google_maps_embedded_url = data.google_maps_embedded_url.replaceAll(
+      "&#39;",
+      "'"
+    );
   }
 
   try {
@@ -142,7 +153,9 @@ export default async function updateRestaurant(
         phone,
         website,
         cover_photo_url,
+        cover_photo_author,
         other_photos_url,
+        place_id,
         hide_restaurant
       ) = (
         ${data.name}, 
@@ -165,7 +178,9 @@ export default async function updateRestaurant(
         ${data.phone},
         ${data.website},
         ${data.cover_photo_url},
+        ${data.cover_photo_author},
         ${data.other_photos_url},
+        ${data.place_id},
         ${data.hide_restaurant}
       )
       WHERE id = ${id}

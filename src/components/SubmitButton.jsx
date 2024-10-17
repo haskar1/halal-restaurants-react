@@ -5,7 +5,7 @@ export default function SubmitButton({
   btnTextPending = "Submitting...",
 }) {
   let className =
-    "bg-[#136c72] text-white text-lg border-none rounded-lg py-3 px-10 cursor-pointer";
+    "bg-[#136c72] text-white text-lg border-none rounded-lg py-3 cursor-pointer max-w-52";
 
   if (isSubmitting) {
     className += " opacity-70";

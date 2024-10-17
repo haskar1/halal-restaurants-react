@@ -12,10 +12,6 @@ export default async function RestaurantPage({ params }) {
   const restaurant = await getRestaurant(decodeURIComponent(params.slug));
   const photosArr = [];
 
-  if (restaurant?.cover_photo_url) {
-    photosArr.push(restaurant.cover_photo_url);
-  }
-
   if (restaurant?.other_photos_url?.length > 0) {
     restaurant.other_photos_url.map((photoUrl) => photosArr.push(photoUrl));
   }
@@ -26,12 +22,29 @@ export default async function RestaurantPage({ params }) {
         <div>
           <div className="container">
             <div className="grid gap-8 my-16 mx-auto max-w-2xl">
-              {photosArr.length > 0 &&
-                photosArr.map((photo_url, index) => (
+              <div className="cover-photo">
+                <Image
+                  id={`restaurant-photo-1`}
+                  src={restaurant.cover_photo_url}
+                  alt={
+                    restaurant.cover_photo_author
+                      ? `Photo by ${restaurant.cover_photo_author}`
+                      : restaurant.name
+                  }
+                  className="w-full h-auto mb-2"
+                  width="400"
+                  height="400"
+                />
+                {restaurant.cover_photo_author && (
+                  <p>Photo by {restaurant.cover_photo_author}</p>
+                )}
+              </div>
+              {restaurant.other_photos_url.length > 0 &&
+                restaurant.other_photos_url.map((url, index) => (
                   <Image
-                    id={`restaurant-photo-${index + 1}`}
+                    id={`restaurant-photo-${index + 2}`}
                     key={index}
-                    src={photo_url}
+                    src={url}
                     alt={`${restaurant.name} Photo ${index + 1}`}
                     className="w-full h-auto"
                     width="400"

@@ -25,10 +25,10 @@ export default async function getMapboxLocationInfo(location) {
       // );
       // const restaurantJson = await restaurantResponse.json();
       const host = headers().get("host");
-      const protocal =
+      const protocol =
         process?.env.NODE_ENV === "development" ? "http" : "https";
       let res = await fetch(
-        `${protocal}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=50`,
+        `${protocol}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=50`,
         {
           cache: "no-store",
         }

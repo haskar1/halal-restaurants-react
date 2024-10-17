@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFormState } from "react-dom";
 import updateRestaurant from "@/utils/update-restaurant";
 import SubmitButton from "@/components/SubmitButton";
+import Autocomplete from "react-google-autocomplete";
 
 export const fetchCache = "force-no-store";
 
@@ -14,6 +15,7 @@ export default function UpdateRestaurantForm({ params }) {
   const [cuisines, setCuisines] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customErrorMsg, setCustomErrorMsg] = useState("");
+  const [placePhotos, setPlacePhotos] = useState(null);
   const stateMessageRef = useRef(null);
 
   useEffect(() => {
@@ -39,6 +41,68 @@ export default function UpdateRestaurantForm({ params }) {
         console.error("Error fetching cuisines: ", error);
       });
   }, []);
+
+  async function fetchPlacePhotos() {
+    const photosRes = await fetch(
+      `https://places.googleapis.com/v1/places/${restaurant.place_id}?fields=photos&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+    );
+    const fetchedPlacePhotos = await photosRes.json();
+    fetchPhotoURIs(fetchedPlacePhotos);
+  }
+
+  async function fetchPhotoURIs(fetchedPlacePhotos) {
+    let fetchedPhotosInfo = [];
+    await Promise.all(
+      fetchedPlacePhotos?.photos.map((photo) =>
+        fetch(
+          `https://places.googleapis.com/v1/${photo.name}/media?maxWidthPx=500&skipHttpRedirect=true&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const author =
+              photo.authorAttributions[0]?.displayName || "Unknown Author";
+            fetchedPhotosInfo.push({
+              photoUri: data.photoUri,
+              author: author,
+            });
+          })
+      )
+    );
+    // Sort by Author
+    fetchedPhotosInfo.sort((a, b) =>
+      a.author > b.author ? 1 : b.author > a.author ? -1 : 0
+    );
+    setPlacePhotos(fetchedPhotosInfo);
+  }
+
+  async function handleImageClick(photo, imageName) {
+    try {
+      const photoUri = photo.photoUri;
+      const author = photo.author;
+
+      const response = await fetch("/api/upload-photo", {
+        method: "POST",
+        body: JSON.stringify({ photoUri, imageName }),
+      });
+      const data = await response.json();
+      const message = data.message;
+      console.log(message);
+
+      if (response.ok) {
+        setRestaurant({
+          ...restaurant,
+          cover_photo_author: author,
+        });
+        alert("Image replaced successfully!");
+      } else {
+        console.error("Replace failed:", result.message);
+        alert("Image replacing failed!");
+      }
+    } catch (error) {
+      console.error("Error replacing image:", error);
+      alert("An error occurred during replacing.");
+    }
+  }
 
   useEffect(() => {
     // If submitted data failed validation, make submit button clickable again
@@ -74,7 +138,7 @@ export default function UpdateRestaurantForm({ params }) {
           <form
             action={formAction}
             onSubmit={() => setIsSubmitting(true)}
-            className="grid max-w-[30rem]"
+            className="grid"
           >
             <input type="hidden" name="id" defaultValue={restaurant.id} />
 
@@ -83,8 +147,8 @@ export default function UpdateRestaurantForm({ params }) {
               type="text"
               id="restaurant_name"
               name="name"
-              defaultValue={restaurant.name} // Pre-fill with existing restaurant name
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              defaultValue={restaurant.name}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               min="1"
               required
             />
@@ -95,7 +159,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="slug"
               name="slug"
               defaultValue={restaurant.slug}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               min="1"
               required
             />
@@ -106,7 +170,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="address"
               name="address"
               defaultValue={restaurant.address}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               min="1"
               required
             />
@@ -117,7 +181,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="city"
               name="city"
               defaultValue={restaurant.city}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               min="1"
               required
             />
@@ -128,7 +192,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="address_url"
               name="address_url"
               defaultValue={restaurant.address_url}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               min="1"
               required
             />
@@ -136,12 +200,13 @@ export default function UpdateRestaurantForm({ params }) {
             <label htmlFor="google_maps_embedded_url">
               Google Maps Embedded URL:
             </label>
-            <input
+            <textarea
               type="text"
+              rows="7"
               id="google_maps_embedded_url"
               name="google_maps_embedded_url"
               defaultValue={restaurant.google_maps_embedded_url}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
 
             <label htmlFor="latitude">Latitude:</label>
@@ -150,7 +215,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="latitude"
               name="latitude"
               defaultValue={restaurant.latitude}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               required
             />
 
@@ -160,7 +225,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="longitude"
               name="longitude"
               defaultValue={restaurant.longitude}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               required
             />
 
@@ -168,9 +233,9 @@ export default function UpdateRestaurantForm({ params }) {
             <textarea
               id="restaurant_summary"
               name="restaurant_summary"
-              rows="4"
+              rows="10"
               defaultValue={restaurant.restaurant_summary}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
 
             <label htmlFor="halal_status">Halal Status:</label>
@@ -178,7 +243,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="halal_status"
               name="halal_status"
               defaultValue={restaurant.halal_status}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             >
               <option value=""></option>
               <option value="Fully Halal">Fully Halal</option>
@@ -190,9 +255,9 @@ export default function UpdateRestaurantForm({ params }) {
             <textarea
               id="halal_description"
               name="halal_description"
-              rows="4"
+              rows="7"
               defaultValue={restaurant.halal_description}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
 
             <label htmlFor="alcohol_served">Alcohol Served?</label>
@@ -200,7 +265,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="alcohol_served"
               name="alcohol_served"
               defaultValue={restaurant.alcohol_served}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             >
               <option value=""></option>
               <option value="Yes">Yes</option>
@@ -212,7 +277,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="pork_served"
               name="pork_served"
               defaultValue={restaurant.pork_served}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             >
               <option value=""></option>
               <option value="Yes">Yes</option>
@@ -224,7 +289,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="slaughter_method"
               name="slaughter_method"
               defaultValue={restaurant.slaughter_method}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             >
               <option value=""></option>
               <option value="Hand Slaughtered">Hand Slaughtered</option>
@@ -237,7 +302,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="rating"
               name="rating"
               defaultValue={restaurant.rating}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
               min="1"
               max="5"
               step="0.1"
@@ -248,7 +313,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="price"
               name="price"
               defaultValue={restaurant.price}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             >
               <option value=""></option>
               <option value="$">$</option>
@@ -263,7 +328,7 @@ export default function UpdateRestaurantForm({ params }) {
               id="phone"
               name="phone"
               defaultValue={restaurant.phone}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
 
             <label htmlFor="website">Website:</label>
@@ -272,16 +337,64 @@ export default function UpdateRestaurantForm({ params }) {
               id="website"
               name="website"
               defaultValue={restaurant.website}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
 
-            <label htmlFor="cover_photo_url">Cover_photo_url:</label>
+            {placePhotos?.length > 0 && (
+              <div className="w-full flex flex-wrap gap-6 mb-[3rem]">
+                {placePhotos.map((photo, index) => (
+                  <div key={index}>
+                    <img
+                      src={photo.photoUri}
+                      onClick={() => handleImageClick(photo, `${slug}-photo-1`)}
+                      alt={`Photo by ${photo.author}`}
+                      className="cursor-pointer"
+                    />
+                    <p className="max-w-[500px] pb-2">{photo.photoUri}</p>
+                    <p className="max-w-[500px]">Author: {photo.author}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="grid gap-[0.5rem] mb-[1.5rem]">
+              <div>
+                <label htmlFor="cover_photo_url" className="block">
+                  Cover_photo_url:
+                </label>
+                <input
+                  type="text"
+                  id="cover_photo_url"
+                  name="cover_photo_url"
+                  defaultValue={restaurant.cover_photo_url}
+                  className="block w-full text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] max-w-[35rem] min-h-10"
+                />
+              </div>
+
+              {!placePhotos && (
+                <button
+                  type="button"
+                  onClick={() => fetchPlacePhotos()}
+                  className="bg-[#136c72] text-white text-lg border-none rounded-lg cursor-pointer max-w-fit px-4 py-1"
+                >
+                  Change Cover Photo
+                </button>
+              )}
+            </div>
+
+            <label htmlFor="cover_photo_author">Cover Photo Author:</label>
             <input
               type="text"
-              id="cover_photo_url"
-              name="cover_photo_url"
-              defaultValue={restaurant.cover_photo_url}
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              id="cover_photo_author"
+              name="cover_photo_author"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
+              value={restaurant.cover_photo_author}
+              onChange={(e) =>
+                setRestaurant({
+                  ...restaurant,
+                  cover_photo_author: e.target.value,
+                })
+              }
             />
 
             <label htmlFor="other_photos_1_url">Other_photos_url:</label>
@@ -292,7 +405,7 @@ export default function UpdateRestaurantForm({ params }) {
               defaultValue={
                 restaurant.other_photos_url && restaurant.other_photos_url[0]
               }
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
             <input
               type="text"
@@ -301,7 +414,7 @@ export default function UpdateRestaurantForm({ params }) {
               defaultValue={
                 restaurant.other_photos_url && restaurant.other_photos_url[1]
               }
-              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem]"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
             />
 
             {cuisines && cuisines.length > 0 && (
@@ -326,6 +439,44 @@ export default function UpdateRestaurantForm({ params }) {
                 </div>
               </div>
             )}
+
+            <div>
+              <label htmlFor="restaurant_search">
+                Search Google for restaurant (this is only for updating the
+                Place ID below):
+              </label>
+            </div>
+            <Autocomplete
+              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+              onPlaceSelected={(place) => {
+                setRestaurant({
+                  ...restaurant,
+                  place_id: place.place_id,
+                });
+              }}
+              options={{
+                types: ["establishment"],
+              }}
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1rem] w-full max-w-[35rem] min-h-10"
+              id="restaurant_search"
+            />
+
+            <label htmlFor="place_id">
+              Place ID (for Google Place Details API):
+            </label>
+            <input
+              type="text"
+              id="place_id"
+              name="place_id"
+              className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
+              value={restaurant.place_id}
+              onChange={(e) =>
+                setRestaurant({
+                  ...restaurant,
+                  place_id: e.target.value,
+                })
+              }
+            />
 
             <div className="flex gap-2 mb-[1.5rem]">
               <label htmlFor="hide_restaurant">

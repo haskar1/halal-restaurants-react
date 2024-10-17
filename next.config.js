@@ -3,8 +3,8 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // matching all API routes
-        source: "/api/:path*",
+        // matching all routes
+        source: "/:path*",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },
           { key: "Access-Control-Allow-Origin", value: "*" }, // replace this your actual origin
@@ -38,6 +38,12 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "img.whoishalal.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "whoishalal-images.s3.us-east-2.amazonaws.com",
         port: "",
         pathname: "/**",
       },

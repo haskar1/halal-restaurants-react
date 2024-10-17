@@ -7,9 +7,9 @@ import { headers } from "next/headers";
 
 export default async function sitemap() {
   const host = headers().get("host");
-  const protocal = process?.env.NODE_ENV === "development" ? "http" : "https";
+  const protocol = process?.env.NODE_ENV === "development" ? "http" : "https";
 
-  const res = await fetch(`${protocal}://${host}/api/get-sitemap`);
+  const res = await fetch(`${protocol}://${host}/api/get-sitemap`);
   const data = await res.json();
 
   const allRestaurantsSitemap = data.allRestaurantsSitemap;
