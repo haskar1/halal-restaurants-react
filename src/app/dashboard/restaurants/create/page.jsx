@@ -17,10 +17,14 @@ export default function CreateRestaurantForm() {
   const [placeDetails, setPlaceDetails] = useState(null);
   const [slug, setSlug] = useState("");
   const [restaurantSummary, setRestaurantSummary] = useState("");
+  // const [restaurantSummaryOpenAI, setRestaurantSummaryOpenAI] = useState("");
   const [alcoholServed, setAlcoholServed] = useState("");
   const [priceLevel, setPriceLevel] = useState("");
   const [placePhotos, setPlacePhotos] = useState(null);
   const [coverPhoto, setCoverPhoto] = useState(null);
+
+  // const [combinedRestaurantSummary, setCombinedRestaurantSummary] =
+  //   `${restaurantSummary}\n\nOpenAI summary: ${restaurantSummaryOpenAI}`;
 
   const placeCityTownNeighborhood = placeDetails?.addressComponents.find(
     ({ types }) => types.includes("locality") || types.includes("sublocality")
@@ -58,17 +62,18 @@ export default function CreateRestaurantForm() {
   useEffect(() => {
     if (placeDetails) {
       setRestaurantSummary(
-        placeDetails?.generativeSummary?.description?.text
-          ? `${placeDetails.generativeSummary.description.text.replace(
-              /(\r\n|\n|\r)/gm,
-              " "
-            )}`
-          : placeDetails?.generativeSummary?.overview?.text
-            ? `${placeDetails.generativeSummary.overview.text.replace(
-                /(\r\n|\n|\r)/gm,
-                " "
-              )}`
-            : ""
+        (prevSummary) =>
+          prevSummary +
+          "\n\n" +
+          `Google Description: ${placeDetails.generativeSummary.description?.text?.replace(
+            /(\r\n|\n|\r)/gm,
+            " "
+          )}` +
+          "\n\n" +
+          `Google Overview: ${placeDetails.generativeSummary.overview?.text?.replace(
+            /(\r\n|\n|\r)/gm,
+            " "
+          )}`
       );
     }
   }, [placeDetails]);
@@ -122,6 +127,25 @@ export default function CreateRestaurantForm() {
       `https://places.googleapis.com/v1/places/${place.place_id}?fields=id,displayName,photos,addressComponents,servesBeer,servesCocktails,servesWine,formattedAddress,googleMapsUri,location,generativeSummary,rating,userRatingCount,priceLevel,nationalPhoneNumber,websiteUri&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
     );
     const fetchedPlaceDetails = await placeDetailsResponse.json();
+
+    if (fetchedPlaceDetails.websiteUri) {
+      // Get restaurant summary using OpenAI API with the summarize-restaurant python script
+      const summaryResponse = await fetch("/api/summarize-restaurant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: fetchedPlaceDetails.websiteUri }), // Send the restaurant's website URL
+      });
+
+      const summaryData = await summaryResponse.json();
+      if (summaryResponse.ok) {
+        setRestaurantSummary(summaryData.summary);
+      } else {
+        console.error("Failed to fetch summary:", summaryData.error);
+      }
+    }
+
     fetchPhotos(fetchedPlaceDetails);
     setPlaceDetails(fetchedPlaceDetails);
     console.log("placeDetails: ", fetchedPlaceDetails);
@@ -341,6 +365,7 @@ export default function CreateRestaurantForm() {
           name="restaurant_summary"
           rows="10"
           className="text-black pl-2 pr-2 border border-solid border-black rounded mt-[0.5rem] mb-[1.5rem] max-w-[35rem] min-h-10"
+          // value={`${restaurantSummary}\n\nOpenAI summary: ${restaurantSummaryOpenAI}`}
           value={restaurantSummary}
           onChange={(e) => setRestaurantSummary(e.target.value)}
         />
