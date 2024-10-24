@@ -1,14 +1,17 @@
 import { sql } from "@vercel/postgres";
 
 export default async function handler(request, response) {
-  const limit = request.query.limit;
-  const latitude = request.query.latitude;
-  const longitude = request.query.longitude;
+  const limit = JSON.parse(request.query.limit);
+  const latitude = JSON.parse(request.query.latitude);
+  const longitude = JSON.parse(request.query.longitude);
   const bbox = JSON.parse(request.query.bbox);
 
-  let boundsSWLongitude, boundsSWLatitude, boundsNELongitude, boundsNELatitude;
+  let boundsSWLongitude = 0;
+  let boundsSWLatitude = 0;
+  let boundsNELongitude = 0;
+  let boundsNELatitude = 0;
 
-  if (bbox.length > 0) {
+  if (bbox && bbox.length === 4) {
     boundsSWLongitude = bbox[0];
     boundsSWLatitude = bbox[1];
     boundsNELongitude = bbox[2];
@@ -16,10 +19,17 @@ export default async function handler(request, response) {
   }
 
   try {
-    // If bbox results are fewer than the limit, that means there are more restaurants outside of the bounds.
-    // So, select all restaurants within 10 mile radius of searched location center and sort results by highest rating to lowest rating. Return [limit] results.
-    // If there are less than [limit] restaurants in 10 mile radius, then keep searching nearest restaurants within max radius of 20 miles until you reach total [limit] results.
-    // In that case, the results within 10 mile radius are sorted by rating, and the remaining nearest restaurants are sorted by distance.
+    // CURRENT SEARCH ALGORITHM:
+    // First search: Searches within bounds of location for up to [limit] restaurants. If there are no bounds (like Miami), it returns 0 restaurants for this step.
+    // Second search: Then, searches within 20 mile radius of center of location and returns up to [limit] restaurants. This is in case the bounds are too small or weirdly shaped, so it makes sense to search broader. Exclude duplicate results from first search.
+    // Third search: If there is at least one restaurant result from the first two searches, then search within an expanded radius of 40 miles up to [limit] restaurants. Exclude duplicates from first two searches.
+    // I made the third search so that if you search somewhere like Benson, NC it returns zero results (instead of showing results in Raleigh), but if you search Dallas it expands to all surrounding cities around dallas (Plano, Frisco, etc). I may change this later.
+
+    // ***OLD SEARCH ALGORITHM, JUST FOR REFERENCE:
+    // ***If bbox results are fewer than the limit, that means there are more restaurants outside of the bounds.
+    // ***So, select all restaurants within 10 mile radius of searched location center and sort results by highest rating to lowest rating. Return [limit] results.
+    // ***If there are less than [limit] restaurants in 10 mile radius, then keep searching nearest restaurants within max radius of 20 miles until you reach total [limit] results.
+    // ***In that case, the results within 10 mile radius are sorted by rating, and the remaining nearest restaurants are sorted by distance.
 
     let result = await sql`
       WITH bbox_restaurants AS (
@@ -50,6 +60,13 @@ export default async function handler(request, response) {
         LEFT JOIN
           cuisines c ON rc.cuisine_id = c.id
         WHERE
+          -- Check that all bounds are not NULL, otherwise the query exits and the location returns zero restaurants 
+          ${boundsSWLongitude} <> '0' AND 
+          ${boundsSWLatitude} <> '0' AND 
+          ${boundsNELongitude} <> '0' AND 
+          ${boundsNELatitude} <> '0' AND
+
+          -- Use the bounding box to filter locations
           ST_Within(r.location, ST_MakeEnvelope(${boundsSWLongitude}, ${boundsSWLatitude}, ${boundsNELongitude}, ${boundsNELatitude}, 4326))
           AND hide_restaurant = false
         GROUP BY
@@ -87,8 +104,8 @@ export default async function handler(request, response) {
         LEFT JOIN
           cuisines c ON rc.cuisine_id = c.id
         WHERE
-          -- Only restaurants within 10 mile radius
-          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 10
+          -- Only restaurants within 20 mile radius
+          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 20
           -- Prevent duplicates with bbox_restaurants
           AND NOT EXISTS (
             SELECT 1 FROM bbox_restaurants br WHERE br.restaurant_id = r.id
@@ -148,8 +165,8 @@ export default async function handler(request, response) {
         GROUP BY
           r.id, r.name, r.address, r.cover_photo_url, r.rating
         HAVING
-          -- Only restaurants within max 20 mile radius
-          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 20
+          -- Only restaurants within max 40 mile radius
+          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 40
         ORDER BY
           distance
         LIMIT ${limit}

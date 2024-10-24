@@ -65,9 +65,10 @@ export default function Map({ locationInfo, searchResults, setSearchResults }) {
       // attributionControl: false,
     });
 
-    if (map?.current && bbox) {
-      map.current.jumpTo({ center: [mapCenterLon, mapCenterLat] });
-    }
+    // if (map?.current && bbox) {
+    //   console.log("jumping..");
+    //   map.current.jumpTo({ center: [mapCenterLon, mapCenterLat] });
+    // }
 
     map.current.on("load", () => {
       // Add an image to use as a custom marker
@@ -89,13 +90,18 @@ export default function Map({ locationInfo, searchResults, setSearchResults }) {
               { triggeredByFitBounds: true }
             );
             map.current.on("moveend", (event) => {
-              // Check if the event contains the custom 'triggeredByFitBounds' property
+              // This is to active the Search Area button. Waits until fitBounds is called, then activates it.
+              // Otherwise, the Search Area button would be called automatically when map initializes which we don't want
               if (event.triggeredByFitBounds) {
                 setIsMapLoaded(true);
               }
             });
 
             // map.current.fitBounds(bbox2, { padding: 100 });
+          } else {
+            // If there are no restaurants found then fitBounds isn't called, so the Search Area button is activated now.
+            // Whenever the map is manually moved now, the Search Area button appears
+            setIsMapLoaded(true);
           }
 
           if (map.current.getSource("restaurants")) {

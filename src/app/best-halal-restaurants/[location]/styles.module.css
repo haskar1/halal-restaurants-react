@@ -88,6 +88,10 @@
   padding: 0 0.25rem;
 }
 
+.listings_and_filters_container {
+  padding: 0 0 5rem;
+}
+
 .restaurant_count {
   text-align: center;
   padding-left: 1rem;
@@ -177,7 +181,7 @@
     align-items: start;
     column-gap: 3rem;
     row-gap: 1rem;
-    padding: 2rem 0;
+    padding: 2rem 0 5rem;
   }
 
   .restaurant_count {

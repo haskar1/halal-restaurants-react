@@ -28,21 +28,10 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
   const params = useParams();
   const router = useRouter();
   const allRestaurants = searchResults?.features || []; // Original list
-  const sessionStoredFilteredRestaurants = JSON.parse(
-    sessionStorage.getItem("filteredRestaurants")
-  );
-  const [filteredRestaurants, setFilteredRestaurants] = useState(
-    sessionStoredFilteredRestaurants || searchResults
-  );
-  const [selectedCuisines, setSelectedCuisines] = useState(
-    JSON.parse(sessionStorage.getItem("selectedCuisines")) || []
-  );
-  const [selectedPrices, setSelectedPrices] = useState(
-    JSON.parse(sessionStorage.getItem("selectedPrices")) || []
-  );
-  const [selectedOthers, setSelectedOthers] = useState(
-    JSON.parse(sessionStorage.getItem("selectedOthers")) || []
-  );
+  const [filteredRestaurants, setFilteredRestaurants] = useState(searchResults);
+  const [selectedCuisines, setSelectedCuisines] = useState([]);
+  const [selectedPrices, setSelectedPrices] = useState([]);
+  const [selectedOthers, setSelectedOthers] = useState([]);
 
   // Filters button on mobile
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -51,6 +40,34 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
   if (useMediaQuery("(min-width:768px)") && mobileFiltersOpen) {
     handleMobileFiltersClose();
   }
+
+  useEffect(() => {
+    const sessionStorageFilteredRestaurants = JSON.parse(
+      sessionStorage.getItem("filteredRestaurants")
+    );
+    const sessionStorageSelectedCuisines = JSON.parse(
+      sessionStorage.getItem("selectedCuisines")
+    );
+    const sessionStorageSelectedPrices = JSON.parse(
+      sessionStorage.getItem("selectedPrices")
+    );
+    const sessionStorageSelectedOthers = JSON.parse(
+      sessionStorage.getItem("selectedOthers")
+    );
+
+    if (sessionStorageFilteredRestaurants) {
+      setFilteredRestaurants(sessionStorageFilteredRestaurants);
+    }
+    if (sessionStorageSelectedCuisines) {
+      setSelectedCuisines(sessionStorageSelectedCuisines);
+    }
+    if (sessionStorageSelectedPrices) {
+      setSelectedPrices(sessionStorageSelectedPrices);
+    }
+    if (sessionStorageSelectedOthers) {
+      setSelectedOthers(sessionStorageSelectedOthers);
+    }
+  }, []);
 
   // Update the filteredRestaurants whenever cuisines or prices or other filters change
   useEffect(() => {

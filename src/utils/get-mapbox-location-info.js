@@ -14,9 +14,15 @@ export default async function getMapboxLocationInfo(location) {
     const locationJson = await locationResponse.json();
     locationInfo = locationJson.features[0];
 
-    const bbox = JSON.stringify(locationInfo?.properties?.bbox);
-    const mapCenterLat = locationInfo?.properties?.coordinates.latitude;
-    const mapCenterLon = locationInfo?.properties?.coordinates.longitude;
+    const bbox = locationInfo?.properties?.bbox
+      ? JSON.stringify(locationInfo?.properties?.bbox)
+      : null;
+    const mapCenterLat = locationInfo?.properties?.coordinates.latitude
+      ? JSON.stringify(locationInfo?.properties?.coordinates.latitude)
+      : null;
+    const mapCenterLon = locationInfo?.properties?.coordinates.longitude
+      ? JSON.stringify(locationInfo?.properties?.coordinates.longitude)
+      : null;
 
     // Fetch location's restaurants from database
     if (mapCenterLat && mapCenterLon) {
@@ -28,10 +34,9 @@ export default async function getMapboxLocationInfo(location) {
       const protocol =
         process?.env.NODE_ENV === "development" ? "http" : "https";
       let res = await fetch(
-        `${protocol}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=50`,
-        {
-          cache: "no-store",
-        }
+        `${protocol}://${host}/api/get-map-restaurants?bbox=${bbox}&latitude=${mapCenterLat}&longitude=${mapCenterLon}&limit=${JSON.stringify(
+          50
+        )}`
       );
       const restaurantJson = await res.json();
       locationRestaurantsGeoJSON = restaurantJson.geoJsonData;

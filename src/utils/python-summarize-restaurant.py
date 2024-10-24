@@ -21,7 +21,7 @@ load_dotenv()
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 LANGUAGE = "english"
-SENTENCES_COUNT = 5
+SENTENCES_COUNT = 10
 
 
 if __name__ == "__main__":

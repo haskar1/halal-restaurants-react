@@ -45,14 +45,23 @@ export default function CreateRestaurantForm() {
           .toLowerCase()
           .replaceAll(" ", "-")
           .replaceAll("'", "")
+          .replaceAll("’", "")
+          .replaceAll(",", "")
+          .replaceAll(".", "")
           .replaceAll("&", "and")}-${placeCityTownNeighborhood
           ?.toLowerCase()
           .replaceAll(" ", "-")
           .replaceAll("'", "")
+          .replaceAll("’", "")
+          .replaceAll(",", "")
+          .replaceAll(".", "")
           .replaceAll("&", "and")}-${placeState
           ?.toLowerCase()
           .replaceAll(" ", "-")
           .replaceAll("'", "")
+          .replaceAll("’", "")
+          .replaceAll(",", "")
+          .replaceAll(".", "")
           .replaceAll("&", "and")}`
       );
     }
@@ -60,20 +69,22 @@ export default function CreateRestaurantForm() {
 
   // Restaurant Summary
   useEffect(() => {
-    if (placeDetails) {
+    const description = placeDetails?.generativeSummary?.description?.text;
+    const overview = placeDetails?.generativeSummary?.overview?.text;
+    if (description) {
       setRestaurantSummary(
         (prevSummary) =>
           prevSummary +
-          "\n\n" +
-          `Google Description: ${placeDetails.generativeSummary.description?.text?.replace(
-            /(\r\n|\n|\r)/gm,
-            " "
-          )}` +
-          "\n\n" +
-          `Google Overview: ${placeDetails.generativeSummary.overview?.text?.replace(
-            /(\r\n|\n|\r)/gm,
-            " "
-          )}`
+          `Google Description: ${description.replace(/(\r\n|\n|\r)/gm, " ")}` +
+          "\n\n"
+      );
+    }
+    if (overview) {
+      setRestaurantSummary(
+        (prevSummary) =>
+          prevSummary +
+          `Google Description: ${overview.replace(/(\r\n|\n|\r)/gm, " ")}` +
+          "\n\n"
       );
     }
   }, [placeDetails]);
@@ -122,33 +133,39 @@ export default function CreateRestaurantForm() {
     }
   }, [placeDetails]);
 
+  // Get restaurant summary using OpenAI API with the summarize-restaurant python script
+  useEffect(() => {
+    async function fetchRestaurantSummary() {
+      if (placeDetails?.websiteUri) {
+        const summaryResponse = await fetch("/api/summarize-restaurant", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url: placeDetails.websiteUri }), // Send the restaurant's website URL
+        });
+
+        const summaryData = await summaryResponse.json();
+        if (summaryResponse.ok) {
+          setRestaurantSummary(
+            (prevSummary) => prevSummary + summaryData.summary
+          );
+        } else {
+          console.error("Failed to fetch summary:", summaryData.error);
+        }
+      }
+    }
+    fetchRestaurantSummary();
+  }, [placeDetails]);
+
   async function fetchPlaceDetails(place) {
     const placeDetailsResponse = await fetch(
       `https://places.googleapis.com/v1/places/${place.place_id}?fields=id,displayName,photos,addressComponents,servesBeer,servesCocktails,servesWine,formattedAddress,googleMapsUri,location,generativeSummary,rating,userRatingCount,priceLevel,nationalPhoneNumber,websiteUri&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
     );
     const fetchedPlaceDetails = await placeDetailsResponse.json();
 
-    if (fetchedPlaceDetails.websiteUri) {
-      // Get restaurant summary using OpenAI API with the summarize-restaurant python script
-      const summaryResponse = await fetch("/api/summarize-restaurant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url: fetchedPlaceDetails.websiteUri }), // Send the restaurant's website URL
-      });
-
-      const summaryData = await summaryResponse.json();
-      if (summaryResponse.ok) {
-        setRestaurantSummary(summaryData.summary);
-      } else {
-        console.error("Failed to fetch summary:", summaryData.error);
-      }
-    }
-
     fetchPhotos(fetchedPlaceDetails);
     setPlaceDetails(fetchedPlaceDetails);
-    console.log("placeDetails: ", fetchedPlaceDetails);
   }
 
   async function fetchPhotos(fetchedPlaceDetails) {
@@ -337,6 +354,7 @@ export default function CreateRestaurantForm() {
             placeDetails &&
             `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY}&q=place_id:${placeDetails?.id}`
           }
+          required
         />
 
         <label htmlFor="latitude">Latitude:</label>

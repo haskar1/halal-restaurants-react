@@ -7,22 +7,36 @@ import getMapboxLocationInfo from "@/utils/get-mapbox-location-info";
 import _ from "lodash";
 
 export default function MapPage() {
-  const [locationInfo, setLocationInfo] = useState(
-    JSON.parse(sessionStorage.getItem("locationInfo")) || null
-  );
-  const [filteredRestaurants, setFilteredRestaurants] = useState(
-    JSON.parse(sessionStorage.getItem("filteredRestaurants")) || null
-  );
+  const [locationInfo, setLocationInfo] = useState(null);
+  const [filteredRestaurants, setFilteredRestaurants] = useState(null);
   const params = useParams();
 
   useEffect(() => {
+    const sessionStorageLocationInfo = JSON.parse(
+      sessionStorage.getItem("locationInfo")
+    );
+
+    const sessionStorageFilteredRestaurants = JSON.parse(
+      sessionStorage.getItem("filteredRestaurants")
+    );
+
+    if (!locationInfo && sessionStorageLocationInfo) {
+      setLocationInfo(sessionStorageLocationInfo);
+    }
+
+    if (!filteredRestaurants && sessionStorageFilteredRestaurants) {
+      setFilteredRestaurants(sessionStorageFilteredRestaurants);
+    }
+
+    if (params.location) fetchData();
+
     async function fetchData() {
       const fetchedLocation = await getMapboxLocationInfo(params.location);
       const fetchedLocationInfo = fetchedLocation?.locationInfo;
       const fetchedLocationRestaurants =
         fetchedLocation?.locationRestaurantsGeoJSON;
 
-      if (_.isEqual(fetchedLocationInfo, locationInfo)) return;
+      if (_.isEqual(fetchedLocationInfo, sessionStorageLocationInfo)) return;
 
       setLocationInfo(fetchedLocationInfo);
       sessionStorage.setItem(
@@ -40,7 +54,6 @@ export default function MapPage() {
       sessionStorage.setItem("selectedPrices", JSON.stringify([]));
       sessionStorage.setItem("selectedOthers", JSON.stringify([]));
     }
-    fetchData();
   }, [params.location]);
 
   return (
