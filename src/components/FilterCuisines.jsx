@@ -18,10 +18,7 @@ export default function FilterCuisines({
       updatedSelectedCuisines = selectedCuisines.filter((c) => c !== cuisine);
     }
     setSelectedCuisines(updatedSelectedCuisines);
-    sessionStorage.setItem(
-      "selectedCuisines",
-      JSON.stringify(updatedSelectedCuisines)
-    );
+    sessionStorage.setItem("selectedCuisines", updatedSelectedCuisines);
   };
 
   return (

@@ -18,10 +18,7 @@ export default function FilterPrice({
       updatedSelectedPrices = selectedPrices.filter((p) => p !== price);
     }
     setSelectedPrices(updatedSelectedPrices);
-    sessionStorage.setItem(
-      "selectedPrices",
-      JSON.stringify(updatedSelectedPrices)
-    );
+    sessionStorage.setItem("selectedPrices", updatedSelectedPrices);
   };
 
   return (

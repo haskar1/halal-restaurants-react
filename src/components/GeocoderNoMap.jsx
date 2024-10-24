@@ -38,7 +38,7 @@ export default function GeocoderNoMap() {
   return (
     <>
       {isPageLoading ? (
-        <div className="bg-white text-black w-[19.375rem] h-[36px] rounded flex items-center justify-center">
+        <div className="bg-white text-black w-[19.375rem] h-[3.125rem] md:h-[2.25rem] rounded flex items-center justify-center">
           <p>Loading...</p>
         </div>
       ) : (

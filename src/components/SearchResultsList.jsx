@@ -28,20 +28,19 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
   const params = useParams();
   const router = useRouter();
   const allRestaurants = searchResults?.features || []; // Original list
-  const sessionStoredFilteredRestaurants = JSON.parse(
-    sessionStorage.getItem("filteredRestaurants")
-  );
+  const sessionStoredFilteredRestaurants =
+    sessionStorage.getItem("filteredRestaurants") || null;
   const [filteredRestaurants, setFilteredRestaurants] = useState(
     sessionStoredFilteredRestaurants || searchResults
   );
   const [selectedCuisines, setSelectedCuisines] = useState(
-    JSON.parse(sessionStorage.getItem("selectedCuisines")) || []
+    sessionStorage.getItem("selectedCuisines") || []
   );
   const [selectedPrices, setSelectedPrices] = useState(
-    JSON.parse(sessionStorage.getItem("selectedPrices")) || []
+    sessionStorage.getItem("selectedPrices") || []
   );
   const [selectedOthers, setSelectedOthers] = useState(
-    JSON.parse(sessionStorage.getItem("selectedOthers")) || []
+    sessionStorage.getItem("selectedOthers") || []
   );
 
   // Filters button on mobile
@@ -97,26 +96,18 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
       type: "FeatureCollection",
     });
 
-    sessionStorage.setItem(
-      "filteredRestaurants",
-      JSON.stringify({
-        features: updatedRestaurants,
-        type: "FeatureCollection",
-      })
-    );
+    sessionStorage.setItem("filteredRestaurants", {
+      features: updatedRestaurants,
+      type: "FeatureCollection",
+    });
   }, [selectedCuisines, selectedPrices, selectedOthers, allRestaurants]);
 
   useEffect(() => {
     // If you go to a different location's page, and sessionStorage already had filters..
     // from a previous location saved, then clear those filters and set new location in sessionStorage
-    if (
-      !_.isEqual(
-        JSON.parse(sessionStorage.getItem("locationInfo")),
-        locationInfo
-      )
-    ) {
+    if (!_.isEqual(sessionStorage.getItem("locationInfo"), locationInfo)) {
       clearFilters();
-      sessionStorage.setItem("locationInfo", JSON.stringify(locationInfo));
+      sessionStorage.setItem("locationInfo", locationInfo);
     }
   }, [locationInfo]);
 
@@ -130,13 +121,10 @@ export default function SearchResultsList({ locationInfo, searchResults }) {
     setSelectedPrices([]); // Reset selected prices
     setSelectedOthers([]); // Reset selected other filters
     setFilteredRestaurants(allRestaurants); // Reset the restaurant list to show all restaurants
-    sessionStorage.setItem(
-      "filteredRestaurants",
-      JSON.stringify(allRestaurants)
-    );
-    sessionStorage.setItem("selectedCuisines", JSON.stringify([]));
-    sessionStorage.setItem("selectedPrices", JSON.stringify([]));
-    sessionStorage.setItem("selectedOthers", JSON.stringify([]));
+    sessionStorage.setItem("filteredRestaurants", allRestaurants);
+    sessionStorage.setItem("selectedCuisines", []);
+    sessionStorage.setItem("selectedPrices", []);
+    sessionStorage.setItem("selectedOthers", []);
   }
 
   ////// FILTER OPTIONS - DEFINED HERE TO DETERMINE IF FILTERS COMPONENT NEEDS TO BE RENDERED ///////

@@ -60,20 +60,22 @@ export default function CreateRestaurantForm() {
 
   // Restaurant Summary
   useEffect(() => {
-    if (placeDetails) {
+    const description = placeDetails?.generativeSummary?.description?.text;
+    const overview = placeDetails?.generativeSummary?.overview?.text;
+    if (description) {
       setRestaurantSummary(
         (prevSummary) =>
           prevSummary +
-          "\n\n" +
-          `Google Description: ${placeDetails.generativeSummary.description?.text?.replace(
-            /(\r\n|\n|\r)/gm,
-            " "
-          )}` +
-          "\n\n" +
-          `Google Overview: ${placeDetails.generativeSummary.overview?.text?.replace(
-            /(\r\n|\n|\r)/gm,
-            " "
-          )}`
+          "\n" +
+          `Google Description: ${description.replace(/(\r\n|\n|\r)/gm, " ")}`
+      );
+    }
+    if (overview) {
+      setRestaurantSummary(
+        (prevSummary) =>
+          prevSummary +
+          "\n" +
+          `Google Description: ${overview.replace(/(\r\n|\n|\r)/gm, " ")}`
       );
     }
   }, [placeDetails]);
@@ -148,7 +150,6 @@ export default function CreateRestaurantForm() {
 
     fetchPhotos(fetchedPlaceDetails);
     setPlaceDetails(fetchedPlaceDetails);
-    console.log("placeDetails: ", fetchedPlaceDetails);
   }
 
   async function fetchPhotos(fetchedPlaceDetails) {
@@ -337,6 +338,7 @@ export default function CreateRestaurantForm() {
             placeDetails &&
             `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_API_KEY}&q=place_id:${placeDetails?.id}`
           }
+          required
         />
 
         <label htmlFor="latitude">Latitude:</label>

@@ -19,10 +19,7 @@ export default function FilterOther({
       updatedSelectedOthers = selectedOthers.filter((p) => p !== other);
     }
     setSelectedOthers(updatedSelectedOthers);
-    sessionStorage.setItem(
-      "selectedOthers",
-      JSON.stringify(updatedSelectedOthers)
-    );
+    sessionStorage.setItem("selectedOthers", updatedSelectedOthers);
   };
 
   return (

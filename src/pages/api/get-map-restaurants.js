@@ -1,14 +1,17 @@
 import { sql } from "@vercel/postgres";
 
 export default async function handler(request, response) {
-  const limit = request.query.limit;
-  const latitude = request.query.latitude;
-  const longitude = request.query.longitude;
+  const limit = JSON.parse(request.query.limit);
+  const latitude = JSON.parse(request.query.latitude);
+  const longitude = JSON.parse(request.query.longitude);
   const bbox = JSON.parse(request.query.bbox);
 
-  let boundsSWLongitude, boundsSWLatitude, boundsNELongitude, boundsNELatitude;
+  let boundsSWLongitude = 0;
+  let boundsSWLatitude = 0;
+  let boundsNELongitude = 0;
+  let boundsNELatitude = 0;
 
-  if (bbox.length > 0) {
+  if (bbox && bbox.length === 4) {
     boundsSWLongitude = bbox[0];
     boundsSWLatitude = bbox[1];
     boundsNELongitude = bbox[2];
@@ -50,6 +53,13 @@ export default async function handler(request, response) {
         LEFT JOIN
           cuisines c ON rc.cuisine_id = c.id
         WHERE
+          -- Check that all bounds are not NULL, otherwise the query exits and the location returns zero restaurants 
+          ${boundsSWLongitude} <> '0' AND 
+          ${boundsSWLatitude} <> '0' AND 
+          ${boundsNELongitude} <> '0' AND 
+          ${boundsNELatitude} <> '0' AND
+
+          -- Use the bounding box to filter locations
           ST_Within(r.location, ST_MakeEnvelope(${boundsSWLongitude}, ${boundsSWLatitude}, ${boundsNELongitude}, ${boundsNELatitude}, 4326))
           AND hide_restaurant = false
         GROUP BY
@@ -87,8 +97,8 @@ export default async function handler(request, response) {
         LEFT JOIN
           cuisines c ON rc.cuisine_id = c.id
         WHERE
-          -- Only restaurants within 10 mile radius
-          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 10
+          -- Only restaurants within 20 mile radius
+          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 20
           -- Prevent duplicates with bbox_restaurants
           AND NOT EXISTS (
             SELECT 1 FROM bbox_restaurants br WHERE br.restaurant_id = r.id
@@ -148,8 +158,8 @@ export default async function handler(request, response) {
         GROUP BY
           r.id, r.name, r.address, r.cover_photo_url, r.rating
         HAVING
-          -- Only restaurants within max 20 mile radius
-          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 20
+          -- Only restaurants within max 40 mile radius
+          ROUND((ST_DistanceSphere(ST_MakePoint(${longitude}, ${latitude}), r.location) * 0.000621371192)::NUMERIC, 1) <= 40
         ORDER BY
           distance
         LIMIT ${limit}

@@ -8,10 +8,10 @@ import _ from "lodash";
 
 export default function MapPage() {
   const [locationInfo, setLocationInfo] = useState(
-    JSON.parse(sessionStorage.getItem("locationInfo")) || null
+    sessionStorage.getItem("locationInfo") || null
   );
   const [filteredRestaurants, setFilteredRestaurants] = useState(
-    JSON.parse(sessionStorage.getItem("filteredRestaurants")) || null
+    sessionStorage.getItem("filteredRestaurants") || null
   );
   const params = useParams();
 
@@ -25,20 +25,14 @@ export default function MapPage() {
       if (_.isEqual(fetchedLocationInfo, locationInfo)) return;
 
       setLocationInfo(fetchedLocationInfo);
-      sessionStorage.setItem(
-        "locationInfo",
-        JSON.stringify(fetchedLocationInfo)
-      );
+      sessionStorage.setItem("locationInfo", fetchedLocationInfo);
 
       setFilteredRestaurants(fetchedLocationRestaurants);
-      sessionStorage.setItem(
-        "filteredRestaurants",
-        JSON.stringify(fetchedLocationRestaurants)
-      );
+      sessionStorage.setItem("filteredRestaurants", fetchedLocationRestaurants);
 
-      sessionStorage.setItem("selectedCuisines", JSON.stringify([]));
-      sessionStorage.setItem("selectedPrices", JSON.stringify([]));
-      sessionStorage.setItem("selectedOthers", JSON.stringify([]));
+      sessionStorage.setItem("selectedCuisines", []);
+      sessionStorage.setItem("selectedPrices", []);
+      sessionStorage.setItem("selectedOthers", []);
     }
     fetchData();
   }, [params.location]);
