@@ -1,4 +1,4 @@
-// 142 restaurants and 51 locations, updated 10/31/24
+// 152 restaurants and 53 locations, updated 11/2/24
 // Only manually update this page when there are new locations. Numbers above should match dashboard.
 // You can add other locations not listed on dashboard if wanted (state/country names for example).
 // Restaurants are automatically updated.
@@ -52,6 +52,11 @@ export default async function sitemap() {
     },
     {
       url: "https://www.whoishalal.com/best-halal-restaurants/california-united-states",
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: "https://www.whoishalal.com/best-halal-restaurants/canada",
       changeFrequency: "weekly",
       priority: 1.0,
     },
@@ -112,6 +117,11 @@ export default async function sitemap() {
     },
     {
       url: "https://www.whoishalal.com/best-halal-restaurants/el-segundo-california-united-states",
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: "https://www.whoishalal.com/best-halal-restaurants/etobicoke-ontario-canada",
       changeFrequency: "weekly",
       priority: 1.0,
     },
@@ -236,6 +246,11 @@ export default async function sitemap() {
       priority: 1.0,
     },
     {
+      url: "https://www.whoishalal.com/best-halal-restaurants/toronto-ontario-canada",
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
       url: "https://www.whoishalal.com/best-halal-restaurants/orange-california-united-states",
       changeFrequency: "weekly",
       priority: 1.0,
@@ -287,6 +302,11 @@ export default async function sitemap() {
     },
     {
       url: "https://www.whoishalal.com/best-halal-restaurants/texas-united-states",
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: "https://www.whoishalal.com/best-halal-restaurants/united-states",
       changeFrequency: "weekly",
       priority: 1.0,
     },

@@ -80,7 +80,6 @@ export default function HomePageRestaurantList({
               {nearbyRestaurants.map((restaurant) => (
                 <Link
                   href={`/restaurants/${restaurant.slug}`}
-                  target="_blank"
                   key={restaurant.restaurant_id}
                   className="item"
                 >
@@ -126,7 +125,6 @@ export default function HomePageRestaurantList({
             {popularRestaurants.map((restaurant) => (
               <Link
                 href={`/restaurants/${restaurant.slug}`}
-                // target="_blank"
                 key={restaurant.restaurant_id}
                 className="item"
               >

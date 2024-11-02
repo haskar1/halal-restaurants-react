@@ -9,7 +9,6 @@ import LanguageIcon from "@mui/icons-material/Language";
 import "./style.css";
 
 export const dynamicParams = true;
-export const fetchCache = "force-no-store";
 
 export async function generateMetadata({ params }) {
   const restaurant = await getRestaurant(decodeURIComponent(params.slug));

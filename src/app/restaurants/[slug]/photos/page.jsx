@@ -2,7 +2,6 @@ import getRestaurant from "@/utils/get-restaurant";
 import Image from "next/image";
 
 export const dynamicParams = true;
-export const fetchCache = "force-no-store";
 
 // export const metadata = {
 // title: " [RESTAURANT NAME HERE]| Who Is Halal",

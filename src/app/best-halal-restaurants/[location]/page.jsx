@@ -3,7 +3,6 @@ import SearchResultsList from "@/components/SearchResultsList";
 import styles from "./styles.module.css";
 
 export const dynamicParams = true;
-export const fetchCache = "force-no-store";
 
 export async function generateMetadata({ params }) {
   const location = await getMapboxLocationInfo(params.location);

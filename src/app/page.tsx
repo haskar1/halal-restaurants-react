@@ -10,6 +10,8 @@ import { headers } from "next/headers";
 
 export const metadata: Metadata = {
   title: "Halal Food Near Me | Find Halal Restaurants",
+  description:
+    "Find the best zabiha halal restaurants near you or at any location.",
 };
 
 export default async function Home() {
