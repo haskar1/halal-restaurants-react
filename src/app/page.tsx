@@ -15,8 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const userLatitude = headers().get("cf-iplatitude") || "";
-  const userLongitude = headers().get("cf-iplongitude") || "";
+  const headersList = await headers();
+  const userLatitude = headersList.get("cf-iplatitude") || "";
+  const userLongitude = headersList.get("cf-iplongitude") || "";
 
   return (
     <>

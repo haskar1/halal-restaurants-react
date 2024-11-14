@@ -6,6 +6,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GoogleAdsense from "@/components/GoogleAdsense";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,6 +33,7 @@ export default function RootLayout({
         </body>
       </UserProvider>
       <GoogleAdsense pId={`${process.env.GOOGLE_ADSENSE_ID}`} />
+      <GoogleAnalytics gaId={`${process.env.GOOGLE_ANALYTICS_ID}`} />
     </html>
   );
 }
